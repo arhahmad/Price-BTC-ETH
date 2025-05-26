@@ -7,6 +7,9 @@
   <meta name="theme-color" content="#1a1a1a">
   <link rel="icon" href="https://bitcoin.org/img/icons/opengraph.png">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
   <style>
     :root {
       --primary-color: #4a90e2;
@@ -16,12 +19,14 @@
       --battery-icon-color: #333333;
       --change-positive: #00cc00;
       --change-negative: #ff3333;
+      --date-header-color: #333333;
     }
 
     .night-mode {
       --background-color: #0a0a0a;
       --primary-color: #3a7bd5;
       --text-color: #e0e0e0;
+      --date-header-color: #222222;
       filter: brightness(0.8);
     }
 
@@ -33,6 +38,7 @@
       margin: 0;
       height: 100vh;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       background-color: var(--background-color);
@@ -44,6 +50,21 @@
       transition: background-color 0.3s ease;
     }
 
+    .date-header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: var(--date-header-color);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
     .container {
       display: flex;
       flex-direction: column;
@@ -51,7 +72,6 @@
       padding: 20px;
       max-width: 100%;
       box-sizing: border-box;
-      cursor: pointer;
     }
 
     h1 {
@@ -214,15 +234,6 @@
       text-align: center;
     }
 
-    .settings-form label {
-      display: flex;
-      align-items: center;
-      margin-bottom: 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .settings-form input[type="radio"],
     .settings-form input[type="checkbox"] {
       margin-right: 10px;
       accent-color: var(--primary-color);
@@ -236,6 +247,16 @@
       border: 1px solid #444;
       border-radius: 4px;
       margin-left: 10px;
+    }
+
+    .settings-form select {
+      width: 100%;
+      padding: 8px;
+      background: #333;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 4px;
+      margin-bottom: 15px;
     }
 
     .settings-form .button-group {
@@ -331,6 +352,10 @@
         padding: 10px;
         font-size: 13px;
       }
+      .date-header {
+        font-size: 14px;
+        padding: 8px 14px;
+      }
     }
 
     .offline-mode {
@@ -378,6 +403,8 @@
   </style>
 </head>
 <body>
+  <div class="date-header" id="dateHeader"></div>
+
   <div class="container">
     <h1 id="cryptoTitle">Bitcoin Price</h1>
     <div class="price" id="price">Loading...</div>
@@ -419,19 +446,35 @@
 
   <div class="settings-form" id="settingsForm">
     <h3>Settings</h3>
-    <label>
-      <input type="radio" name="currency" value="bitcoin" checked> Bitcoin
-    </label>
-    <label>
-      <input type="radio" name="currency" value="ethereum"> Ethereum
-    </label>
-    <label style="margin-top: 20px; display: flex; align-items: center;">
+    
+    <!-- هشدار قیمت در ردیف اول -->
+    <label style="margin-bottom: 15px; display: flex; align-items: center;">
       <span style="margin-right: 10px;">Price Alert ($):</span>
       <input type="number" id="alertThresholdInput" style="flex: 1;">
     </label>
-    <label>
-      <input type="checkbox" id="autoNightMode"> Auto Night Mode (10PM-7AM)
+    
+    <label style="margin-bottom: 15px;">
+      <span style="margin-right: 10px;">Cryptocurrency:</span>
+      <select id="currencySelect">
+        <option value="bitcoin" selected>Bitcoin</option>
+        <option value="ethereum">Ethereum</option>
+      </select>
     </label>
+    
+    <label style="margin-bottom: 15px;">
+      <span style="margin-right: 10px;">Update Interval:</span>
+      <select id="updateIntervalSelect">
+        <option value="60000">1 Minute</option>
+        <option value="180000" selected>3 Minutes</option>
+        <option value="300000">5 Minutes</option>
+      </select>
+    </label>
+    
+    <!-- تغییر متن Auto Night Mode به فرمت 24 ساعته -->
+    <label>
+      <input type="checkbox" id="autoNightMode"> Auto Night Mode (22:00-7:00)
+    </label>
+    
     <div class="button-group">
       <button class="save-btn" id="saveSettings">Save</button>
       <button class="cancel-btn" id="cancelSettings">Cancel</button>
@@ -449,6 +492,17 @@
   </div>
 
   <script>
+    // Service Worker Registration for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(registration => {
+          console.log('ServiceWorker registration successful');
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       // Keep screen always on
       if ('wakeLock' in navigator) {
@@ -484,12 +538,14 @@
       const settingsForm = document.getElementById('settingsForm');
       const saveSettings = document.getElementById('saveSettings');
       const cancelSettings = document.getElementById('cancelSettings');
-      const container = document.querySelector('.container');
       const offlineMode = document.getElementById('offlineMode');
       const offlineBatteryLevel = document.getElementById('offlineBatteryLevel');
       const alertThresholdInput = document.getElementById('alertThresholdInput');
       const alertActive = document.getElementById('alertActive');
       const autoNightModeCheckbox = document.getElementById('autoNightMode');
+      const currencySelect = document.getElementById('currencySelect');
+      const updateIntervalSelect = document.getElementById('updateIntervalSelect');
+      const dateHeader = document.getElementById('dateHeader');
 
       let lastBitcoinPrice = null;
       let audioContext = null;
@@ -504,20 +560,64 @@
       let batteryWarningPlayed = false;
       let nightModeInterval = null;
       let isNightModeForced = false;
+      let normalUpdateInterval = localStorage.getItem('updateInterval') ? parseInt(localStorage.getItem('updateInterval')) : 60000;
+      let updateInterval = normalUpdateInterval;
+      let isNightModeActive = false;
+
+      // Update date header
+      const updateDate = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        dateHeader.textContent = `${year}-${month}-${day}`;
+      };
 
       // Set initial alert threshold value
       if (priceAlertThreshold) {
         alertThresholdInput.value = priceAlertThreshold;
       }
 
+      // Set initial currency value
+      const savedCurrency = localStorage.getItem('selectedCurrency') || 'bitcoin';
+      currencySelect.value = savedCurrency;
+
+      // Set initial update interval value
+      updateIntervalSelect.value = localStorage.getItem('updateInterval') || '180000';
+
       // Night mode functions
       const toggleNightMode = (enable) => {
         if (enable) {
           document.body.classList.add('night-mode', 'grayscale-mode');
           isNightModeForced = true;
+          isNightModeActive = true;
+          
+          // Change update interval to 3 minutes in night mode
+          updateInterval = 180000;
+          
+          if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+          }
+          
+          // In settings show "3 Minutes" for night mode
+          updateIntervalSelect.value = '180000';
         } else {
           document.body.classList.remove('night-mode', 'grayscale-mode');
           isNightModeForced = false;
+          isNightModeActive = false;
+          
+          // Restore normal update interval
+          updateInterval = normalUpdateInterval;
+          
+          if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+          }
+          
+          // In settings show the normal interval
+          updateIntervalSelect.value = normalUpdateInterval.toString();
+          
           // Check auto night mode if not in manual mode
           if (autoNightModeCheckbox.checked) {
             checkAutoNightMode();
@@ -532,12 +632,36 @@
         
         const now = new Date();
         const hours = now.getHours();
-        const isNightTime = hours >= 22 || hours < 7; // 10PM-7AM
+        const isNightTime = hours >= 22 || hours < 7; // 22:00-7:00
         
         if (isNightTime) {
           document.body.classList.add('night-mode', 'grayscale-mode');
+          isNightModeActive = true;
+          
+          // Change update interval to 3 minutes in night mode
+          updateInterval = 180000;
+          
+          if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+          }
+          
+          // In settings show "3 Minutes" for night mode
+          updateIntervalSelect.value = '180000';
         } else {
           document.body.classList.remove('night-mode', 'grayscale-mode');
+          isNightModeActive = false;
+          
+          // Restore normal update interval
+          updateInterval = normalUpdateInterval;
+          
+          if (priceUpdateInterval) {
+            clearInterval(priceUpdateInterval);
+            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+          }
+          
+          // In settings show the normal interval
+          updateIntervalSelect.value = normalUpdateInterval.toString();
         }
       };
 
@@ -560,9 +684,8 @@
         alert('Crypto Price App\nVersion 1.0\nA simple app to track cryptocurrency prices');
       });
 
-      // Disable auto night mode by default
-      autoNightModeCheckbox.checked = false;
-      localStorage.setItem('autoNightMode', 'false');
+      // Set auto night mode from localStorage
+      autoNightModeCheckbox.checked = localStorage.getItem('autoNightMode') === 'true';
 
       // Battery status monitoring
       if (navigator.getBattery) {
@@ -614,7 +737,7 @@
           offlineMode.style.display = 'none';
           fetchPrice();
           if (!priceUpdateInterval && !isAppInBackground) {
-            priceUpdateInterval = setInterval(fetchPrice, 60000);
+            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
           }
         } else {
           offlineMode.style.display = 'flex';
@@ -634,7 +757,7 @@
           priceUpdateInterval = null;
         } else if (!isAppInBackground && onlineStatus && !priceUpdateInterval) {
           fetchPrice();
-          priceUpdateInterval = setInterval(fetchPrice, 60000);
+          priceUpdateInterval = setInterval(fetchPrice, updateInterval);
         }
       });
 
@@ -758,8 +881,6 @@
       settings.addEventListener('click', () => {
         menu.classList.remove('active');
         settingsForm.classList.add('active');
-        const savedCurrency = localStorage.getItem('selectedCurrency') || 'bitcoin';
-        document.querySelector(`input[name="currency"][value="${savedCurrency}"]`).checked = true;
       });
 
       refresh.addEventListener('click', () => {
@@ -773,8 +894,15 @@
         window.close();
       });
 
+      // Add click event for date header to manually update prices
+      dateHeader.addEventListener('click', () => {
+        if (onlineStatus) {
+          fetchPrice();
+        }
+      });
+
       saveSettings.addEventListener('click', () => {
-        const selectedCurrency = document.querySelector('input[name="currency"]:checked').value;
+        const selectedCurrency = currencySelect.value;
         localStorage.setItem('selectedCurrency', selectedCurrency);
         
         if (alertThresholdInput.value) {
@@ -787,6 +915,19 @@
         
         // Save night mode setting
         localStorage.setItem('autoNightMode', autoNightModeCheckbox.checked);
+        
+        // Save update interval (only if night mode is not active)
+        if (!isNightModeActive) {
+          normalUpdateInterval = parseInt(updateIntervalSelect.value);
+          localStorage.setItem('updateInterval', normalUpdateInterval);
+          updateInterval = normalUpdateInterval;
+        }
+        
+        // Update the interval if it's changed
+        if (priceUpdateInterval) {
+          clearInterval(priceUpdateInterval);
+          priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+        }
         
         settingsForm.classList.remove('active');
         if (onlineStatus) {
@@ -873,12 +1014,6 @@
         }
       };
 
-      container.addEventListener('click', () => {
-        if (onlineStatus) {
-          fetchPrice();
-        }
-      });
-
       // Stop alert when tapping anywhere during alert
       document.addEventListener('click', () => {
         if (beepInterval) {
@@ -887,6 +1022,7 @@
       });
 
       // Initial setup
+      updateDate();
       checkOnlineStatus();
       setupNightModeTimer();
     });
