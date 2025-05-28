@@ -21,7 +21,6 @@
       --change-negative: #ff3333;
       --date-header-color: #333333;
     }
-
     .night-mode {
       --background-color: #0a0a0a;
       --primary-color: #3a7bd5;
@@ -29,11 +28,7 @@
       --date-header-color: #222222;
       filter: brightness(0.8);
     }
-
-    .grayscale-mode {
-      filter: grayscale(100%);
-    }
-
+    .grayscale-mode { filter: grayscale(100%); }
     body {
       margin: 0;
       height: 100vh;
@@ -49,7 +44,6 @@
       overflow: hidden;
       transition: background-color 0.3s ease;
     }
-
     .date-header {
       position: absolute;
       top: 20px;
@@ -64,7 +58,19 @@
       cursor: pointer;
       letter-spacing: 1px;
     }
-
+    .time-header {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background-color: var(--date-header-color);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      letter-spacing: 1px;
+    }
     .container {
       display: flex;
       flex-direction: column;
@@ -73,7 +79,6 @@
       max-width: 100%;
       box-sizing: border-box;
     }
-
     h1 {
       font-size: 32px;
       color: var(--primary-color);
@@ -81,7 +86,6 @@
       opacity: 0.9;
       font-weight: 400;
     }
-
     .price {
       font-size: 100px;
       font-weight: 500;
@@ -90,61 +94,48 @@
       will-change: transform, opacity;
       text-rendering: optimizeSpeed;
     }
-
-    .price-update {
-      animation: priceChange 0.5s ease;
-    }
-
+    .price-update { animation: priceChange 0.5s ease; }
     @keyframes priceChange {
       0% { opacity: 0.5; transform: scale(0.95); }
       50% { opacity: 1; transform: scale(1.05); }
       100% { opacity: 1; transform: scale(1); }
     }
-
     .change {
       font-size: 28px;
       color: #cccccc;
       will-change: transform, opacity;
       text-rendering: optimizeSpeed;
     }
-
-    .positive {
-      color: var(--change-positive);
-    }
-
-    .negative {
-      color: var(--change-negative);
-    }
-
+    .positive { color: var(--change-positive); }
+    .negative { color: var(--change-negative); }
     .error {
       font-size: 16px;
       color: #ff6666;
       margin-top: 10px;
       opacity: 0.8;
     }
-
     .menu-icons-container {
       position: absolute;
-      top: 20px;
+      bottom: 20px;
       right: 20px;
       display: flex;
       align-items: center;
       gap: 10px;
       z-index: 1000;
     }
-
-    .menu-button {
+    .menu-button, .battery-icon, .crypto-switcher, .browser-icon {
       width: 40px;
       height: 40px;
       background-color: var(--battery-icon-color);
       border-radius: 50%;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       cursor: pointer;
     }
-
+    .menu-button {
+      flex-direction: column;
+    }
     .menu-button span {
       width: 16px;
       height: 1.5px;
@@ -152,29 +143,17 @@
       margin: 2px 0;
       transition: all 0.2s ease;
     }
-
     .battery-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--battery-icon-color);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       color: var(--text-color);
       font-size: 16px;
       font-weight: bold;
-      cursor: pointer;
       transition: all 0.3s ease;
     }
-
-    .night-mode .battery-icon.low {
-      background-color: var(--change-negative);
-    }
-
+    .battery-icon.low { color: var(--change-negative); }
+    .night-mode .battery-icon.low { background-color: var(--change-negative); }
     .menu {
       position: absolute;
-      top: 70px;
+      bottom: 70px;
       right: 20px;
       background-color: #2a2a2a;
       border-radius: 12px;
@@ -185,11 +164,7 @@
       padding: 8px 0;
       min-width: 180px;
     }
-
-    .menu.active {
-      display: flex;
-    }
-
+    .menu.active { display: flex; }
     .menu-item {
       display: flex;
       align-items: center;
@@ -200,11 +175,7 @@
       gap: 15px;
       transition: background-color 0.2s ease;
     }
-
-    .menu-item:hover {
-      background-color: rgba(74, 144, 226, 0.2);
-    }
-
+    .menu-item:hover { background-color: rgba(74, 144, 226, 0.2); }
     .settings-form {
       display: none;
       position: fixed;
@@ -221,11 +192,7 @@
       width: 300px;
       max-width: 90%;
     }
-
-    .settings-form.active {
-      display: block;
-    }
-
+    .settings-form.active { display: block; }
     .settings-form h3 {
       margin: 0 0 20px;
       font-size: 20px;
@@ -233,12 +200,10 @@
       color: var(--text-color);
       text-align: center;
     }
-
     .settings-form input[type="checkbox"] {
       margin-right: 10px;
       accent-color: var(--primary-color);
     }
-
     .settings-form input[type="number"] {
       width: 80px;
       padding: 5px;
@@ -248,7 +213,6 @@
       border-radius: 4px;
       margin-left: 10px;
     }
-
     .settings-form select {
       width: 100%;
       padding: 8px;
@@ -258,14 +222,12 @@
       border-radius: 4px;
       margin-bottom: 15px;
     }
-
-    .settings-form .button-group {
+    .button-group {
       display: flex;
       justify-content: space-between;
       gap: 12px;
       margin-top: 20px;
     }
-
     .settings-form button {
       flex: 1;
       padding: 12px;
@@ -276,88 +238,20 @@
       cursor: pointer;
       transition: background-color 0.2s ease, transform 0.1s ease;
     }
-
-    .settings-form .save-btn {
+    .save-btn {
       background-color: var(--primary-color);
       color: #ffffff;
     }
-
-    .settings-form .save-btn:hover {
-      background-color: #357abd;
-      transform: translateY(-1px);
-    }
-
-    .settings-form .cancel-btn {
+    .save-btn:hover { background-color: #357abd; transform: translateY(-1px); }
+    .cancel-btn {
       background-color: #404040;
       color: #e0e0e0;
     }
-
-    .settings-form .cancel-btn:hover {
-      background-color: #505050;
-      transform: translateY(-1px);
-    }
-
+    .cancel-btn:hover { background-color: #505050; transform: translateY(-1px); }
     .low-power-mode * {
       animation: none !important;
       transition: none !important;
     }
-
-    @media (orientation: landscape) {
-      .price {
-        font-size: 120px;
-      }
-      .change {
-        font-size: 32px;
-      }
-      h1 {
-        font-size: 36px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .price {
-        font-size: 70px;
-      }
-      .change {
-        font-size: 22px;
-      }
-      h1 {
-        font-size: 24px;
-      }
-      .menu-button, .battery-icon {
-        width: 35px;
-        height: 35px;
-      }
-      .menu-button span {
-        width: 14px;
-        height: 1.3px;
-      }
-      .battery-icon {
-        font-size: 14px;
-      }
-      .menu {
-        top: 60px;
-        right: 15px;
-        min-width: 160px;
-      }
-      .menu-item {
-        font-size: 14px;
-        padding: 8px 15px;
-      }
-      .settings-form {
-        width: 280px;
-        padding: 20px;
-      }
-      .settings-form button {
-        padding: 10px;
-        font-size: 13px;
-      }
-      .date-header {
-        font-size: 14px;
-        padding: 8px 14px;
-      }
-    }
-
     .offline-mode {
       position: fixed;
       top: 0;
@@ -371,20 +265,17 @@
       align-items: center;
       z-index: 2000;
     }
-
     .offline-message {
       color: #fff;
       font-size: 32px;
       font-weight: bold;
       margin-bottom: 20px;
     }
-
     .battery-status {
       color: #fff;
       font-size: 24px;
       margin-top: 10px;
     }
-
     .alert-active {
       position: fixed;
       top: 0;
@@ -400,18 +291,81 @@
       color: white;
       font-size: 24px;
     }
+    .crypto-switcher {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: var(--text-color);
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+    .crypto-switcher:hover { transform: rotate(180deg); }
+    .browser-icon {
+      position: absolute;
+      bottom: 20px;
+      left: 70px;
+      color: var(--text-color);
+      z-index: 1000;
+    }
+    .material-icons { font-size: 24px; }
+
+    @media (orientation: landscape) {
+      .price { font-size: 120px; }
+      .change { font-size: 32px; }
+      h1 { font-size: 36px; }
+    }
+    @media (max-width: 600px) {
+      .price { font-size: 70px; }
+      .change { font-size: 22px; }
+      h1 { font-size: 24px; }
+      .menu-button, .battery-icon, .crypto-switcher, .browser-icon {
+        width: 35px;
+        height: 35px;
+      }
+      .menu-button span {
+        width: 14px;
+        height: 1.3px;
+      }
+      .battery-icon { font-size: 14px; }
+      .menu {
+        bottom: 60px;
+        right: 15px;
+        min-width: 160px;
+      }
+      .menu-item {
+        font-size: 14px;
+        padding: 8px 15px;
+      }
+      .settings-form {
+        width: 280px;
+        padding: 20px;
+      }
+      .settings-form button {
+        padding: 10px;
+        font-size: 13px;
+      }
+      .date-header, .time-header {
+        font-size: 14px;
+        padding: 8px 14px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="date-header" id="dateHeader"></div>
-
+  <div class="time-header" id="timeHeader"></div>
   <div class="container">
     <h1 id="cryptoTitle">Bitcoin Price</h1>
     <div class="price" id="price">Loading...</div>
     <div class="change" id="change">24h Change: Loading...</div>
     <div class="error" id="error"></div>
   </div>
-
+  <div class="crypto-switcher" id="cryptoSwitcher">
+    <span class="material-icons">autorenew</span>
+  </div>
+  <div class="browser-icon" id="browserIcon">
+    <span class="material-icons">public</span>
+  </div>
   <div class="menu-icons-container">
     <div class="battery-icon" id="batteryIcon">N/A</div>
     <div class="menu-button" id="menuButton">
@@ -420,7 +374,6 @@
       <span></span>
     </div>
   </div>
-
   <div class="menu" id="menu">
     <div class="menu-item" id="settings">
       <span class="material-icons">settings</span>
@@ -443,16 +396,12 @@
       <span>Exit</span>
     </div>
   </div>
-
   <div class="settings-form" id="settingsForm">
     <h3>Settings</h3>
-    
-    <!-- هشدار قیمت در ردیف اول -->
     <label style="margin-bottom: 15px; display: flex; align-items: center;">
       <span style="margin-right: 10px;">Price Alert ($):</span>
       <input type="number" id="alertThresholdInput" style="flex: 1;">
     </label>
-    
     <label style="margin-bottom: 15px;">
       <span style="margin-right: 10px;">Cryptocurrency:</span>
       <select id="currencySelect">
@@ -460,7 +409,6 @@
         <option value="ethereum">Ethereum</option>
       </select>
     </label>
-    
     <label style="margin-bottom: 15px;">
       <span style="margin-right: 10px;">Update Interval:</span>
       <select id="updateIntervalSelect">
@@ -469,48 +417,40 @@
         <option value="300000">5 Minutes</option>
       </select>
     </label>
-    
-    <!-- تغییر متن Auto Night Mode به فرمت 24 ساعته -->
     <label>
       <input type="checkbox" id="autoNightMode"> Auto Night Mode (22:00-7:00)
     </label>
-    
     <div class="button-group">
       <button class="save-btn" id="saveSettings">Save</button>
       <button class="cancel-btn" id="cancelSettings">Cancel</button>
     </div>
   </div>
-
   <div class="offline-mode" id="offlineMode" style="display: none;">
     <div class="offline-message">no internet connected</div>
     <div class="battery-status">battery level: <span id="offlineBatteryLevel">N/A</span></div>
   </div>
-
   <div class="alert-active" id="alertActive" style="display: none;">
     <div>Price Alert Active</div>
     <div style="font-size: 16px; margin-top: 10px;">Tap to stop alert</div>
   </div>
 
   <script>
-    // Service Worker Registration for PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-          console.log('ServiceWorker registration successful');
-        }).catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-      });
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
-      // Keep screen always on
+      // Service Worker Registration
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+
+      // Wake Lock
       if ('wakeLock' in navigator) {
         let wakeLock = null;
         const requestWakeLock = async () => {
           try {
             wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Screen will stay on');
           } catch (err) {
             console.error('Failed to acquire wake lock:', err);
           }
@@ -523,331 +463,298 @@
         });
       }
 
-      const priceElement = document.getElementById('price');
-      const changeElement = document.getElementById('change');
-      const errorElement = document.getElementById('error');
-      const cryptoTitle = document.getElementById('cryptoTitle');
-      const menuButton = document.getElementById('menuButton');
-      const menu = document.getElementById('menu');
-      const settings = document.getElementById('settings');
-      const refresh = document.getElementById('refresh');
-      const nightModeToggle = document.getElementById('nightModeToggle');
-      const about = document.getElementById('about');
-      const exit = document.getElementById('exit');
-      const batteryIcon = document.getElementById('batteryIcon');
-      const settingsForm = document.getElementById('settingsForm');
-      const saveSettings = document.getElementById('saveSettings');
-      const cancelSettings = document.getElementById('cancelSettings');
-      const offlineMode = document.getElementById('offlineMode');
-      const offlineBatteryLevel = document.getElementById('offlineBatteryLevel');
-      const alertThresholdInput = document.getElementById('alertThresholdInput');
-      const alertActive = document.getElementById('alertActive');
-      const autoNightModeCheckbox = document.getElementById('autoNightMode');
-      const currencySelect = document.getElementById('currencySelect');
-      const updateIntervalSelect = document.getElementById('updateIntervalSelect');
-      const dateHeader = document.getElementById('dateHeader');
+      // DOM Elements
+      const elements = {
+        price: document.getElementById('price'),
+        change: document.getElementById('change'),
+        error: document.getElementById('error'),
+        cryptoTitle: document.getElementById('cryptoTitle'),
+        menuButton: document.getElementById('menuButton'),
+        menu: document.getElementById('menu'),
+        settings: document.getElementById('settings'),
+        refresh: document.getElementById('refresh'),
+        nightModeToggle: document.getElementById('nightModeToggle'),
+        about: document.getElementById('about'),
+        exit: document.getElementById('exit'),
+        batteryIcon: document.getElementById('batteryIcon'),
+        cryptoSwitcher: document.getElementById('cryptoSwitcher'),
+        browserIcon: document.getElementById('browserIcon'),
+        settingsForm: document.getElementById('settingsForm'),
+        saveSettings: document.getElementById('saveSettings'),
+        cancelSettings: document.getElementById('cancelSettings'),
+        offlineMode: document.getElementById('offlineMode'),
+        offlineBatteryLevel: document.getElementById('offlineBatteryLevel'),
+        alertThresholdInput: document.getElementById('alertThresholdInput'),
+        alertActive: document.getElementById('alertActive'),
+        autoNightModeCheckbox: document.getElementById('autoNightMode'),
+        currencySelect: document.getElementById('currencySelect'),
+        updateIntervalSelect: document.getElementById('updateIntervalSelect'),
+        dateHeader: document.getElementById('dateHeader'),
+        timeHeader: document.getElementById('timeHeader')
+      };
 
-      let lastBitcoinPrice = null;
-      let audioContext = null;
-      let beepInterval = null;
-      let onlineStatus = navigator.onLine;
-      let priceUpdateInterval = null;
-      let currentBatteryLevel = 'N/A';
-      let priceAlertThreshold = localStorage.getItem('priceAlertThreshold') ? parseFloat(localStorage.getItem('priceAlertThreshold')) : null;
-      let isAppInBackground = false;
-      let currentOscillator = null;
-      let currentGainNode = null;
-      let batteryWarningPlayed = false;
-      let nightModeInterval = null;
-      let isNightModeForced = false;
-      let normalUpdateInterval = localStorage.getItem('updateInterval') ? parseInt(localStorage.getItem('updateInterval')) : 60000;
-      let updateInterval = normalUpdateInterval;
-      let isNightModeActive = false;
+      // App State
+      const state = {
+        lastBitcoinPrice: null,
+        audioContext: null,
+        beepInterval: null,
+        onlineStatus: navigator.onLine,
+        priceUpdateInterval: null,
+        currentBatteryLevel: 'N/A',
+        priceAlertThreshold: localStorage.getItem('priceAlertThreshold') ? 
+          parseFloat(localStorage.getItem('priceAlertThreshold')) : null,
+        isAppInBackground: false,
+        currentOscillator: null,
+        currentGainNode: null,
+        batteryWarningPlayed: false,
+        nightModeInterval: null,
+        isNightModeForced: false,
+        normalUpdateInterval: localStorage.getItem('updateInterval') ? 
+          parseInt(localStorage.getItem('updateInterval')) : 60000,
+        updateInterval: localStorage.getItem('updateInterval') ? 
+          parseInt(localStorage.getItem('updateInterval')) : 60000,
+        isNightModeActive: false,
+        timeUpdateInterval: null
+      };
 
-      // Update date header
+      // Initialize
+      const init = () => {
+        updateDate();
+        updateTime();
+        setupEventListeners();
+        checkOnlineStatus();
+        setupNightModeTimer();
+        setupBatteryMonitoring();
+        
+        if (state.priceAlertThreshold) {
+          elements.alertThresholdInput.value = state.priceAlertThreshold;
+        }
+        
+        elements.currencySelect.value = localStorage.getItem('selectedCurrency') || 'bitcoin';
+        elements.updateIntervalSelect.value = localStorage.getItem('updateInterval') || '180000';
+        elements.autoNightModeCheckbox.checked = localStorage.getItem('autoNightMode') === 'true';
+      };
+
+      // Date Functions
       const updateDate = () => {
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
-        dateHeader.textContent = `${year}-${month}-${day}`;
+        elements.dateHeader.textContent = `${year}-${month}-${day}`;
       };
 
-      // Set initial alert threshold value
-      if (priceAlertThreshold) {
-        alertThresholdInput.value = priceAlertThreshold;
-      }
+      // Time Functions
+      const updateTime = () => {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        elements.timeHeader.textContent = `${hours}:${minutes}:${seconds}`;
+      };
 
-      // Set initial currency value
-      const savedCurrency = localStorage.getItem('selectedCurrency') || 'bitcoin';
-      currencySelect.value = savedCurrency;
-
-      // Set initial update interval value
-      updateIntervalSelect.value = localStorage.getItem('updateInterval') || '180000';
-
-      // Night mode functions
+      // Night Mode Functions
       const toggleNightMode = (enable) => {
         if (enable) {
           document.body.classList.add('night-mode', 'grayscale-mode');
-          isNightModeForced = true;
-          isNightModeActive = true;
-          
-          // Change update interval to 3 minutes in night mode
-          updateInterval = 180000;
-          
-          if (priceUpdateInterval) {
-            clearInterval(priceUpdateInterval);
-            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-          }
-          
-          // In settings show "3 Minutes" for night mode
-          updateIntervalSelect.value = '180000';
+          state.isNightModeForced = true;
+          state.isNightModeActive = true;
+          state.updateInterval = 180000;
+          elements.updateIntervalSelect.value = '180000';
         } else {
           document.body.classList.remove('night-mode', 'grayscale-mode');
-          isNightModeForced = false;
-          isNightModeActive = false;
-          
-          // Restore normal update interval
-          updateInterval = normalUpdateInterval;
-          
-          if (priceUpdateInterval) {
-            clearInterval(priceUpdateInterval);
-            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-          }
-          
-          // In settings show the normal interval
-          updateIntervalSelect.value = normalUpdateInterval.toString();
-          
-          // Check auto night mode if not in manual mode
-          if (autoNightModeCheckbox.checked) {
-            checkAutoNightMode();
-          }
+          state.isNightModeForced = false;
+          state.isNightModeActive = false;
+          state.updateInterval = state.normalUpdateInterval;
+          elements.updateIntervalSelect.value = state.normalUpdateInterval.toString();
+          if (elements.autoNightModeCheckbox.checked) checkAutoNightMode();
         }
         
-        menu.classList.remove('active');
+        if (state.priceUpdateInterval) {
+          clearInterval(state.priceUpdateInterval);
+          state.priceUpdateInterval = setInterval(fetchPrice, state.updateInterval);
+        }
+        
+        elements.menu.classList.remove('active');
       };
 
       const checkAutoNightMode = () => {
-        if (!autoNightModeCheckbox.checked || isNightModeForced) return;
+        if (!elements.autoNightModeCheckbox.checked || state.isNightModeForced) return;
         
         const now = new Date();
         const hours = now.getHours();
-        const isNightTime = hours >= 22 || hours < 7; // 22:00-7:00
+        const isNightTime = hours >= 22 || hours < 7;
         
         if (isNightTime) {
           document.body.classList.add('night-mode', 'grayscale-mode');
-          isNightModeActive = true;
-          
-          // Change update interval to 3 minutes in night mode
-          updateInterval = 180000;
-          
-          if (priceUpdateInterval) {
-            clearInterval(priceUpdateInterval);
-            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-          }
-          
-          // In settings show "3 Minutes" for night mode
-          updateIntervalSelect.value = '180000';
+          state.isNightModeActive = true;
+          state.updateInterval = 180000;
+          elements.updateIntervalSelect.value = '180000';
         } else {
           document.body.classList.remove('night-mode', 'grayscale-mode');
-          isNightModeActive = false;
-          
-          // Restore normal update interval
-          updateInterval = normalUpdateInterval;
-          
-          if (priceUpdateInterval) {
-            clearInterval(priceUpdateInterval);
-            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-          }
-          
-          // In settings show the normal interval
-          updateIntervalSelect.value = normalUpdateInterval.toString();
+          state.isNightModeActive = false;
+          state.updateInterval = state.normalUpdateInterval;
+          elements.updateIntervalSelect.value = state.normalUpdateInterval.toString();
+        }
+        
+        if (state.priceUpdateInterval) {
+          clearInterval(state.priceUpdateInterval);
+          state.priceUpdateInterval = setInterval(fetchPrice, state.updateInterval);
         }
       };
 
       const setupNightModeTimer = () => {
-        if (nightModeInterval) clearInterval(nightModeInterval);
-        
+        if (state.nightModeInterval) clearInterval(state.nightModeInterval);
         checkAutoNightMode();
-        nightModeInterval = setInterval(checkAutoNightMode, 60000); // Check every minute
+        state.nightModeInterval = setInterval(checkAutoNightMode, 60000);
       };
 
-      // Manual night mode toggle
-      nightModeToggle.addEventListener('click', () => {
-        const isNightMode = document.body.classList.contains('night-mode');
-        toggleNightMode(!isNightMode);
-      });
-
-      // About button click handler
-      about.addEventListener('click', () => {
-        menu.classList.remove('active');
-        alert('Crypto Price App\nVersion 1.0\nA simple app to track cryptocurrency prices');
-      });
-
-      // Set auto night mode from localStorage
-      autoNightModeCheckbox.checked = localStorage.getItem('autoNightMode') === 'true';
-
-      // Battery status monitoring
-      if (navigator.getBattery) {
-        navigator.getBattery().then((battery) => {
-          const updateBattery = () => {
-            const batteryLevel = Math.round(battery.level * 100);
-            currentBatteryLevel = batteryLevel;
-            batteryIcon.textContent = batteryLevel;
-            offlineBatteryLevel.textContent = batteryLevel;
-            
-            if (batteryLevel <= 15) {
-              window.close();
-            } else if (batteryLevel < 30) {
-              // Only show red background in night mode
-              if (document.body.classList.contains('night-mode')) {
-                batteryIcon.classList.add('low');
-              }
-              document.documentElement.classList.add('low-power-mode');
+      // Battery Functions
+      const setupBatteryMonitoring = () => {
+        if (navigator.getBattery) {
+          navigator.getBattery().then((battery) => {
+            const updateBattery = () => {
+              const batteryLevel = Math.round(battery.level * 100);
+              state.currentBatteryLevel = batteryLevel;
+              elements.batteryIcon.textContent = batteryLevel;
+              elements.offlineBatteryLevel.textContent = batteryLevel;
               
-              // Reduce update frequency
-              if (priceUpdateInterval) {
-                clearInterval(priceUpdateInterval);
-                priceUpdateInterval = setInterval(fetchPrice, 180000); // 3 minutes
+              if (batteryLevel <= 15) {
+                window.close();
+              } else if (batteryLevel < 30) {
+                elements.batteryIcon.classList.add('low');
+                if (document.body.classList.contains('night-mode')) {
+                  elements.batteryIcon.style.backgroundColor = 'var(--change-negative)';
+                }
+                document.documentElement.classList.add('low-power-mode');
+                
+                if (state.priceUpdateInterval) {
+                  clearInterval(state.priceUpdateInterval);
+                  state.priceUpdateInterval = setInterval(fetchPrice, 180000);
+                }
+                
+                if (!state.batteryWarningPlayed) {
+                  playBatteryWarning();
+                  state.batteryWarningPlayed = true;
+                }
+              } else {
+                elements.batteryIcon.classList.remove('low');
+                if (document.body.classList.contains('night-mode')) {
+                  elements.batteryIcon.style.backgroundColor = 'var(--battery-icon-color)';
+                }
+                document.documentElement.classList.remove('low-power-mode');
+                state.batteryWarningPlayed = false;
               }
-              
-              // Play warning sound once
-              if (!batteryWarningPlayed) {
-                playBatteryWarning();
-                batteryWarningPlayed = true;
-              }
-            } else {
-              batteryIcon.classList.remove('low');
-              document.documentElement.classList.remove('low-power-mode');
-              batteryWarningPlayed = false;
-            }
-          };
-          updateBattery();
-          battery.addEventListener('levelchange', updateBattery);
-        });
-      } else {
-        batteryIcon.textContent = 'N/A';
-        offlineBatteryLevel.textContent = 'N/A';
-      }
+            };
+            updateBattery();
+            battery.addEventListener('levelchange', updateBattery);
+          });
+        } else {
+          elements.batteryIcon.textContent = 'N/A';
+          elements.offlineBatteryLevel.textContent = 'N/A';
+        }
+      };
 
-      // Check online status
+      // Online/Offline Functions
       const checkOnlineStatus = () => {
-        onlineStatus = navigator.onLine;
-        if (onlineStatus) {
-          offlineMode.style.display = 'none';
+        state.onlineStatus = navigator.onLine;
+        if (state.onlineStatus) {
+          elements.offlineMode.style.display = 'none';
           fetchPrice();
-          if (!priceUpdateInterval && !isAppInBackground) {
-            priceUpdateInterval = setInterval(fetchPrice, updateInterval);
+          if (!state.priceUpdateInterval && !state.isAppInBackground) {
+            state.priceUpdateInterval = setInterval(fetchPrice, state.updateInterval);
+          }
+          if (!state.timeUpdateInterval) {
+            state.timeUpdateInterval = setInterval(updateTime, 1000);
           }
         } else {
-          offlineMode.style.display = 'flex';
-          offlineBatteryLevel.textContent = currentBatteryLevel;
-          if (priceUpdateInterval) {
-            clearInterval(priceUpdateInterval);
-            priceUpdateInterval = null;
+          elements.offlineMode.style.display = 'flex';
+          elements.offlineBatteryLevel.textContent = state.currentBatteryLevel;
+          if (state.priceUpdateInterval) {
+            clearInterval(state.priceUpdateInterval);
+            state.priceUpdateInterval = null;
+          }
+          if (state.timeUpdateInterval) {
+            clearInterval(state.timeUpdateInterval);
+            state.timeUpdateInterval = null;
           }
         }
       };
 
-      // Detect app background/foreground state
-      document.addEventListener('visibilitychange', () => {
-        isAppInBackground = document.hidden;
-        if (isAppInBackground && priceUpdateInterval) {
-          clearInterval(priceUpdateInterval);
-          priceUpdateInterval = null;
-        } else if (!isAppInBackground && onlineStatus && !priceUpdateInterval) {
-          fetchPrice();
-          priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-        }
-      });
-
-      // Play gentle beep sound for 15 seconds
+      // Alert Functions
       const playGentleAlert = () => {
-        if (!onlineStatus) return;
+        if (!state.onlineStatus) return;
         
         initAudio();
         
-        if (beepInterval) clearInterval(beepInterval);
-        if (currentOscillator) {
-          currentOscillator.stop();
-          currentOscillator = null;
+        if (state.beepInterval) clearInterval(state.beepInterval);
+        if (state.currentOscillator) {
+          state.currentOscillator.stop();
+          state.currentOscillator = null;
         }
-        if (currentGainNode) {
-          currentGainNode.disconnect();
-          currentGainNode = null;
+        if (state.currentGainNode) {
+          state.currentGainNode.disconnect();
+          state.currentGainNode = null;
         }
         
-        currentOscillator = audioContext.createOscillator();
-        currentGainNode = audioContext.createGain();
-        currentOscillator.type = 'sine';
-        currentOscillator.frequency.value = 800;
-        currentGainNode.gain.value = 0.3;
-        currentOscillator.connect(currentGainNode);
-        currentGainNode.connect(audioContext.destination);
-        currentOscillator.start();
+        state.currentOscillator = state.audioContext.createOscillator();
+        state.currentGainNode = state.audioContext.createGain();
+        state.currentOscillator.type = 'sine';
+        state.currentOscillator.frequency.value = 800;
+        state.currentGainNode.gain.value = 0.3;
+        state.currentOscillator.connect(state.currentGainNode);
+        state.currentGainNode.connect(state.audioContext.destination);
+        state.currentOscillator.start();
         
-        alertActive.style.display = 'flex';
+        elements.alertActive.style.display = 'flex';
         
         let beepCount = 0;
-        const totalBeeps = 7; // 7 beeps in 15 seconds (every 2 seconds)
+        const totalBeeps = 7;
         
-        beepInterval = setInterval(() => {
+        state.beepInterval = setInterval(() => {
           beepCount++;
-          
-          // Alternate between two beep tones
-          currentOscillator.frequency.value = beepCount % 2 === 0 ? 800 : 1000;
-          
-          if (beepCount >= totalBeeps) {
-            stopAlert();
-          }
-        }, 2000); // Beep every 2 seconds
+          state.currentOscillator.frequency.value = beepCount % 2 === 0 ? 800 : 1000;
+          if (beepCount >= totalBeeps) stopAlert();
+        }, 2000);
       };
 
-      // Play battery warning sound (1 second)
       const playBatteryWarning = () => {
         initAudio();
-        
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        const oscillator = state.audioContext.createOscillator();
+        const gainNode = state.audioContext.createGain();
         oscillator.type = 'sine';
         oscillator.frequency.value = 600;
         gainNode.gain.value = 0.5;
         oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+        gainNode.connect(state.audioContext.destination);
         oscillator.start();
-        
-        setTimeout(() => {
-          oscillator.stop();
-        }, 1000);
+        setTimeout(() => oscillator.stop(), 1000);
       };
 
-      // Stop the alert sound
       const stopAlert = () => {
-        clearInterval(beepInterval);
-        beepInterval = null;
-        if (currentOscillator) {
-          currentOscillator.stop();
-          currentOscillator = null;
+        clearInterval(state.beepInterval);
+        state.beepInterval = null;
+        if (state.currentOscillator) {
+          state.currentOscillator.stop();
+          state.currentOscillator = null;
         }
-        if (currentGainNode) {
-          currentGainNode.disconnect();
-          currentGainNode = null;
+        if (state.currentGainNode) {
+          state.currentGainNode.disconnect();
+          state.currentGainNode = null;
         }
-        alertActive.style.display = 'none';
-        // Clear alert history after completion
-        priceAlertThreshold = null;
+        elements.alertActive.style.display = 'none';
+        state.priceAlertThreshold = null;
         localStorage.removeItem('priceAlertThreshold');
-        alertThresholdInput.value = '';
+        elements.alertThresholdInput.value = '';
       };
 
-      // Check price alert conditions
       const checkPriceAlert = (currentPrice) => {
-        if (!priceAlertThreshold || !lastBitcoinPrice) return;
+        if (!state.priceAlertThreshold || !state.lastBitcoinPrice) return;
         
-        const difference = Math.abs(currentPrice - priceAlertThreshold);
-        const isAboveThreshold = currentPrice > priceAlertThreshold;
-        const wasBelowThreshold = lastBitcoinPrice <= priceAlertThreshold;
-        const wasAboveThreshold = lastBitcoinPrice >= priceAlertThreshold;
+        const difference = Math.abs(currentPrice - state.priceAlertThreshold);
+        const isAboveThreshold = currentPrice > state.priceAlertThreshold;
+        const wasBelowThreshold = state.lastBitcoinPrice <= state.priceAlertThreshold;
+        const wasAboveThreshold = state.lastBitcoinPrice >= state.priceAlertThreshold;
         
         if ((isAboveThreshold && wasBelowThreshold) || 
             (!isAboveThreshold && wasAboveThreshold) || 
@@ -856,97 +763,16 @@
         }
       };
 
-      // Initialize audio context
       const initAudio = () => {
-        if (!audioContext) {
-          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        if (!state.audioContext) {
+          state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
       };
 
-      window.addEventListener('online', checkOnlineStatus);
-      window.addEventListener('offline', checkOnlineStatus);
-
-      menuButton.addEventListener('click', () => {
-        menu.classList.toggle('active');
-        settingsForm.classList.remove('active');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!menu.contains(e.target) && !menuButton.contains(e.target) && !settingsForm.contains(e.target)) {
-          menu.classList.remove('active');
-          settingsForm.classList.remove('active');
-        }
-      });
-
-      settings.addEventListener('click', () => {
-        menu.classList.remove('active');
-        settingsForm.classList.add('active');
-      });
-
-      refresh.addEventListener('click', () => {
-        menu.classList.remove('active');
-        if (onlineStatus) {
-          fetchPrice();
-        }
-      });
-
-      exit.addEventListener('click', () => {
-        window.close();
-      });
-
-      // Add click event for date header to manually update prices
-      dateHeader.addEventListener('click', () => {
-        if (onlineStatus) {
-          fetchPrice();
-        }
-      });
-
-      saveSettings.addEventListener('click', () => {
-        const selectedCurrency = currencySelect.value;
-        localStorage.setItem('selectedCurrency', selectedCurrency);
-        
-        if (alertThresholdInput.value) {
-          priceAlertThreshold = parseFloat(alertThresholdInput.value);
-          localStorage.setItem('priceAlertThreshold', priceAlertThreshold);
-        } else {
-          priceAlertThreshold = null;
-          localStorage.removeItem('priceAlertThreshold');
-        }
-        
-        // Save night mode setting
-        localStorage.setItem('autoNightMode', autoNightModeCheckbox.checked);
-        
-        // Save update interval (only if night mode is not active)
-        if (!isNightModeActive) {
-          normalUpdateInterval = parseInt(updateIntervalSelect.value);
-          localStorage.setItem('updateInterval', normalUpdateInterval);
-          updateInterval = normalUpdateInterval;
-        }
-        
-        // Update the interval if it's changed
-        if (priceUpdateInterval) {
-          clearInterval(priceUpdateInterval);
-          priceUpdateInterval = setInterval(fetchPrice, updateInterval);
-        }
-        
-        settingsForm.classList.remove('active');
-        if (onlineStatus) {
-          fetchPrice();
-        }
-        
-        // Setup night mode timer if auto mode is enabled
-        if (autoNightModeCheckbox.checked) {
-          setupNightModeTimer();
-        }
-      });
-
-      cancelSettings.addEventListener('click', () => {
-        settingsForm.classList.remove('active');
-      });
-
+      // Price Fetching
       const fetchPrice = async () => {
         try {
-          if (!onlineStatus || isAppInBackground) return;
+          if (!state.onlineStatus || state.isAppInBackground) return;
           
           const selectedCurrency = localStorage.getItem('selectedCurrency') || 'bitcoin';
           const response = await fetch(`https://api.coingecko.com/api/v3/coins/${selectedCurrency}`);
@@ -955,76 +781,163 @@
           const price = data.market_data.current_price.usd;
           const change = data.market_data.price_change_percentage_24h;
 
-          cryptoTitle.textContent = `${selectedCurrency.charAt(0).toUpperCase() + selectedCurrency.slice(1)} Price`;
-          priceElement.classList.add('price-update');
-          changeElement.classList.add('price-update');
+          elements.cryptoTitle.textContent = `${selectedCurrency.charAt(0).toUpperCase() + selectedCurrency.slice(1)} Price`;
+          elements.price.classList.add('price-update');
+          elements.change.classList.add('price-update');
           setTimeout(() => {
-            priceElement.classList.remove('price-update');
-            changeElement.classList.remove('price-update');
+            elements.price.classList.remove('price-update');
+            elements.change.classList.remove('price-update');
           }, 500);
 
-          // نمایش قیمت اتریوم به صورت رند شده
-          if (selectedCurrency === 'ethereum') {
-            priceElement.textContent = Math.round(price).toLocaleString();
-          } else {
-            priceElement.textContent = price.toLocaleString();
-          }
+          elements.price.textContent = selectedCurrency === 'ethereum' ? 
+            Math.round(price).toLocaleString() : price.toLocaleString();
           
-          changeElement.textContent = `24h Change: ${change.toFixed(2)}%`;
-          changeElement.className = 'change';
-          changeElement.classList.add(change >= 0 ? 'positive' : 'negative');
-          errorElement.textContent = '';
+          elements.change.textContent = `24h Change: ${change.toFixed(2)}%`;
+          elements.change.className = 'change';
+          elements.change.classList.add(change >= 0 ? 'positive' : 'negative');
+          elements.error.textContent = '';
 
           if (selectedCurrency === 'bitcoin') {
             checkPriceAlert(price);
-            lastBitcoinPrice = price;
+            state.lastBitcoinPrice = price;
           }
           
           localStorage.setItem(`${selectedCurrency}Price`, price);
           localStorage.setItem(`${selectedCurrency}Change`, change);
 
-          // حل مشکل غیرفعال شدن حالت شب پس از آپدیت
-          if (autoNightModeCheckbox.checked || isNightModeForced) {
+          if (elements.autoNightModeCheckbox.checked || state.isNightModeForced) {
             checkAutoNightMode();
           }
         } catch (error) {
           console.error('Error fetching data:', error);
-          if (onlineStatus) {
-            errorElement.textContent = 'Failed to load data. Showing last saved data.';
+          if (state.onlineStatus) {
+            elements.error.textContent = 'Failed to load data. Showing last saved data.';
             const selectedCurrency = localStorage.getItem('selectedCurrency') || 'bitcoin';
             const savedPrice = localStorage.getItem(`${selectedCurrency}Price`);
             const savedChange = localStorage.getItem(`${selectedCurrency}Change`);
             if (savedPrice && savedChange) {
-              cryptoTitle.textContent = `${selectedCurrency.charAt(0).toUpperCase() + selectedCurrency.slice(1)} Price`;
-              
-              if (selectedCurrency === 'ethereum') {
-                priceElement.textContent = Math.round(savedPrice).toLocaleString();
-              } else {
-                priceElement.textContent = parseFloat(savedPrice).toLocaleString();
-              }
-              
-              changeElement.textContent = `24h Change: ${parseFloat(savedChange).toFixed(2)}%`;
-              changeElement.className = 'change';
-              changeElement.classList.add(savedChange >= 0 ? 'positive' : 'negative');
+              elements.cryptoTitle.textContent = `${selectedCurrency.charAt(0).toUpperCase() + selectedCurrency.slice(1)} Price`;
+              elements.price.textContent = selectedCurrency === 'ethereum' ? 
+                Math.round(savedPrice).toLocaleString() : parseFloat(savedPrice).toLocaleString();
+              elements.change.textContent = `24h Change: ${parseFloat(savedChange).toFixed(2)}%`;
+              elements.change.className = 'change';
+              elements.change.classList.add(savedChange >= 0 ? 'positive' : 'negative');
             } else {
-              priceElement.textContent = 'N/A';
-              changeElement.textContent = 'N/A';
+              elements.price.textContent = 'N/A';
+              elements.change.textContent = 'N/A';
             }
           }
         }
       };
 
-      // Stop alert when tapping anywhere during alert
-      document.addEventListener('click', () => {
-        if (beepInterval) {
-          stopAlert();
-        }
-      });
+      // Event Listeners
+      const setupEventListeners = () => {
+        // Window Events
+        window.addEventListener('online', checkOnlineStatus);
+        window.addEventListener('offline', checkOnlineStatus);
+        
+        // Document Events
+        document.addEventListener('visibilitychange', () => {
+          state.isAppInBackground = document.hidden;
+          if (state.isAppInBackground && state.priceUpdateInterval) {
+            clearInterval(state.priceUpdateInterval);
+            state.priceUpdateInterval = null;
+          } else if (!state.isAppInBackground && state.onlineStatus && !state.priceUpdateInterval) {
+            fetchPrice();
+            state.priceUpdateInterval = setInterval(fetchPrice, state.updateInterval);
+          }
+        });
+        
+        document.addEventListener('click', (e) => {
+          if (!elements.menu.contains(e.target) && !elements.menuButton.contains(e.target) && 
+              !elements.settingsForm.contains(e.target)) {
+            elements.menu.classList.remove('active');
+            elements.settingsForm.classList.remove('active');
+          }
+          
+          if (state.beepInterval) stopAlert();
+        });
 
-      // Initial setup
-      updateDate();
-      checkOnlineStatus();
-      setupNightModeTimer();
+        // Button Events
+        elements.menuButton.addEventListener('click', () => {
+          elements.menu.classList.toggle('active');
+          elements.settingsForm.classList.remove('active');
+        });
+
+        elements.nightModeToggle.addEventListener('click', () => {
+          const isNightMode = document.body.classList.contains('night-mode');
+          toggleNightMode(!isNightMode);
+        });
+
+        elements.about.addEventListener('click', () => {
+          elements.menu.classList.remove('active');
+          alert('Crypto Price App\nVersion 1.0\nA simple app to track cryptocurrency prices');
+        });
+
+        elements.exit.addEventListener('click', () => window.close());
+        elements.dateHeader.addEventListener('click', () => {
+          if (state.onlineStatus) fetchPrice();
+        });
+
+        elements.cryptoSwitcher.addEventListener('click', () => {
+          const selectedCurrency = elements.currencySelect.value === 'bitcoin' ? 'ethereum' : 'bitcoin';
+          elements.currencySelect.value = selectedCurrency;
+          localStorage.setItem('selectedCurrency', selectedCurrency);
+          fetchPrice();
+        });
+
+        elements.browserIcon.addEventListener('click', () => {
+          window.location.href = 'https://arhahmad.github.io/Price-BTC-ETH/';
+        });
+
+        elements.settings.addEventListener('click', () => {
+          elements.menu.classList.remove('active');
+          elements.settingsForm.classList.add('active');
+        });
+
+        elements.refresh.addEventListener('click', () => {
+          elements.menu.classList.remove('active');
+          if (state.onlineStatus) fetchPrice();
+        });
+
+        elements.saveSettings.addEventListener('click', () => {
+          const selectedCurrency = elements.currencySelect.value;
+          localStorage.setItem('selectedCurrency', selectedCurrency);
+          
+          if (elements.alertThresholdInput.value) {
+            state.priceAlertThreshold = parseFloat(elements.alertThresholdInput.value);
+            localStorage.setItem('priceAlertThreshold', state.priceAlertThreshold);
+          } else {
+            state.priceAlertThreshold = null;
+            localStorage.removeItem('priceAlertThreshold');
+          }
+          
+          localStorage.setItem('autoNightMode', elements.autoNightModeCheckbox.checked);
+          
+          if (!state.isNightModeActive) {
+            state.normalUpdateInterval = parseInt(elements.updateIntervalSelect.value);
+            localStorage.setItem('updateInterval', state.normalUpdateInterval);
+            state.updateInterval = state.normalUpdateInterval;
+          }
+          
+          if (state.priceUpdateInterval) {
+            clearInterval(state.priceUpdateInterval);
+            state.priceUpdateInterval = setInterval(fetchPrice, state.updateInterval);
+          }
+          
+          elements.settingsForm.classList.remove('active');
+          if (state.onlineStatus) fetchPrice();
+          
+          if (elements.autoNightModeCheckbox.checked) setupNightModeTimer();
+        });
+
+        elements.cancelSettings.addEventListener('click', () => {
+          elements.settingsForm.classList.remove('active');
+        });
+      };
+
+      // Start the app
+      init();
     });
   </script>
 </body>
