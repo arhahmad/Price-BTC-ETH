@@ -1,60 +1,340 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>قیمت لحظه‌ای ارزها</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crypto Prices</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
+    :root {
+      --header-color: #2d2d2d;
+      --background: #121212;
+      --surface: #1e1e1e;
+      --on-primary: #ffffff;
+      --menu-bg: #1a1a1a;
+      --widget-border: 3px solid #3a3a3a;
+      --widget-gap: 30px;
+      --page-padding: 20px;
+    }
+    
     body {
-      background-color: #121212;
-      color: #ffffff;
+      background-color: var(--background);
+      color: var(--on-primary);
       font-family: 'Tahoma', sans-serif;
-      text-align: center;
-      padding-top: 50px;
+      margin: 0;
+      padding: 0;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
-    h2 {
-      margin-bottom: 20px;
-      font-size: 28px;
-      color: #00ffc3;
+    
+    .header {
+      background-color: var(--header-color);
+      color: var(--on-primary);
+      padding: 0 20px;
+      height: 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 25px;
+      left: var(--page-padding);
+      right: var(--page-padding);
+      z-index: 1000;
+      border-radius: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      margin: 0 auto;
+      max-width: calc(1200px - (var(--page-padding) * 2));
+      border: 1px solid #333;
     }
+    
+    .header-title {
+      font-weight: bold;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+    
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--on-primary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background-color 0.2s;
+    }
+    
+    .menu-btn:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    
+    .menu {
+      position: absolute;
+      top: 55px;
+      right: 8px;
+      background-color: var(--menu-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      display: none;
+      min-width: 180px;
+      overflow: hidden;
+      z-index: 1001;
+      border: 1px solid #333;
+    }
+    
+    .menu.show {
+      display: block;
+    }
+    
+    .menu-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .menu-item:hover {
+      background-color: rgba(255,255,255,0.05);
+    }
+    
+    .menu-item .material-icons {
+      margin-right: 10px;
+      font-size: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px var(--page-padding) 15px;
+    }
+    
+    .widgets-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--widget-gap);
+      margin: 20px 0;
+    }
+    
     .widget {
-      margin: 30px auto;
-      width: 350px;
+      background-color: var(--surface);
+      border-radius: 8px;
+      width: calc(50% - var(--widget-gap) - var(--page-padding));
+      max-width: 400px;
+      min-width: 280px;
+      overflow: hidden;
+      border: var(--widget-border);
+      pointer-events: none;
+    }
+    
+    .tradingview-widget-container {
+      height: 140px;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      padding: 10px var(--page-padding);
+      color: var(--on-primary);
+      opacity: 0.7;
+      font-size: 11px;
+    }
+    
+    @media (max-width: 900px) {
+      .widget {
+        width: 100%;
+        max-width: 500px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      :root {
+        --page-padding: 15px;
+        --widget-gap: 25px;
+      }
+      
+      .header {
+        top: 20px;
+        left: var(--page-padding);
+        right: var(--page-padding);
+        border-radius: 25px;
+      }
+      
+      .container {
+        padding: 90px var(--page-padding) 10px;
+      }
+      
+      .widgets-container {
+        gap: var(--widget-gap);
+      }
+    }
+    
+    @media (max-width: 480px) {
+      :root {
+        --page-padding: 10px;
+        --widget-gap: 20px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>قیمت لحظه‌ای بیت‌کوین و اتریوم از Binance</h2>
-
-  <!-- ویجت بیت‌کوین -->
-  <div class="widget">
-    <div class="tradingview-widget-container">
-      <div id="btc_widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-      {
-        "symbol": "BINANCE:BTCUSDT",
-        "width": "100%",
-        "isTransparent": false,
-        "colorTheme": "dark",
-        "locale": "fa"
-      }
-      </script>
+  <div class="header">
+    <div class="header-title">CRYPTO PRICES</div>
+    <button class="menu-btn" id="menuBtn">
+      <span class="material-icons">menu</span>
+    </button>
+    <div class="menu" id="menu">
+      <div class="menu-item" id="settingsBtn">
+        <span class="material-icons">settings</span>
+        <span>Settings</span>
+      </div>
+      <div class="menu-item" id="logoutBtn">
+        <span class="material-icons">logout</span>
+        <span>Logout</span>
+      </div>
     </div>
   </div>
 
-  <!-- ویجت اتریوم -->
-  <div class="widget">
-    <div class="tradingview-widget-container">
-      <div id="eth_widget"></div>
-      <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-      {
-        "symbol": "BINANCE:ETHUSDT",
-        "width": "100%",
-        "isTransparent": false,
-        "colorTheme": "dark",
-        "locale": "fa"
-      }
-      </script>
+  <div class="container">
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="btc_widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {
+            "symbol": "BINANCE:BTCUSDT",
+            "width": "100%",
+            "isTransparent": false,
+            "colorTheme": "dark",
+            "locale": "en"
+          }
+          </script>
+        </div>
+      </div>
+      
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="eth_widget"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {
+            "symbol": "BINANCE:ETHUSDT",
+            "width": "100%",
+            "isTransparent": false,
+            "colorTheme": "dark",
+            "locale": "en"
+          }
+          </script>
+        </div>
+      </div>
     </div>
+    
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="btc-dominance-chart"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "CRYPTOCAP:BTC.D",
+            "width": "100%",
+            "height": "100%",
+            "locale": "en",
+            "colorTheme": "dark",
+            "isTransparent": false,
+            "autosize": true
+          }
+          </script>
+        </div>
+      </div>
+      
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="eth-dominance-chart"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "CRYPTOCAP:ETH.D",
+            "width": "100%",
+            "height": "100%",
+            "locale": "en",
+            "colorTheme": "dark",
+            "isTransparent": false,
+            "autosize": true
+          }
+          </script>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      Market data provided by TradingView
+    </footer>
   </div>
+
+  <script>
+    // Screen Wake Lock API to keep screen on
+    let wakeLock = null;
+    
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          console.log('Screen Wake Lock is active');
+          
+          wakeLock.addEventListener('release', () => {
+            console.log('Screen Wake Lock was released');
+          });
+        }
+      } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+      }
+    }
+    
+    // Request wake lock when page becomes visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && wakeLock === null) {
+        requestWakeLock();
+      }
+    });
+    
+    // Initial wake lock request
+    requestWakeLock();
+    
+    // Menu toggle functionality
+    const menuBtn = document.getElementById('menuBtn');
+    const menu = document.getElementById('menu');
+    
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('show');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', () => {
+      menu.classList.remove('show');
+    });
+    
+    // Prevent menu from closing when clicking inside it
+    menu.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    
+    // Logout functionality
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+      window.close();
+    });
+    
+    // Settings functionality
+    const settingsBtn = document.getElementById('settingsBtn');
+    settingsBtn.addEventListener('click', () => {
+      alert('Settings would open here in a real application');
+    });
+    
+    // Disable touch feedback on widgets
+    document.querySelectorAll('.widget').forEach(widget => {
+      widget.style.pointerEvents = 'none';
+    });
+  </script>
 </body>
 </html>
