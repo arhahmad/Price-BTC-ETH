@@ -12,9 +12,9 @@
       --surface: #1e1e1e;
       --on-primary: #ffffff;
       --menu-bg: #1a1a1a;
-      --widget-border: 3px solid #3a3a3a;
-      --widget-gap: 30px;
-      --page-padding: 20px;
+      --widget-border: 2px solid #3a3a3a;
+      --widget-gap: 15px;
+      --page-padding: 15px;
     }
     
     body {
@@ -32,27 +32,78 @@
     .header {
       background-color: var(--header-color);
       color: var(--on-primary);
-      padding: 0 20px;
-      height: 50px;
+      padding: 0 15px;
+      height: 50px; /* افزایش ارتفاع هدر */
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: fixed;
-      top: 25px;
+      top: 15px;
       left: var(--page-padding);
       right: var(--page-padding);
       z-index: 1000;
-      border-radius: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-radius: 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       margin: 0 auto;
       max-width: calc(1200px - (var(--page-padding) * 2));
       border: 1px solid #333;
     }
     
+    .header-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .battery-container {
+      display: flex;
+      align-items: center;
+      margin-right: auto;
+    }
+    
+    .battery-icon {
+      position: relative;
+      width: 30px; /* بزرگتر */
+      height: 15px; /* بزرگتر */
+      border: 2px solid var(--on-primary); /* ضخیم‌تر */
+      border-radius: 3px;
+      margin-right: 6px;
+    }
+    
+    .battery-icon::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 4px;
+      width: 3px;
+      height: 6px;
+      background-color: var(--on-primary);
+      border-radius: 0 2px 2px 0;
+    }
+    
+    .battery-level {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      bottom: 2px;
+      background-color: var(--on-primary);
+      border-radius: 2px;
+    }
+    
+    .battery-percent {
+      font-size: 14px; /* بزرگتر */
+      margin-left: 4px;
+      font-weight: 500;
+    }
+    
     .header-title {
       font-weight: bold;
-      font-size: 16px;
+      font-size: 16px; /* بزرگتر */
       letter-spacing: 0.5px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
     
     .menu-btn {
@@ -60,24 +111,29 @@
       border: none;
       color: var(--on-primary);
       cursor: pointer;
-      padding: 8px;
+      padding: 8px; /* بزرگتر */
       border-radius: 50%;
       transition: background-color 0.2s;
+      margin-left: auto;
     }
     
     .menu-btn:hover {
       background-color: rgba(255,255,255,0.1);
     }
     
+    .menu-btn .material-icons {
+      font-size: 24px; /* بزرگتر */
+    }
+    
     .menu {
       position: absolute;
-      top: 55px;
+      top: 55px; /* تنظیم با ارتفاع هدر جدید */
       right: 8px;
       background-color: var(--menu-bg);
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      border-radius: 8px; /* گردی بیشتر */
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       display: none;
-      min-width: 180px;
+      min-width: 180px; /* بزرگتر */
       overflow: hidden;
       z-index: 1001;
       border: 1px solid #333;
@@ -88,11 +144,11 @@
     }
     
     .menu-item {
-      padding: 12px 16px;
+      padding: 12px 16px; /* بزرگتر */
       display: flex;
       align-items: center;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 15px; /* بزرگتر */
     }
     
     .menu-item:hover {
@@ -100,14 +156,14 @@
     }
     
     .menu-item .material-icons {
-      margin-right: 10px;
-      font-size: 20px;
+      margin-right: 12px; /* فاصله بیشتر */
+      font-size: 22px; /* بزرگتر */
     }
     
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 100px var(--page-padding) 15px;
+      padding: 75px var(--page-padding) 10px; /* تنظیم با ارتفاع هدر جدید */
     }
     
     .widgets-container {
@@ -115,84 +171,110 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: var(--widget-gap);
-      margin: 20px 0;
+      margin: 10px 0;
     }
     
     .widget {
       background-color: var(--surface);
-      border-radius: 8px;
-      width: calc(50% - var(--widget-gap) - var(--page-padding));
-      max-width: 400px;
-      min-width: 280px;
+      border-radius: 6px;
+      width: calc(50% - (var(--widget-gap) / 2));
+      max-width: 350px;
+      min-width: 240px;
       overflow: hidden;
       border: var(--widget-border);
       pointer-events: none;
     }
     
     .tradingview-widget-container {
-      height: 140px;
-    }
-    
-    footer {
-      text-align: center;
-      margin-top: 40px;
-      padding: 10px var(--page-padding);
-      color: var(--on-primary);
-      opacity: 0.7;
-      font-size: 11px;
+      height: 120px;
     }
     
     @media (max-width: 900px) {
       .widget {
         width: 100%;
-        max-width: 500px;
+        max-width: 400px;
       }
     }
     
     @media (max-width: 768px) {
       :root {
-        --page-padding: 15px;
-        --widget-gap: 25px;
+        --page-padding: 12px;
+        --widget-gap: 12px;
       }
       
       .header {
-        top: 20px;
-        left: var(--page-padding);
-        right: var(--page-padding);
-        border-radius: 25px;
+        top: 12px;
       }
       
       .container {
-        padding: 90px var(--page-padding) 10px;
-      }
-      
-      .widgets-container {
-        gap: var(--widget-gap);
+        padding: 70px var(--page-padding) 8px;
       }
     }
     
     @media (max-width: 480px) {
       :root {
         --page-padding: 10px;
-        --widget-gap: 20px;
+        --widget-gap: 10px;
+      }
+      
+      .widget {
+        min-width: 200px;
+      }
+      
+      .tradingview-widget-container {
+        height: 110px;
+      }
+      
+      .header-title {
+        font-size: 15px;
+      }
+      
+      .battery-icon {
+        width: 26px;
+        height: 13px;
+      }
+      
+      .battery-percent {
+        font-size: 13px;
+      }
+      
+      .menu-item {
+        padding: 10px 14px;
+        font-size: 14px;
+      }
+      
+      .menu-item .material-icons {
+        font-size: 20px;
       }
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="header-title">CRYPTO PRICES</div>
-    <button class="menu-btn" id="menuBtn">
-      <span class="material-icons">menu</span>
-    </button>
-    <div class="menu" id="menu">
-      <div class="menu-item" id="settingsBtn">
-        <span class="material-icons">settings</span>
-        <span>Settings</span>
+    <div class="header-content">
+      <div class="battery-container">
+        <div class="battery-icon">
+          <div class="battery-level" id="batteryLevel"></div>
+        </div>
+        <span class="battery-percent" id="batteryPercent"></span>
       </div>
-      <div class="menu-item" id="logoutBtn">
-        <span class="material-icons">logout</span>
-        <span>Logout</span>
+      <div class="header-title">CRYPTO PRICES</div>
+      <button class="menu-btn" id="menuBtn">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="menu" id="menu">
+        <div class="menu-item" id="settingsBtn">
+          <span class="material-icons">settings</span>
+          <span>Settings</span>
+        </div>
+        <div class="menu-item" id="aboutBtn">
+          <span class="material-icons">info</span>
+          <span>About</span>
+        </div>
+        <div class="menu-item" id="logoutBtn">
+          <span class="material-icons">logout</span>
+          <span>Exit</span>
+        </div>
       </div>
     </div>
   </div>
@@ -266,13 +348,27 @@
       </div>
     </div>
     
-    <footer>
-      Market data provided by TradingView
-    </footer>
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="usdt-dominance-chart"></div>
+          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {
+            "symbol": "CRYPTOCAP:USDT.D",
+            "width": "100%",
+            "height": "100%",
+            "locale": "en",
+            "colorTheme": "dark",
+            "isTransparent": false,
+            "autosize": true
+          }
+          </script>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Screen Wake Lock API to keep screen on
     let wakeLock = null;
     
     async function requestWakeLock() {
@@ -290,17 +386,14 @@
       }
     }
     
-    // Request wake lock when page becomes visible
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible' && wakeLock === null) {
         requestWakeLock();
       }
     });
     
-    // Initial wake lock request
     requestWakeLock();
     
-    // Menu toggle functionality
     const menuBtn = document.getElementById('menuBtn');
     const menu = document.getElementById('menu');
     
@@ -309,32 +402,75 @@
       menu.classList.toggle('show');
     });
     
-    // Close menu when clicking outside
     document.addEventListener('click', () => {
       menu.classList.remove('show');
     });
     
-    // Prevent menu from closing when clicking inside it
     menu.addEventListener('click', (e) => {
       e.stopPropagation();
     });
     
-    // Logout functionality
     const logoutBtn = document.getElementById('logoutBtn');
     logoutBtn.addEventListener('click', () => {
       window.close();
     });
     
-    // Settings functionality
     const settingsBtn = document.getElementById('settingsBtn');
     settingsBtn.addEventListener('click', () => {
       alert('Settings would open here in a real application');
     });
     
-    // Disable touch feedback on widgets
+    const aboutBtn = document.getElementById('aboutBtn');
+    aboutBtn.addEventListener('click', () => {
+      alert('About information would appear here');
+    });
+    
     document.querySelectorAll('.widget').forEach(widget => {
       widget.style.pointerEvents = 'none';
     });
+    
+    // Battery status functionality
+    function updateBatteryStatus() {
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(battery) {
+          updateBatteryInfo(battery);
+          
+          battery.addEventListener('levelchange', function() {
+            updateBatteryInfo(battery);
+          });
+          
+          battery.addEventListener('chargingchange', function() {
+            updateBatteryInfo(battery);
+          });
+        });
+      } else {
+        // Fallback for browsers that don't support Battery Status API
+        const batteryLevel = document.getElementById('batteryLevel');
+        const batteryPercent = document.getElementById('batteryPercent');
+        batteryLevel.style.width = '100%';
+        batteryPercent.textContent = '100'; // حذف علامت %
+      }
+    }
+    
+    function updateBatteryInfo(battery) {
+      const batteryLevel = document.getElementById('batteryLevel');
+      const batteryPercent = document.getElementById('batteryPercent');
+      const level = Math.round(battery.level * 100);
+      
+      batteryLevel.style.width = `${level}%`;
+      batteryPercent.textContent = `${level}`; // حذف علامت %
+      
+      if (battery.charging) {
+        batteryLevel.style.backgroundColor = '#4CAF50'; // Green when charging
+      } else if (level <= 20) {
+        batteryLevel.style.backgroundColor = '#F44336'; // Red when low
+      } else {
+        batteryLevel.style.backgroundColor = '#ffffff'; // White when normal
+      }
+    }
+    
+    // Initialize battery status
+    updateBatteryStatus();
   </script>
 </body>
 </html>
