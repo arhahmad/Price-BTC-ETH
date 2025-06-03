@@ -15,6 +15,7 @@
       --widget-border: 2px solid #3a3a3a;
       --widget-gap: 10px;
       --page-padding: 15px;
+      --alert-color: #f44336;
     }
     * {
       -webkit-tap-highlight-color: transparent;
@@ -31,59 +32,57 @@
       background-color: var(--background);
       color: var(--on-primary);
       font-family: Tahoma,sans-serif;
-      touch-action: pan-y;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
       overscroll-behavior-y: contain;
       min-height: 100vh;
       overflow-x: hidden;
+      transition: filter 0.3s ease;
     }
+    body.grayscale { filter: grayscale(100%); }
     .header {
       background-color: var(--header-color);
-      color: var(--on-primary);
-      padding: 0 15px;
-      height: 50px;
+      padding: 0 var(--page-padding);
+      height: 45px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: fixed;
-      top: 15px;
+      top: 8px;
       left: var(--page-padding);
       right: var(--page-padding);
       z-index: 1000;
-      border-radius: 22px;
+      border-radius: 20px;
       box-shadow: 0 2px 8px rgba(0,0,0,.2);
       margin: 0 auto;
       max-width: calc(1200px - var(--page-padding)*2);
       border: 1px solid #333;
     }
-    .header-content,.battery-container {
-      display: flex;
-      align-items: center;
-    }
-    .header-content {
-      width: 100%;
-      justify-content: space-between;
-    }
+    .header-content, .battery-container { display: flex; align-items: center; }
+    .header-content { width: 100%; justify-content: space-between; }
     .battery-icon {
       position: relative;
-      width: 30px;
-      height: 15px;
+      width: 26px;
+      height: 12px;
       border: 2px solid var(--on-primary);
       border-radius: 3px;
       margin-right: 6px;
+      transition: border-color 0.3s ease;
     }
+    .battery-icon.low-battery { border-color: var(--alert-color); }
     .battery-icon::after {
       content: '';
       position: absolute;
       right: -4px;
-      top: 4px;
+      top: 3px;
       width: 3px;
-      height: 6px;
+      height: 5px;
       background-color: var(--on-primary);
       border-radius: 0 2px 2px 0;
+      transition: background-color 0.3s ease;
     }
+    .battery-icon.low-battery::after { background-color: var(--alert-color); }
     .battery-level {
       position: absolute;
       top: 2px;
@@ -91,12 +90,16 @@
       bottom: 2px;
       background-color: var(--on-primary);
       border-radius: 2px;
+      transition: background-color 0.3s ease;
     }
+    .battery-level.low-battery { background-color: var(--alert-color); }
     .battery-percent {
-      font-size: 15px;
+      font-size: 16px;
       margin-left: 4px;
       font-weight: 500;
+      transition: color 0.3s ease;
     }
+    .battery-percent.low-battery { color: var(--alert-color); }
     .header-title {
       font-weight: 700;
       font-size: 16px;
@@ -115,15 +118,11 @@
       transition: background-color .2s;
       margin-left: auto;
     }
-    .menu-btn:hover {
-      background-color: rgba(255,255,255,.1);
-    }
-    .menu-btn .material-icons {
-      font-size: 24px;
-    }
+    .menu-btn:hover { background-color: rgba(255,255,255,.1); }
+    .menu-btn .material-icons { font-size: 24px; }
     .menu {
       position: absolute;
-      top: 55px;
+      top: 50px;
       right: 8px;
       background-color: var(--menu-bg);
       border-radius: 8px;
@@ -134,9 +133,7 @@
       z-index: 1001;
       border: 1px solid #333;
     }
-    .menu.show {
-      display: block;
-    }
+    .menu.show { display: block; }
     .menu-item {
       padding: 12px 16px;
       display: flex;
@@ -144,17 +141,12 @@
       cursor: pointer;
       font-size: 15px;
     }
-    .menu-item:hover {
-      background-color: rgba(255,255,255,.05);
-    }
-    .menu-item .material-icons {
-      margin-right: 12px;
-      font-size: 22px;
-    }
+    .menu-item:hover { background-color: rgba(255,255,255,.05); }
+    .menu-item .material-icons { margin-right: 12px; font-size: 22px; }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 70px var(--page-padding) 10px;
+      padding: 55px var(--page-padding) 30px;
       -webkit-overflow-scrolling: touch;
     }
     .widgets-container {
@@ -175,55 +167,73 @@
       pointer-events: none;
       transform: translateZ(0);
     }
-    .tradingview-widget-container {
-      height: 120px;
+    .tradingview-widget-container { height: 120px; }
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.7);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
     }
-    @media (max-width: 900px) {
-      .widget {
-        width: 100%;
-        max-width: 400px;
-      }
+    .alert-box {
+      background-color: #2d2d2d;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 80%;
+      text-align: center;
+      border: 2px solid var(--alert-color);
+      animation: pulse 1.5s infinite;
     }
+    .alert-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .alert-message { font-size: 16px; margin-bottom: 15px; }
+    .alert-close {
+      background-color: var(--alert-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      padding: 10px 0 20px;
+      color: #666;
+      font-size: 12px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 900px) { .widget { width: 100%; max-width: 400px; } }
     @media (max-width: 768px) {
-      :root {
-        --page-padding: 12px;
-        --widget-gap: 8px;
-      }
-      .header {
-        top: 12px;
-      }
-      .container {
-        padding: 65px var(--page-padding) 8px;
-      }
+      :root { --page-padding: 12px; --widget-gap: 8px; }
+      .header { top: 8px; height: 42px; }
+      .container { padding: 52px var(--page-padding) 25px; }
     }
     @media (max-width: 480px) {
-      :root {
-        --page-padding: 10px;
-        --widget-gap: 6px;
-      }
-      .widget {
-        min-width: 200px;
-      }
-      .tradingview-widget-container {
-        height: 110px;
-      }
-      .header-title {
-        font-size: 15px;
-      }
-      .battery-icon {
-        width: 26px;
-        height: 13px;
-      }
-      .battery-percent {
-        font-size: 14px;
-      }
-      .menu-item {
-        padding: 10px 14px;
-        font-size: 14px;
-      }
-      .menu-item .material-icons {
-        font-size: 20px;
-      }
+      :root { --page-padding: 10px; --widget-gap: 6px; }
+      .widget { min-width: 200px; }
+      .tradingview-widget-container { height: 110px; }
+      .header-title { font-size: 15px; }
+      .battery-icon { width: 24px; height: 11px; }
+      .battery-percent { font-size: 15px; }
+      .menu-item { padding: 10px 14px; font-size: 14px; }
+      .menu-item .material-icons { font-size: 20px; }
+      .alert-box { padding: 15px; max-width: 90%; }
+      .alert-title { font-size: 16px; }
+      .alert-message { font-size: 14px; }
+      .footer { font-size: 11px; }
     }
   </style>
 </head>
@@ -231,7 +241,7 @@
   <div class="header">
     <div class="header-content">
       <div class="battery-container">
-        <div class="battery-icon">
+        <div class="battery-icon" id="batteryIcon">
           <div class="battery-level" id="batteryLevel"></div>
         </div>
         <span class="battery-percent" id="batteryPercent"></span>
@@ -244,6 +254,10 @@
         <div class="menu-item" id="settingsBtn">
           <span class="material-icons">settings</span>
           <span>Settings</span>
+        </div>
+        <div class="menu-item" id="nightModeBtn">
+          <span class="material-icons">dark_mode</span>
+          <span>Night Mode</span>
         </div>
         <div class="menu-item" id="aboutBtn">
           <span class="material-icons">info</span>
@@ -304,6 +318,15 @@
         </div>
       </div>
     </div>
+    <div class="footer">Powered by TradingView</div>
+  </div>
+
+  <div class="alert-overlay" id="alertOverlay">
+    <div class="alert-box">
+      <div class="alert-title">PRICE ALERT!</div>
+      <div class="alert-message" id="alertMessage"></div>
+      <button class="alert-close" id="alertClose">DISMISS</button>
+    </div>
   </div>
 
   <script>
@@ -325,11 +348,12 @@
     });
     requestWakeLock();
     
-    const menuBtn=document.getElementById('menuBtn'),
-          menu=document.getElementById('menu'),
-          logoutBtn=document.getElementById('logoutBtn'),
-          settingsBtn=document.getElementById('settingsBtn'),
-          aboutBtn=document.getElementById('aboutBtn');
+    const menu=document.getElementById('menu'),
+          menuBtn=document.getElementById('menuBtn'),
+          batteryIcon=document.getElementById('batteryIcon'),
+          batteryLevel=document.getElementById('batteryLevel'),
+          batteryPercent=document.getElementById('batteryPercent'),
+          nightModeBtn=document.getElementById('nightModeBtn');
     
     menuBtn.addEventListener('click',e=>{
       e.stopPropagation();
@@ -337,34 +361,186 @@
     });
     document.addEventListener('click',()=>menu.classList.remove('show'));
     menu.addEventListener('click',e=>e.stopPropagation());
-    logoutBtn.addEventListener('click',()=>window.close());
-    settingsBtn.addEventListener('click',()=>alert('Settings would open here in a real application'));
-    aboutBtn.addEventListener('click',()=>alert('About information would appear here'));
-    document.querySelectorAll('.widget').forEach(widget=>{widget.style.pointerEvents='none'});
+    document.getElementById('logoutBtn').addEventListener('click',()=>window.close());
+    document.getElementById('settingsBtn').addEventListener('click',()=>alert('Settings would open here'));
+    document.getElementById('aboutBtn').addEventListener('click',()=>alert('About information would appear here'));
+    document.querySelectorAll('.widget').forEach(w=>w.style.pointerEvents='none');
+    
+    nightModeBtn.addEventListener('click',()=>{
+      document.body.classList.toggle('grayscale');
+      const icon=nightModeBtn.querySelector('.material-icons');
+      if(document.body.classList.contains('grayscale')){
+        icon.textContent='light_mode';
+        nightModeBtn.querySelector('span:last-child').textContent='Day Mode';
+      }else{
+        icon.textContent='dark_mode';
+        nightModeBtn.querySelector('span:last-child').textContent='Night Mode';
+      }
+      menu.classList.remove('show');
+    });
+    
+    let batterySound=null,batterySoundTimeout=null,lastBatteryAlertTime=0;
     
     function updateBatteryStatus(){
       if('getBattery'in navigator){
-        navigator.getBattery().then(function(battery){
-          updateBatteryInfo(battery);
-          battery.addEventListener('levelchange',()=>updateBatteryInfo(battery));
-          battery.addEventListener('chargingchange',()=>updateBatteryInfo(battery));
+        navigator.getBattery().then(b=>{
+          updateBatteryInfo(b);
+          b.addEventListener('levelchange',()=>updateBatteryInfo(b));
+          b.addEventListener('chargingchange',()=>updateBatteryInfo(b));
         });
       }else{
-        const batteryLevel=document.getElementById('batteryLevel'),
-              batteryPercent=document.getElementById('batteryPercent');
         batteryLevel.style.width='100%';
         batteryPercent.textContent='100';
       }
     }
-    function updateBatteryInfo(battery){
-      const batteryLevel=document.getElementById('batteryLevel'),
-            batteryPercent=document.getElementById('batteryPercent'),
-            level=Math.round(battery.level*100);
-      batteryLevel.style.width=`${level}%`;
-      batteryPercent.textContent=`${level}`;
-      batteryLevel.style.backgroundColor=battery.charging?'#4CAF50':level<=20?'#F44336':'#fff';
+    
+    function updateBatteryInfo(b){
+      const l=Math.round(b.level*100),isLow=l<=30&&!b.charging;
+      batteryLevel.style.width=`${l}%`;
+      batteryPercent.textContent=l;
+      
+      if(isLow){
+        batteryLevel.classList.add('low-battery');
+        batteryPercent.classList.add('low-battery');
+        batteryIcon.classList.add('low-battery');
+        const n=Date.now();
+        if(n-lastBatteryAlertTime>60000){
+          playLowBatterySound();
+          lastBatteryAlertTime=n;
+        }
+      }else{
+        batteryLevel.classList.remove('low-battery');
+        batteryPercent.classList.remove('low-battery');
+        batteryIcon.classList.remove('low-battery');
+        batteryLevel.style.backgroundColor=b.charging?'#4CAF50':'#fff';
+      }
     }
+    
+    function playLowBatterySound(){
+      stopBatterySound();
+      try{
+        const a=new (window.AudioContext||window.webkitAudioContext)();
+        batterySound=a.createOscillator();
+        const g=a.createGain();
+        batterySound.type='sine';
+        batterySound.frequency.value=440;
+        g.gain.value=0.5;
+        batterySound.connect(g);
+        g.connect(a.destination);
+        batterySound.start();
+        batterySoundTimeout=setTimeout(stopBatterySound,3000);
+      }catch(e){}
+    }
+    
+    function stopBatterySound(){
+      if(batterySound){
+        batterySound.stop();
+        batterySound=null;
+      }
+      if(batterySoundTimeout){
+        clearTimeout(batterySoundTimeout);
+        batterySoundTimeout=null;
+      }
+    }
+    
     updateBatteryStatus();
+
+    let btcPriceHistory={'1min':[],'5min':[],'15min':[]},
+        alertSound=null,alertTimeout=null,lastAlertTime=0,lastBtcPrice=null;
+
+    function checkBtcPrice(){
+      const w=document.querySelector('#btc_widget iframe');
+      if(w)w.contentWindow.postMessage({frame_id:'btc_widget',type:'get_symbol_data'},'*');
+    }
+
+    window.addEventListener('message',e=>{
+      if(e.data.type==='symbol_data'&&e.data.frame_id==='btc_widget'){
+        const p=e.data.data.price;
+        if(p&&p!==lastBtcPrice){
+          lastBtcPrice=p;
+          checkPriceMovement(p);
+        }
+      }
+    });
+
+    function checkPriceMovement(p){
+      const n=Date.now();
+      btcPriceHistory['1min'].push({price:p,time:n});
+      btcPriceHistory['5min'].push({price:p,time:n});
+      btcPriceHistory['15min'].push({price:p,time:n});
+      
+      btcPriceHistory['1min']=btcPriceHistory['1min'].filter(i=>n-i.time<=6e4);
+      btcPriceHistory['5min']=btcPriceHistory['5min'].filter(i=>n-i.time<=3e5);
+      btcPriceHistory['15min']=btcPriceHistory['15min'].filter(i=>n-i.time<=9e5);
+      
+      const c={
+        '1min':calculatePriceChange(btcPriceHistory['1min']),
+        '5min':calculatePriceChange(btcPriceHistory['5min']),
+        '15min':calculatePriceChange(btcPriceHistory['15min'])
+      };
+      
+      if((Math.abs(c['1min'])>0.5||Math.abs(c['5min'])>1||Math.abs(c['15min'])>2)&&(n-lastAlertTime>3e4)){
+        triggerPriceAlert(c);
+        lastAlertTime=n;
+      }
+    }
+
+    function calculatePriceChange(p){
+      if(p.length<2)return 0;
+      const o=p[0].price,l=p[p.length-1].price;
+      return((l-o)/o)*100;
+    }
+
+    function triggerPriceAlert(c){
+      let m="Significant BTC price movement detected:\n";
+      if(Math.abs(c['1min'])>0.5)m+=`${c['1min'].toFixed(2)}% in 1 minute\n`;
+      if(Math.abs(c['5min'])>1)m+=`${c['5min'].toFixed(2)}% in 5 minutes\n`;
+      if(Math.abs(c['15min'])>2)m+=`${c['15min'].toFixed(2)}% in 15 minutes\n`;
+      
+      document.getElementById('alertMessage').textContent=m;
+      document.getElementById('alertOverlay').style.display='flex';
+      playAlertSound();
+    }
+
+    function playAlertSound(){
+      try{
+        const a=new (window.AudioContext||window.webkitAudioContext)();
+        alertSound=a.createOscillator();
+        const g=a.createGain();
+        alertSound.type='sine';
+        alertSound.frequency.value=880;
+        g.gain.value=0;
+        alertSound.connect(g);
+        g.connect(a.destination);
+        g.gain.linearRampToValueAtTime(0.5,a.currentTime+3);
+        alertSound.start();
+        alertTimeout=setTimeout(()=>{
+          if(alertSound){
+            alertSound.stop();
+            alertSound=null;
+          }
+        },1e4);
+      }catch(e){}
+    }
+
+    function stopAlertSound(){
+      if(alertSound){
+        alertSound.stop();
+        alertSound=null;
+      }
+      if(alertTimeout){
+        clearTimeout(alertTimeout);
+        alertTimeout=null;
+      }
+    }
+
+    document.getElementById('alertClose').addEventListener('click',()=>{
+      document.getElementById('alertOverlay').style.display='none';
+      stopAlertSound();
+    });
+
+    setInterval(checkBtcPrice,1e4);
+    checkBtcPrice();
   </script>
 </body>
 </html>
