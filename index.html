@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <title>Crypto Prices</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>
@@ -10,30 +10,40 @@
       --header-color: #2d2d2d;
       --background: #121212;
       --surface: #1e1e1e;
-      --on-primary: #ffffff;
+      --on-primary: #fff;
       --menu-bg: #1a1a1a;
       --widget-border: 2px solid #3a3a3a;
-      --widget-gap: 15px;
+      --widget-gap: 10px;
       --page-padding: 15px;
     }
-    
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: none;
+      touch-action: pan-y;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      overflow-x: hidden;
+      -ms-content-zooming: none;
+    }
     body {
       background-color: var(--background);
       color: var(--on-primary);
-      font-family: 'Tahoma', sans-serif;
-      margin: 0;
-      padding: 0;
-      touch-action: manipulation;
+      font-family: Tahoma,sans-serif;
+      touch-action: pan-y;
       -webkit-touch-callout: none;
       -webkit-user-select: none;
       user-select: none;
+      overscroll-behavior-y: contain;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-    
     .header {
       background-color: var(--header-color);
       color: var(--on-primary);
       padding: 0 15px;
-      height: 50px; /* افزایش ارتفاع هدر */
+      height: 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -43,34 +53,27 @@
       right: var(--page-padding);
       z-index: 1000;
       border-radius: 22px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
       margin: 0 auto;
-      max-width: calc(1200px - (var(--page-padding) * 2));
+      max-width: calc(1200px - var(--page-padding)*2);
       border: 1px solid #333;
     }
-    
-    .header-content {
+    .header-content,.battery-container {
       display: flex;
       align-items: center;
+    }
+    .header-content {
       width: 100%;
       justify-content: space-between;
     }
-    
-    .battery-container {
-      display: flex;
-      align-items: center;
-      margin-right: auto;
-    }
-    
     .battery-icon {
       position: relative;
-      width: 30px; /* بزرگتر */
-      height: 15px; /* بزرگتر */
-      border: 2px solid var(--on-primary); /* ضخیم‌تر */
+      width: 30px;
+      height: 15px;
+      border: 2px solid var(--on-primary);
       border-radius: 3px;
       margin-right: 6px;
     }
-    
     .battery-icon::after {
       content: '';
       position: absolute;
@@ -81,7 +84,6 @@
       background-color: var(--on-primary);
       border-radius: 0 2px 2px 0;
     }
-    
     .battery-level {
       position: absolute;
       top: 2px;
@@ -90,159 +92,135 @@
       background-color: var(--on-primary);
       border-radius: 2px;
     }
-    
     .battery-percent {
-      font-size: 14px; /* بزرگتر */
+      font-size: 15px;
       margin-left: 4px;
       font-weight: 500;
     }
-    
     .header-title {
-      font-weight: bold;
-      font-size: 16px; /* بزرگتر */
-      letter-spacing: 0.5px;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: .5px;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
     }
-    
     .menu-btn {
       background: none;
       border: none;
       color: var(--on-primary);
       cursor: pointer;
-      padding: 8px; /* بزرگتر */
+      padding: 8px;
       border-radius: 50%;
-      transition: background-color 0.2s;
+      transition: background-color .2s;
       margin-left: auto;
     }
-    
     .menu-btn:hover {
-      background-color: rgba(255,255,255,0.1);
+      background-color: rgba(255,255,255,.1);
     }
-    
     .menu-btn .material-icons {
-      font-size: 24px; /* بزرگتر */
+      font-size: 24px;
     }
-    
     .menu {
       position: absolute;
-      top: 55px; /* تنظیم با ارتفاع هدر جدید */
+      top: 55px;
       right: 8px;
       background-color: var(--menu-bg);
-      border-radius: 8px; /* گردی بیشتر */
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
       display: none;
-      min-width: 180px; /* بزرگتر */
+      min-width: 180px;
       overflow: hidden;
       z-index: 1001;
       border: 1px solid #333;
     }
-    
     .menu.show {
       display: block;
     }
-    
     .menu-item {
-      padding: 12px 16px; /* بزرگتر */
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       cursor: pointer;
-      font-size: 15px; /* بزرگتر */
+      font-size: 15px;
     }
-    
     .menu-item:hover {
-      background-color: rgba(255,255,255,0.05);
+      background-color: rgba(255,255,255,.05);
     }
-    
     .menu-item .material-icons {
-      margin-right: 12px; /* فاصله بیشتر */
-      font-size: 22px; /* بزرگتر */
+      margin-right: 12px;
+      font-size: 22px;
     }
-    
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 75px var(--page-padding) 10px; /* تنظیم با ارتفاع هدر جدید */
+      padding: 70px var(--page-padding) 10px;
+      -webkit-overflow-scrolling: touch;
     }
-    
     .widgets-container {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: var(--widget-gap);
-      margin: 10px 0;
+      margin: 5px 0;
     }
-    
     .widget {
       background-color: var(--surface);
       border-radius: 6px;
-      width: calc(50% - (var(--widget-gap) / 2));
+      width: calc(50% - var(--widget-gap)/2);
       max-width: 350px;
       min-width: 240px;
       overflow: hidden;
       border: var(--widget-border);
       pointer-events: none;
+      transform: translateZ(0);
     }
-    
     .tradingview-widget-container {
       height: 120px;
     }
-    
     @media (max-width: 900px) {
       .widget {
         width: 100%;
         max-width: 400px;
       }
     }
-    
     @media (max-width: 768px) {
       :root {
         --page-padding: 12px;
-        --widget-gap: 12px;
+        --widget-gap: 8px;
       }
-      
       .header {
         top: 12px;
       }
-      
       .container {
-        padding: 70px var(--page-padding) 8px;
+        padding: 65px var(--page-padding) 8px;
       }
     }
-    
     @media (max-width: 480px) {
       :root {
         --page-padding: 10px;
-        --widget-gap: 10px;
+        --widget-gap: 6px;
       }
-      
       .widget {
         min-width: 200px;
       }
-      
       .tradingview-widget-container {
         height: 110px;
       }
-      
       .header-title {
         font-size: 15px;
       }
-      
       .battery-icon {
         width: 26px;
         height: 13px;
       }
-      
       .battery-percent {
-        font-size: 13px;
+        font-size: 14px;
       }
-      
       .menu-item {
         padding: 10px 14px;
         font-size: 14px;
       }
-      
       .menu-item .material-icons {
         font-size: 20px;
       }
@@ -284,84 +262,44 @@
       <div class="widget">
         <div class="tradingview-widget-container">
           <div id="btc_widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-          {
-            "symbol": "BINANCE:BTCUSDT",
-            "width": "100%",
-            "isTransparent": false,
-            "colorTheme": "dark",
-            "locale": "en"
-          }
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {"symbol":"BINANCE:BTCUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
           </script>
         </div>
       </div>
-      
       <div class="widget">
         <div class="tradingview-widget-container">
           <div id="eth_widget"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-          {
-            "symbol": "BINANCE:ETHUSDT",
-            "width": "100%",
-            "isTransparent": false,
-            "colorTheme": "dark",
-            "locale": "en"
-          }
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {"symbol":"BINANCE:ETHUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
           </script>
         </div>
       </div>
     </div>
-    
     <div class="widgets-container">
       <div class="widget">
         <div class="tradingview-widget-container">
           <div id="btc-dominance-chart"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-          {
-            "symbol": "CRYPTOCAP:BTC.D",
-            "width": "100%",
-            "height": "100%",
-            "locale": "en",
-            "colorTheme": "dark",
-            "isTransparent": false,
-            "autosize": true
-          }
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
           </script>
         </div>
       </div>
-      
       <div class="widget">
         <div class="tradingview-widget-container">
           <div id="eth-dominance-chart"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-          {
-            "symbol": "CRYPTOCAP:ETH.D",
-            "width": "100%",
-            "height": "100%",
-            "locale": "en",
-            "colorTheme": "dark",
-            "isTransparent": false,
-            "autosize": true
-          }
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:ETH.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
           </script>
         </div>
       </div>
     </div>
-    
     <div class="widgets-container">
       <div class="widget">
         <div class="tradingview-widget-container">
           <div id="usdt-dominance-chart"></div>
-          <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-          {
-            "symbol": "CRYPTOCAP:USDT.D",
-            "width": "100%",
-            "height": "100%",
-            "locale": "en",
-            "colorTheme": "dark",
-            "isTransparent": false,
-            "autosize": true
-          }
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
           </script>
         </div>
       </div>
@@ -369,107 +307,63 @@
   </div>
 
   <script>
-    let wakeLock = null;
+    document.addEventListener('dblclick',e=>e.preventDefault(),{passive:!1});
+    document.addEventListener('gesturestart',e=>e.preventDefault());
+    document.addEventListener('touchmove',e=>{if(e.scale!==1)e.preventDefault()},{passive:!1});
     
-    async function requestWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await navigator.wakeLock.request('screen');
-          console.log('Screen Wake Lock is active');
-          
-          wakeLock.addEventListener('release', () => {
-            console.log('Screen Wake Lock was released');
-          });
+    let wakeLock=null;
+    async function requestWakeLock(){
+      try{
+        if('wakeLock'in navigator){
+          wakeLock=await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release',()=>{});
         }
-      } catch (err) {
-        console.error(`${err.name}, ${err.message}`);
-      }
+      }catch(err){}
     }
-    
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible' && wakeLock === null) {
-        requestWakeLock();
-      }
+    document.addEventListener('visibilitychange',()=>{
+      if(document.visibilityState==='visible'&&wakeLock===null)requestWakeLock();
     });
-    
     requestWakeLock();
     
-    const menuBtn = document.getElementById('menuBtn');
-    const menu = document.getElementById('menu');
+    const menuBtn=document.getElementById('menuBtn'),
+          menu=document.getElementById('menu'),
+          logoutBtn=document.getElementById('logoutBtn'),
+          settingsBtn=document.getElementById('settingsBtn'),
+          aboutBtn=document.getElementById('aboutBtn');
     
-    menuBtn.addEventListener('click', (e) => {
+    menuBtn.addEventListener('click',e=>{
       e.stopPropagation();
       menu.classList.toggle('show');
     });
+    document.addEventListener('click',()=>menu.classList.remove('show'));
+    menu.addEventListener('click',e=>e.stopPropagation());
+    logoutBtn.addEventListener('click',()=>window.close());
+    settingsBtn.addEventListener('click',()=>alert('Settings would open here in a real application'));
+    aboutBtn.addEventListener('click',()=>alert('About information would appear here'));
+    document.querySelectorAll('.widget').forEach(widget=>{widget.style.pointerEvents='none'});
     
-    document.addEventListener('click', () => {
-      menu.classList.remove('show');
-    });
-    
-    menu.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    logoutBtn.addEventListener('click', () => {
-      window.close();
-    });
-    
-    const settingsBtn = document.getElementById('settingsBtn');
-    settingsBtn.addEventListener('click', () => {
-      alert('Settings would open here in a real application');
-    });
-    
-    const aboutBtn = document.getElementById('aboutBtn');
-    aboutBtn.addEventListener('click', () => {
-      alert('About information would appear here');
-    });
-    
-    document.querySelectorAll('.widget').forEach(widget => {
-      widget.style.pointerEvents = 'none';
-    });
-    
-    // Battery status functionality
-    function updateBatteryStatus() {
-      if ('getBattery' in navigator) {
-        navigator.getBattery().then(function(battery) {
+    function updateBatteryStatus(){
+      if('getBattery'in navigator){
+        navigator.getBattery().then(function(battery){
           updateBatteryInfo(battery);
-          
-          battery.addEventListener('levelchange', function() {
-            updateBatteryInfo(battery);
-          });
-          
-          battery.addEventListener('chargingchange', function() {
-            updateBatteryInfo(battery);
-          });
+          battery.addEventListener('levelchange',()=>updateBatteryInfo(battery));
+          battery.addEventListener('chargingchange',()=>updateBatteryInfo(battery));
         });
-      } else {
-        // Fallback for browsers that don't support Battery Status API
-        const batteryLevel = document.getElementById('batteryLevel');
-        const batteryPercent = document.getElementById('batteryPercent');
-        batteryLevel.style.width = '100%';
-        batteryPercent.textContent = '100'; // حذف علامت %
+      }else{
+        const batteryLevel=document.getElementById('batteryLevel'),
+              batteryPercent=document.getElementById('batteryPercent');
+        batteryLevel.style.width='100%';
+        batteryPercent.textContent='100';
       }
     }
-    
-    function updateBatteryInfo(battery) {
-      const batteryLevel = document.getElementById('batteryLevel');
-      const batteryPercent = document.getElementById('batteryPercent');
-      const level = Math.round(battery.level * 100);
-      
-      batteryLevel.style.width = `${level}%`;
-      batteryPercent.textContent = `${level}`; // حذف علامت %
-      
-      if (battery.charging) {
-        batteryLevel.style.backgroundColor = '#4CAF50'; // Green when charging
-      } else if (level <= 20) {
-        batteryLevel.style.backgroundColor = '#F44336'; // Red when low
-      } else {
-        batteryLevel.style.backgroundColor = '#ffffff'; // White when normal
-      }
+    function updateBatteryInfo(battery){
+      const batteryLevel=document.getElementById('batteryLevel'),
+            batteryPercent=document.getElementById('batteryPercent'),
+            level=Math.round(battery.level*100);
+      batteryLevel.style.width=`${level}%`;
+      batteryPercent.textContent=`${level}`;
+      batteryLevel.style.backgroundColor=battery.charging?'#4CAF50':level<=20?'#F44336':'#fff';
     }
-    
-    // Initialize battery status
     updateBatteryStatus();
   </script>
 </body>
