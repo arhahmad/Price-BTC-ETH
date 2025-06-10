@@ -1,1064 +1,259 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crypto Price</title>
-  <meta name="theme-color" content="#1a1a1a">
-  <link rel="icon" href="https://bitcoin.org/img/icons/opengraph.png">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="orientation" content="landscape">
-  <style>
-    :root {
-      --primary-color: #4a90e2;
-      --background-color: #1a1a1a;
-      --text-color: #ffffff;
-      --menu-button-color: #ffffff;
-      --battery-icon-color: #333333;
-      --change-positive: #00cc00;
-      --change-negative: #ff3333;
-      --header-bg-color: #333333;
-    }
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: var(--background-color);
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      text-align: center;
-      color: var(--text-color);
-      position: relative;
-      overflow: hidden;
-      transition: background-color 0.3s ease;
-    }
-    .orientation-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      text-align: center;
-    }
-    .orientation-overlay .material-icons {
-      font-size: 80px;
-      margin-bottom: 20px;
-      color: #ffffff;
-      animation: rotateIcon 1.5s infinite ease-in-out;
-    }
-    .orientation-overlay p {
-      font-size: 24px;
-      font-weight: bold;
-    }
-    @keyframes rotateIcon {
-        0% { transform: rotate(0deg); }
-        50% { transform: rotate(90deg); }
-        100% { transform: rotate(0deg); }
-    }
-    body.portrait-mode > *:not(.orientation-overlay) {
-        display: none;
-    }
-    .date-header, .time-header {
-      position: absolute;
-      background-color: var(--header-bg-color);
-      color: white;
-      padding: 5px 20px;
-      border-radius: 50px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      letter-spacing: 1px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      z-index: 10;
-    }
-    .date-header {
-      top: 20px;
-      left: 15px;
-      cursor: pointer;
-    }
-    .time-header {
-      top: 20px;
-      right: 15px;
-      width: 90px;
-    }
-    .current-price-header {
-        position: absolute;
-        font-size: 110px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: auto;
-        height: auto;
-        padding: 10px 40px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-        z-index: 5;
-        white-space: nowrap;
-        min-width: 300px;
-        max-width: 90%;
-        background-color: var(--header-bg-color);
-        color: white;
-        border-radius: 50px;
-    }
-    .current-price-header.price-update {
-        animation: pricePulse 0.6s ease-out;
-    }
-    @keyframes pricePulse {
-        0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        50% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.8; }
-        100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    }
-    .crypto-title-header, .alternate-crypto-header {
-      position: absolute;
-      width: auto;
-      font-size: 20px;
-      padding: 8px 30px;
-      height: auto;
-      z-index: 10;
-      white-space: nowrap;
-      background-color: var(--header-bg-color);
-      color: white;
-      border-radius: 50px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 15px;
-      min-width: 280px;
-      padding-right: 30px;
-    }
-    .crypto-title-header {
-      top: calc(50% - 130px);
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .alternate-crypto-header {
-      bottom: calc(50% - 130px);
-      left: 50%;
-      transform: translateX(-50%);
-    }
-    .crypto-title-header .crypto-change-info,
-    .alternate-crypto-header .crypto-change-info {
-        display: flex;
-        align-items: center;
-        margin-left: auto;
-        gap: 5px;
-    }
-    .crypto-title-header .material-icons,
-    .alternate-crypto-header .material-icons {
-        font-size: 20px;
-        color: white;
-    }
-    .crypto-title-header .crypto-text,
-    .alternate-crypto-header .crypto-text {
-        color: white !important;
-        font-weight: bold;
-    }
-    .change-header {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: var(--header-bg-color);
-      color: white;
-      padding: 6px 25px;
-      border-radius: 50px;
-      font-weight: 300;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      letter-spacing: 1px;
-      height: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      z-index: 1000;
-      min-width: 150px;
-      visibility: hidden;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      max-width: 100%;
-      box-sizing: border-box;
-    }
-    .price, .change { display: none; }
-    .error {
-      font-size: 16px;
-      color: #ff6666;
-      margin-top: 10px;
-      opacity: 0.8;
-    }
-    .menu-icons-container {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      z-index: 1000;
-    }
-    .menu-button, .battery-icon, .crypto-switcher, .browser-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--battery-icon-color);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-    }
-    .menu-button { flex-direction: column; }
-    .menu-button span {
-      width: 16px;
-      height: 1.5px;
-      background-color: var(--menu-button-color);
-      margin: 2px 0;
-      transition: all 0.2s ease;
-    }
-    .battery-icon {
-      color: var(--text-color);
-      font-size: 16px;
-      font-weight: bold;
-      transition: all 0.3s ease;
-    }
-    .battery-icon.low {
-      color: var(--change-negative);
-      box-shadow: 0 0 10px 2px var(--change-negative);
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .battery-icon.blinking {
-      animation: blink 1s infinite alternate;
-    }
-    .menu {
-      position: absolute;
-      bottom: 70px;
-      right: 20px;
-      background-color: #2a2a2a;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      display: none;
-      flex-direction: column;
-      z-index: 999;
-      padding: 8px 0;
-      min-width: 180px;
-    }
-    .menu.active { display: flex; }
-    .menu-item {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      color: var(--text-color);
-      font-size: 16px;
-      cursor: pointer;
-      gap: 15px;
-      transition: background-color 0.2s ease;
-    }
-    .menu-item:hover { background-color: rgba(74, 144, 226, 0.2); }
-    .settings-form {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #252525;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      z-index: 1001;
-      color: var(--text-color);
-      text-align: left;
-      width: 350px;
-      max-width: 90%;
-    }
-    .settings-form.active { display: block; }
-    .settings-form h3 {
-      margin: 0 0 20px;
-      font-size: 20px;
-      font-weight: 500;
-      color: var(--text-color);
-      text-align: center;
-    }
-    .settings-form label {
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-    }
-    .settings-form label span:first-child {
-        margin-right: 10px;
-        min-width: 120px;
-    }
-    .settings-form input[type="checkbox"] {
-      accent-color: var(--primary-color);
-    }
-    .settings-form input[type="number"],
-    .settings-form select {
-      flex: 1;
-      padding: 5px;
-      background: #333;
-      color: white;
-      border: 1px solid #444;
-      border-radius: 4px;
-    }
-    .button-group {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .settings-form button {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
-    }
-    .save-btn {
-      background-color: var(--primary-color);
-      color: #ffffff;
-    }
-    .save-btn:hover { background-color: #357abd; transform: translateY(-1px); }
-    .cancel-btn {
-      background-color: #404040;
-      color: #e0e0e0;
-    }
-    .cancel-btn:hover { background-color: #505050; transform: translateY(-1px); }
-    .offline-mode {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-    .offline-message {
-      color: #fff;
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-    .battery-status {
-      color: #fff;
-      font-size: 24px;
-      margin-top: 10px;
-    }
-    .alert-active {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 1500;
-      color: white;
-      font-size: 24px;
-      cursor: pointer;
-    }
-    .crypto-switcher {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      color: var(--text-color);
-      z-index: 1000;
-      transition: transform 0.3s ease;
-    }
-    .crypto-switcher:hover { transform: rotate(180deg); }
-    .browser-icon {
-      position: absolute;
-      bottom: 20px;
-      left: 70px;
-      color: var(--text-color);
-      z-index: 1000;
-    }
-    .material-icons { font-size: 24px; }
-    .about-modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #2a2a2a;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      z-index: 2000;
-      color: white;
-      text-align: center;
-      width: 300px;
-      max-width: 90%;
-    }
-    .about-modal h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        font-size: 20px;
-    }
-    .about-modal p {
-        margin-bottom: 10px;
-        line-height: 1.5;
-    }
-    .about-modal button {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 8px;
-        background-color: #404040;
-        color: #e0e0e0;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.2s ease;
-    }
-    .about-modal button:hover {
-        background-color: #505050;
-    }
-    @media (orientation: landscape) {
-      .current-price-header { font-size: 120px; }
-      .crypto-title-header { font-size: 24px; top: calc(50% - 145px); }
-      .alternate-crypto-header { font-size: 24px; bottom: calc(50% - 145px); }
-    }
-    @media (max-width: 600px) {
-      .menu-button, .battery-icon, .crypto-switcher, .browser-icon {
-        width: 35px;
-        height: 35px;
-      }
-      .menu-button span {
-        width: 14px;
-        height: 1.3px;
-      }
-      .battery-icon { font-size: 14px; }
-      .menu {
-        bottom: 60px;
-        right: 15px;
-        min-width: 160px;
-      }
-      .menu-item {
-        font-size: 14px;
-        padding: 8px 15px;
-      }
-      .settings-form {
-        width: 280px;
-        padding: 20px;
-      }
-      .settings-form button {
-        padding: 10px;
-        font-size: 13px;
-      }
-      .date-header, .time-header {
-        font-size: 16px;
-        padding: 4px 15px;
-        height: 22px;
-        top: 15px;
-      }
-      .time-header { width: 80px; }
-      .current-price-header {
-        font-size: 80px;
-        padding: 8px 30px;
-      }
-      .crypto-title-header {
-        font-size: 16px;
-        padding: 6px 20px;
-        top: calc(50% - 100px);
-      }
-      .alternate-crypto-header {
-        font-size: 16px;
-        padding: 6px 20px;
-        bottom: calc(50% - 100px);
-      }
-      .crypto-title-header .material-icons,
-      .alternate-crypto-header .material-icons { font-size: 16px; }
-    }
-  </style>
+    <title>Crypto Prices</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #000; color: #E0E0E0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Roboto', sans-serif; text-align: center; }
+        #price-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 0; }
+        #title-container { display: flex; align-items: center; position: absolute; top: 10vh; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+        #title { font-size: 2em; margin-right: 0.5em; }
+        #price { font-size: 20em; font-weight: bold; line-height: 1; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-feature-settings: "kern" 1, "liga" 0; -webkit-font-feature-settings: "kern" 1, "liga" 0; text-rendering: optimizeLegibility; }
+        @media (max-width: 1900px) { #price { font-size: 18em; } }
+        @media (max-width: 1700px) { #price { font-size: 16em; } }
+        @media (max-width: 1400px) { #price { font-size: 14em; } }
+        @media (max-width: 1200px) { #price { font-size: 12em; } }
+        @media (max-width: 900px) { #price { font-size: 10em; } }
+        @media (max-width: 700px) { #price { font-size: 8em; } }
+        @media (max-width: 500px) { #price { font-size: 6em; } }
+        #change-info { display: flex; align-items: center; justify-content: center; }
+        .change-icon { font-size: 1.5em; vertical-align: middle; margin-right: 0.8em; color: #E0E0E0; }
+        .change-text { font-size: 1.5em; color: #E0E0E0; }
+        #ethereum-info { display: flex; align-items: center; justify-content: center; font-size: 2.2em; color: #B0B0B0; position: absolute; bottom: 10vh; left: 50%; transform: translateX(-50%); white-space: nowrap; margin-top: 0; }
+        @media (max-width: 900px) { #ethereum-info { font-size: 2em; } }
+        @media (max-width: 600px) { #ethereum-info { font-size: 1.7em; } }
+        #ethereum-info span { margin-right: 0.5em; }
+        #ethereum-price { font-weight: bold; margin-right: 0.8em; }
+        #ethereum-change-icon { font-size: 0.8em; }
+        #ethereum-change { font-size: 0.8em; }
+        #battery-header {
+            width: 50px;
+            height: 25px;
+            border-radius: 12px;
+            background-color: #333;
+            border: 1px solid white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 1em;
+        }
+        #battery-level.low-battery { color: #F44336; }
+        #landscape-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; color: #E0E0E0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-size: 1.5em; }
+        @media screen and (orientation: portrait) { #landscape-message { display: flex; } body > *:not(#landscape-message) { display: none; } }
+        @media screen and (orientation: landscape) { #landscape-message { display: none; } }
+        #landscape-message .material-icons { font-size: 3em; margin-bottom: 15px; animation: rotate-device 2s infinite ease-in-out; }
+        @keyframes rotate-device { 0% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } 100% { transform: rotate(0deg); } }
+    </style>
 </head>
 <body>
-  <div class="orientation-overlay" id="orientationOverlay">
-    <span class="material-icons">screen_rotation</span>
-    <p>Please rotate your device 90 degrees.</p>
-  </div>
-  <div class="date-header" id="dateHeader"></div>
-  <div class="time-header" id="timeHeader"></div>
-  <div class="crypto-title-header" id="cryptoTitleHeader">
-    <span id="cryptoTitleText"></span>
-    <span class="crypto-change-info">
-        <span class="material-icons">multiline_chart</span>
-        <span class="crypto-text" id="changeValueInTitle">-</span>
-    </span>
-  </div>
-  <div class="current-price-header" id="currentPriceHeader">Loading...</div>
-  <div class="alternate-crypto-header" id="alternateCryptoHeader">
-    <span id="alternateCryptoTitleText"></span>
-    <span id="alternateCryptoPriceText"></span>
-    <span class="crypto-change-info">
-        <span class="material-icons">multiline_chart</span>
-        <span class="crypto-text" id="alternateChangeValueText">-</span>
-    </span>
-  </div>
-  <div class="container">
-    <div class="price" id="price"></div>
-    <div class="change" id="change"></div>
-    <div class="error" id="error"></div>
-  </div>
-  <div class="crypto-switcher" id="cryptoSwitcher">
-    <span class="material-icons">autorenew</span>
-  </div>
-  <div class="browser-icon" id="browserIcon">
-    <span class="material-icons">public</span>
-  </div>
-  <div class="change-header" id="changeHeader"></div>
-  <div class="menu-icons-container">
-    <div class="battery-icon" id="batteryIcon">N/A</div>
-    <div class="menu-button" id="menuButton">
-      <span></span>
-      <span></span>
-      <span></span>
+    <div id="landscape-message">
+        <i class="material-icons">screen_rotation</i>
+        <p>Please rotate your device</p>
     </div>
-  </div>
-  <div class="menu" id="menu">
-    <div class="menu-item" id="settings">
-      <span class="material-icons">settings</span>
-      <span>Settings</span>
+
+    <div id="price-container">
+        <div id="title-container">
+            <div id="title">BITCOIN PRICE</div>
+            <div id="change-info">
+                <i id="change-icon" class="material-icons change-icon">trending_flat</i>
+                <span id="change" class="change-text"></span>
+                <div id="battery-header">
+                    <span id="battery-level"></span>
+                </div>
+            </div>
+        </div>
+        <div id="price"></div>
+
+        <div id="ethereum-info">
+            <span>ETHEREUM</span>
+            <span id="ethereum-price"></span>
+            <i id="ethereum-change-icon" class="material-icons change-icon">trending_flat</i>
+            <span id="ethereum-change" class="change-text"></span>
+        </div>
     </div>
-    <div class="menu-item" id="refresh">
-      <span class="material-icons">refresh</span>
-      <span>Refresh</span>
-    </div>
-    <div class="menu-item" id="about">
-      <span class="material-icons">info</span>
-      <span>About</span>
-    </div>
-    <div class="menu-item" id="exit">
-      <span class="material-icons">logout</span>
-      <span>Exit</span>
-    </div>
-  </div>
-  <div class="settings-form" id="settingsForm">
-    <h3>Settings</h3>
-    <label>
-      <span>Price Alert ($):</span>
-      <input type="number" id="alertThresholdInput">
-    </label>
-    <label>
-      <span>Cryptocurrency:</span>
-      <select id="currencySelect">
-        <option value="bitcoin" selected>Bitcoin</option>
-        <option value="ethereum">Ethereum</option>
-      </select>
-    </label>
-    <label>
-      <span>Update Interval:</span>
-      <select id="updateIntervalSelect">
-        <option value="10000">10 Seconds</option>
-        <option value="60000" selected>1 Minute</option>
-        <option value="180000">3 Minutes</option>
-        <option value="300000">5 Minutes</option>
-      </select>
-    </label>
-    <div class="button-group">
-      <button class="save-btn" id="saveSettings">Save</button>
-      <button class="cancel-btn" id="cancelSettings">Cancel</button>
-    </div>
-  </div>
-  <div class="offline-mode" id="offlineMode" style="display: none;">
-    <div class="offline-message">No internet connected</div>
-    <div class="battery-status">Battery level: <span id="offlineBatteryLevel">N/A</span></div>
-  </div>
-  <div class="alert-active" id="alertActive" style="display: none;">
-    <div>Price Alert Active</div>
-    <div style="font-size: 16px; margin-top: 10px;">Tap to stop alert</div>
-  </div>
-  <div class="about-modal" id="aboutModal">
-    <h3>About Crypto Price App</h3>
-    <p>Version 1.0</p>
-    <p>A simple app to track cryptocurrency prices.</p>
-    <p>Developed with ❤️ for crypto enthusiasts.</p>
-    <button class="cancel-btn" id="closeAboutModal">Close</button>
-  </div>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const API_KEY = 'YOUR_CRYPTOCOMPARE_API_KEY';
-      const PRICE_ALERT_TOLERANCE = 100;
-      const DEFAULT_PRICE_UPDATE_INTERVAL_MS = 60000;
 
-      let wakeLock = null;
-      const requestWakeLock = async () => {
-        if (!('wakeLock' in navigator)) return;
-        try {
-          wakeLock = await navigator.wakeLock.request('screen');
-        } catch (err) {}
-      };
-      requestWakeLock();
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible' && wakeLock === null) requestWakeLock();
-        else if (document.visibilityState === 'hidden' && wakeLock !== null) {
-            wakeLock.release().then(() => wakeLock = null);
-        }
-        state.isAppInBackground = document.hidden;
-        startPriceUpdateInterval();
-      });
+    <script>
+        const API_BASE = 'https://min-api.cryptocompare.com/data/';
+        const priceEl = document.getElementById('price');
+        const changeEl = document.getElementById('change');
+        const changeIcon = document.getElementById('change-icon');
+        const ethereumPriceEl = document.getElementById('ethereum-price');
+        const ethereumChangeEl = document.getElementById('ethereum-change');
+        const ethereumChangeIcon = document.getElementById('ethereum-change-icon');
+        const landscapeMsg = document.getElementById('landscape-message');
+        const priceContainer = document.getElementById('price-container');
+        const batteryHeader = document.getElementById('battery-header');
+        const batteryLevelEl = document.getElementById('battery-level');
 
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => {})
-            .catch(err => {});
-        });
-      }
+        let dataInterval, batteryInterval, wakeLock = null;
 
-      const elements = {
-        error: document.getElementById('error'),
-        menuButton: document.getElementById('menuButton'),
-        menu: document.getElementById('menu'),
-        settings: document.getElementById('settings'),
-        refresh: document.getElementById('refresh'),
-        about: document.getElementById('about'),
-        exit: document.getElementById('exit'),
-        batteryIcon: document.getElementById('batteryIcon'),
-        cryptoSwitcher: document.getElementById('cryptoSwitcher'),
-        browserIcon: document.getElementById('browserIcon'),
-        settingsForm: document.getElementById('settingsForm'),
-        saveSettings: document.getElementById('saveSettings'),
-        cancelSettings: document.getElementById('cancelSettings'),
-        offlineMode: document.getElementById('offlineMode'),
-        offlineBatteryLevel: document.getElementById('offlineBatteryLevel'),
-        alertThresholdInput: document.getElementById('alertThresholdInput'),
-        alertActive: document.getElementById('alertActive'),
-        currencySelect: document.getElementById('currencySelect'),
-        updateIntervalSelect: document.getElementById('updateIntervalSelect'),
-        dateHeader: document.getElementById('dateHeader'),
-        timeHeader: document.getElementById('timeHeader'),
-        aboutModal: document.getElementById('aboutModal'),
-        closeAboutModal: document.getElementById('closeAboutModal'),
-        orientationOverlay: document.getElementById('orientationOverlay'),
-        cryptoTitleHeader: document.getElementById('cryptoTitleHeader'),
-        cryptoTitleText: document.getElementById('cryptoTitleText'),
-        currentPriceHeader: document.getElementById('currentPriceHeader'),
-        changeValueInTitle: document.getElementById('changeValueInTitle'),
-        alternateCryptoHeader: document.getElementById('alternateCryptoHeader'),
-        alternateCryptoTitleText: document.getElementById('alternateCryptoTitleText'),
-        alternateCryptoPriceText: document.getElementById('alternateCryptoPriceText'),
-        alternateChangeValueText: document.getElementById('alternateChangeValueText')
-      };
+        const fmtNum = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-      const state = {
-        lastPrice: null,
-        audioContext: null,
-        beepInterval: null,
-        onlineStatus: navigator.onLine,
-        priceUpdateIntervalId: null,
-        timeUpdateIntervalId: null,
-        currentBatteryLevel: 'N/A',
-        priceAlertThreshold: localStorage.getItem('priceAlertThreshold') ? parseFloat(localStorage.getItem('priceAlertThreshold')) : null,
-        isAppInBackground: false,
-        currentOscillator: null,
-        currentGainNode: null,
-        batteryWarningPlayed: false,
-        userSelectedUpdateInterval: parseInt(localStorage.getItem('updateInterval') || DEFAULT_PRICE_UPDATE_INTERVAL_MS),
-        currentUpdateInterval: parseInt(localStorage.getItem('updateInterval') || DEFAULT_PRICE_UPDATE_INTERVAL_MS),
-        currentCrypto: localStorage.getItem('selectedCurrency') || 'bitcoin',
-        bitcoinData: { price: 'N/A', change: '-' },
-        ethereumData: { price: 'N/A', change: '-' }
-      };
-
-      const updateDate = () => {
-        elements.dateHeader.textContent = new Intl.DateTimeFormat('en-US', {
-            year: 'numeric', month: '2-digit', day: '2-digit'
-        }).format(new Date());
-      };
-
-      const updateTime = () => {
-        elements.timeHeader.textContent = new Intl.DateTimeFormat('en-US', {
-            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-        }).format(new Date());
-      };
-
-      const startPriceUpdateInterval = () => {
-        if (state.priceUpdateIntervalId) clearInterval(state.priceUpdateIntervalId);
-        state.currentUpdateInterval = state.userSelectedUpdateInterval;
-        if (state.onlineStatus && !state.isAppInBackground) {
-          state.priceUpdateIntervalId = setInterval(fetchPrice, state.currentUpdateInterval);
-        } else {
-          state.priceUpdateIntervalId = null;
-        }
-      };
-
-      const initAudio = () => {
-        if (!state.audioContext) {
-          try {
-            state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            if (state.audioContext.state === 'suspended') state.audioContext.resume().catch(e => {});
-          } catch (e) {
-            elements.error.textContent = 'Error initializing audio.';
-            return false;
-          }
-        } else if (state.audioContext.state === 'suspended') {
-            state.audioContext.resume().catch(e => {});
-        }
-        return true;
-      };
-
-      const playBatteryBeep = () => {
-          if (!state.onlineStatus || !initAudio()) return;
-          if (elements.alertActive.style.display === 'flex') stopAlert();
-          let oscillator = state.audioContext.createOscillator();
-          let gainNode = state.audioContext.createGain();
-          oscillator.type = 'sine';
-          oscillator.frequency.value = 880;
-          gainNode.gain.value = 0.4;
-          oscillator.connect(gainNode);
-          gainNode.connect(state.audioContext.destination);
-          oscillator.start(state.audioContext.currentTime);
-          oscillator.stop(state.audioContext.currentTime + 1);
-          oscillator.onended = () => {
-              oscillator.disconnect();
-              gainNode.disconnect();
-          };
-      };
-
-      const setupBatteryMonitoring = () => {
-        if (navigator.getBattery) {
-          navigator.getBattery().then(battery => {
-            const updateBatteryStatus = () => {
-              const level = Math.round(battery.level * 100);
-              state.currentBatteryLevel = level;
-              elements.batteryIcon.textContent = level;
-              elements.offlineBatteryLevel.textContent = level;
-              if (!battery.charging && level <= 30) {
-                if (!state.batteryWarningPlayed) {
-                  playBatteryBeep();
-                  state.batteryWarningPlayed = true;
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    wakeLock.addEventListener('release', () => console.log('Screen Wake Lock released!'));
+                } catch (err) {
+                    console.error(`${err.name}, ${err.message}`);
                 }
-                elements.batteryIcon.classList.add('low', 'blinking');
-              } else {
-                state.batteryWarningPlayed = false;
-                elements.batteryIcon.classList.remove('low', 'blinking');
-              }
-              elements.error.textContent = '';
-              startPriceUpdateInterval();
-            };
-            updateBatteryStatus();
-            battery.addEventListener('levelchange', updateBatteryStatus);
-            battery.addEventListener('chargingchange', updateBatteryStatus);
-          }).catch(err => {
-            elements.batteryIcon.textContent = 'N/A';
-            elements.offlineBatteryLevel.textContent = 'N/A';
-            elements.error.textContent = 'Battery status not available.';
-          });
-        } else {
-          elements.batteryIcon.textContent = 'N/A';
-          elements.offlineBatteryLevel.textContent = 'N/A';
-          elements.error.textContent = 'Battery Status API not supported.';
+            } else {
+                console.warn('Wake Lock API not supported by this browser.');
+            }
         }
-      };
 
-      const checkOnlineStatus = () => {
-        state.onlineStatus = navigator.onLine;
-        if (state.onlineStatus) {
-          elements.offlineMode.style.display = 'none';
-          fetchPrice();
-          startPriceUpdateInterval();
-          if (!state.timeUpdateIntervalId) {
-            state.timeUpdateIntervalId = setInterval(updateTime, 1000);
-          }
-          elements.error.textContent = '';
-        } else {
-          elements.offlineMode.style.display = 'flex';
-          elements.offlineBatteryLevel.textContent = state.currentBatteryLevel;
-          if (state.priceUpdateIntervalId) {
-            clearInterval(state.priceUpdateIntervalId);
-            state.priceUpdateIntervalId = null;
-          }
-          if (state.timeUpdateIntervalId) {
-            clearInterval(state.timeUpdateIntervalId);
-            state.timeUpdateIntervalId = null;
-          }
-          elements.error.textContent = 'No internet connection. Displaying last saved data.';
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+            }
         }
-      };
 
-      const playBeepAlert = () => {
-        if (!state.onlineStatus || !initAudio()) return;
-        stopAlert();
-        elements.alertActive.style.display = 'flex';
-        const beepDuration = 0.1;
-        const silenceDuration = 0.1;
-        const sequencePause = 0.5;
-        const playSingleBeep = (frequency, duration) => {
-          state.currentOscillator = state.audioContext.createOscillator();
-          state.currentGainNode = state.audioContext.createGain();
-          state.currentOscillator.type = 'sine';
-          state.currentOscillator.frequency.value = frequency;
-          state.currentGainNode.gain.value = 0.2;
-          state.currentOscillator.connect(state.currentGainNode);
-          state.currentGainNode.connect(state.audioContext.destination);
-          state.currentOscillator.start(state.audioContext.currentTime);
-          state.currentOscillator.stop(state.audioContext.currentTime + duration);
-          state.currentOscillator.onended = () => {
-            if (state.currentOscillator) state.currentOscillator.disconnect();
-            if (state.currentGainNode) state.currentGainNode.disconnect();
-          };
-        };
-        const playBeepSequence = () => {
-          playSingleBeep(1000, beepDuration);
-          setTimeout(() => {
-            playSingleBeep(1000, beepDuration);
-          }, (beepDuration + silenceDuration) * 1000);
-        };
-        playBeepSequence();
-        state.beepInterval = setInterval(playBeepSequence, (beepDuration * 2 + silenceDuration + sequencePause) * 1000);
-        setTimeout(() => stopAlert(), 10000);
-      };
-
-      const stopAlert = () => {
-        if (state.beepInterval) {
-          clearInterval(state.beepInterval);
-          state.beepInterval = null;
+        function updateUI(currentPrice, changePct, priceElement, changeElement, changeIconElement) {
+            priceElement.textContent = fmtNum(Math.round(currentPrice));
+            changeElement.textContent = `${changePct.toFixed(2)}%`;
+            changeIconElement.textContent = changePct > 0 ? 'trending_up' : (changePct < 0 ? 'trending_down' : 'trending_flat');
+            changeElement.style.color = changePct > 0 ? '#4CAF50' : (changePct < 0 ? '#F44336' : '#E0E0E0');
         }
-        if (state.currentOscillator) {
-          state.currentOscillator.stop();
-          state.currentOscillator.disconnect();
-          state.currentOscillator = null;
+
+        function loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey) {
+            const storedData = localStorage.getItem(localStorageKey);
+            if (storedData) {
+                try {
+                    const { price, change } = JSON.parse(storedData);
+                    updateUI(price, change, priceEl, changeEl, changeIcon);
+                } catch (e) {
+                    console.error(`Error parsing stored data for ${fsym}:`, e);
+                    priceEl.textContent = 'N/A';
+                    changeEl.textContent = 'N/A';
+                    changeIcon.textContent = 'error';
+                }
+            } else {
+                priceEl.textContent = 'N/A';
+                changeEl.textContent = 'N/A';
+                changeIcon.textContent = 'trending_flat';
+            }
         }
-        if (state.currentGainNode) {
-          state.currentGainNode.disconnect();
-          state.currentGainNode = null;
+
+        async function getCrypto(fsym, priceEl, changeEl, changeIcon, localStorageKey) {
+            if (!navigator.onLine) {
+                loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey);
+                changeIcon.textContent = 'cloud_off';
+                return;
+            }
+
+            try {
+                const [currentRes, historicalRes] = await Promise.all([
+                    fetch(`${API_BASE}price?fsym=${fsym}&tsyms=USD`),
+                    fetch(`${API_BASE}v2/histoday?fsym=${fsym}&tsym=USD&limit=1`)
+                ]);
+
+                if (!currentRes.ok || !historicalRes.ok) throw new Error(`HTTP error! status: ${currentRes.status} / ${historicalRes.status}`);
+
+                const currentData = await currentRes.json();
+                const historicalData = await historicalRes.json();
+
+                const currentPrice = currentData.USD;
+                const yesterdayClose = historicalData.Data.Data[0]?.close || currentPrice;
+                const changePct = yesterdayClose > 0 ? ((currentPrice - yesterdayClose) / yesterdayClose) * 100 : 0;
+
+                updateUI(currentPrice, changePct, priceEl, changeEl, changeIcon);
+                localStorage.setItem(localStorageKey, JSON.stringify({ price: currentPrice, change: changePct }));
+
+            } catch (error) {
+                console.error(`Error fetching ${fsym} data:`, error);
+                priceEl.textContent = 'ERROR';
+                changeEl.textContent = 'ERROR';
+                changeIcon.textContent = 'error';
+                loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey);
+            }
         }
-        elements.alertActive.style.display = 'none';
-        state.priceAlertThreshold = null;
-        localStorage.removeItem('priceAlertThreshold');
-        elements.alertThresholdInput.value = '';
-      };
 
-      const checkPriceAlert = price => {
-        if (state.priceAlertThreshold === null || state.lastPrice === null) return;
-        const currentPrice = price;
-        const previousPrice = state.lastPrice;
-        const threshold = state.priceAlertThreshold;
-        const crossedUp = (previousPrice <= threshold && currentPrice > threshold);
-        const crossedDown = (previousPrice >= threshold && currentPrice < threshold);
-        const withinTolerance = Math.abs(currentPrice - threshold) <= PRICE_ALERT_TOLERANCE;
-        if ((crossedUp || crossedDown || withinTolerance) && elements.alertActive.style.display !== 'flex') {
-            playBeepAlert();
+        function updateBattery() {
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    const level = Math.round(battery.level * 100);
+                    batteryLevelEl.textContent = level;
+                    batteryLevelEl.classList.toggle('low-battery', level < 30);
+                }).catch(error => {
+                    console.error('Error fetching battery status:', error);
+                    batteryLevelEl.textContent = 'N/A';
+                    batteryLevelEl.classList.remove('low-battery');
+                });
+            } else {
+                batteryLevelEl.textContent = 'N/A';
+                batteryLevelEl.classList.remove('low-battery');
+            }
         }
-      };
 
-      const updateDisplayData = (mainCryptoData, alternateCryptoData, alternateCryptoName) => {
-        elements.cryptoTitleText.textContent = `${state.currentCrypto === 'bitcoin' ? 'Bitcoin' : 'Ethereum'} Price`;
-        elements.changeValueInTitle.textContent = `${typeof mainCryptoData.change === 'number' ? mainCryptoData.change.toFixed(2) : '-'}%`;
-        elements.currentPriceHeader.textContent = mainCryptoData.price.toLocaleString();
-        elements.currentPriceHeader.classList.add('price-update');
-        setTimeout(() => elements.currentPriceHeader.classList.remove('price-update'), 600);
-
-        elements.alternateCryptoTitleText.textContent = alternateCryptoName;
-        elements.alternateCryptoPriceText.textContent = alternateCryptoData.price.toLocaleString();
-        elements.alternateChangeValueText.textContent = `${typeof alternateCryptoData.change === 'number' ? alternateCryptoData.change.toFixed(2) : '-'}%`;
-
-        elements.changeValueInTitle.style.color = typeof mainCryptoData.change === 'number' ? (mainCryptoData.change >= 0 ? 'var(--change-positive)' : 'var(--change-negative)') : 'white';
-        elements.alternateChangeValueText.style.color = typeof alternateCryptoData.change === 'number' ? (alternateCryptoData.change >= 0 ? 'var(--change-positive)' : 'var(--change-negative)') : 'white';
-      };
-
-      const fetchPrice = async () => {
-        try {
-          if (!state.onlineStatus || state.isAppInBackground) return;
-          const [bitcoinPriceResponse, ethereumPriceResponse] = await Promise.all([
-            fetch(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=BTC&tsyms=USD&api_key=${API_KEY}`),
-            fetch(`https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD&api_key=${API_KEY}`)
-          ]);
-          if (!bitcoinPriceResponse.ok) throw new Error('Failed to fetch Bitcoin data.');
-          if (!ethereumPriceResponse.ok) throw new Error('Failed to fetch Ethereum data.');
-
-          const bitcoinData = await bitcoinPriceResponse.json();
-          const ethereumData = await ethereumPriceResponse.json();
-
-          state.bitcoinData = {
-              price: Math.round(bitcoinData.RAW.BTC.USD.PRICE),
-              change: parseFloat(bitcoinData.DISPLAY.BTC.USD.CHANGEPCT24HOUR)
-          };
-          state.ethereumData = {
-              price: Math.round(ethereumData.RAW.ETH.USD.PRICE),
-              change: parseFloat(ethereumData.DISPLAY.ETH.USD.CHANGEPCT24HOUR)
-          };
-
-          const mainCrypto = state.currentCrypto === 'bitcoin' ? state.bitcoinData : state.ethereumData;
-          const alternateCrypto = state.currentCrypto === 'bitcoin' ? state.ethereumData : state.bitcoinData;
-          const alternateCryptoName = state.currentCrypto === 'bitcoin' ? 'Ethereum' : 'Bitcoin';
-
-          updateDisplayData(mainCrypto, alternateCrypto, alternateCryptoName);
-
-          elements.error.textContent = '';
-          checkPriceAlert(mainCrypto.price);
-          state.lastPrice = mainCrypto.price;
-
-          localStorage.setItem('bitcoinPrice', state.bitcoinData.price);
-          localStorage.setItem('bitcoinChange', state.bitcoinData.change);
-          localStorage.setItem('ethereumPrice', state.ethereumData.price);
-          localStorage.setItem('ethereumChange', state.ethereumData.change);
-
-        } catch (error) {
-          elements.error.textContent = `Error loading data: ${error.message}. Displaying last saved data.`;
-          const lastBitcoinPrice = localStorage.getItem('bitcoinPrice');
-          const lastBitcoinChange = localStorage.getItem('bitcoinChange');
-          const lastEthereumPrice = localStorage.getItem('ethereumPrice');
-          const lastEthereumChange = localStorage.getItem('ethereumChange');
-
-          state.bitcoinData = {
-              price: lastBitcoinPrice ? Math.round(parseFloat(lastBitcoinPrice)) : 'N/A',
-              change: lastBitcoinChange ? parseFloat(lastBitcoinChange) : '-'
-          };
-          state.ethereumData = {
-              price: lastEthereumPrice ? Math.round(parseFloat(lastEthereumPrice)) : 'N/A',
-              change: lastEthereumChange ? parseFloat(lastEthereumChange) : '-'
-          };
-          const mainCrypto = state.currentCrypto === 'bitcoin' ? state.bitcoinData : state.ethereumData;
-          const alternateCrypto = state.currentCrypto === 'bitcoin' ? state.ethereumData : state.bitcoinData;
-          const alternateCryptoName = state.currentCrypto === 'bitcoin' ? 'Ethereum' : 'Bitcoin';
-          updateDisplayData(mainCrypto, alternateCrypto, alternateCryptoName);
+        function refreshAll() {
+            if (window.innerWidth > window.innerHeight) {
+                getCrypto('BTC', priceEl, changeEl, changeIcon, 'bitcoinData');
+                getCrypto('ETH', ethereumPriceEl, ethereumChangeEl, ethereumChangeIcon, 'ethereumData');
+            }
         }
-      };
 
-      const checkOrientation = () => {
-        if (window.innerHeight > window.innerWidth) {
-          elements.orientationOverlay.style.display = 'flex';
-          document.body.classList.add('portrait-mode');
-        } else {
-          elements.orientationOverlay.style.display = 'none';
-          document.body.classList.remove('portrait-mode');
+        function setupRefreshIntervals() {
+            clearInterval(dataInterval);
+            dataInterval = setInterval(refreshAll, 30000);
+            clearInterval(batteryInterval);
+            batteryInterval = setInterval(updateBattery, 5000);
         }
-      };
 
-      const closeAllModals = () => {
-        elements.menu.classList.remove('active');
-        elements.settingsForm.classList.remove('active');
-        elements.aboutModal.style.display = 'none';
-      };
+        function checkOrientation() {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            landscapeMsg.style.display = isPortrait ? 'flex' : 'none';
+            priceContainer.style.display = isPortrait ? 'none' : 'flex';
+            
+            if (isPortrait) {
+                clearInterval(dataInterval);
+                clearInterval(batteryInterval);
+                releaseWakeLock();
+            } else {
+                loadCryptoFromLocalStorage('BTC', priceEl, changeEl, changeIcon, 'bitcoinData');
+                loadCryptoFromLocalStorage('ETH', ethereumPriceEl, ethereumChangeEl, ethereumChangeIcon, 'ethereumData');
+                refreshAll();
+                updateBattery();
+                setupRefreshIntervals();
+                requestWakeLock();
+            }
+        }
 
-      const setupEventListeners = () => {
-        window.addEventListener('online', checkOnlineStatus);
-        window.addEventListener('offline', checkOnlineStatus);
-        window.addEventListener('resize', checkOrientation);
+        function init() {
+            priceEl.textContent = '';
+            changeEl.textContent = '';
+            ethereumPriceEl.textContent = '';
+            ethereumChangeEl.textContent = '';
 
-        document.addEventListener('click', e => {
-          if (!elements.menu.contains(e.target) && !elements.menuButton.contains(e.target) &&
-              !elements.settingsForm.contains(e.target) && !elements.settings.contains(e.target) &&
-              !elements.aboutModal.contains(e.target) && !elements.about.contains(e.target)) {
-            closeAllModals();
-          }
-        });
+            checkOrientation();
+            requestWakeLock();
 
-        elements.alertActive.addEventListener('click', stopAlert);
-        elements.menuButton.addEventListener('click', () => {
-          elements.menu.classList.toggle('active');
-          elements.settingsForm.classList.remove('active');
-          elements.aboutModal.style.display = 'none';
-        });
-        elements.about.addEventListener('click', () => {
-          closeAllModals();
-          elements.aboutModal.style.display = 'block';
-        });
-        elements.closeAboutModal.addEventListener('click', () => {
-            elements.aboutModal.style.display = 'none';
-        });
-        elements.exit.addEventListener('click', () => window.close());
-        elements.dateHeader.addEventListener('click', () => { if (state.onlineStatus) fetchPrice(); });
-        elements.cryptoSwitcher.addEventListener('click', () => {
-          state.currentCrypto = (state.currentCrypto === 'bitcoin' ? 'ethereum' : 'bitcoin');
-          localStorage.setItem('selectedCurrency', state.currentCrypto);
-          fetchPrice();
-        });
-        elements.browserIcon.addEventListener('click', () => window.open('https://arhahmad.github.io/Price-BTC-ETH/', '_blank'));
-        elements.settings.addEventListener('click', () => {
-          closeAllModals();
-          elements.settingsForm.classList.add('active');
-          elements.alertThresholdInput.value = state.priceAlertThreshold || '';
-          elements.currencySelect.value = state.currentCrypto;
-          elements.updateIntervalSelect.value = state.userSelectedUpdateInterval.toString();
-        });
-        elements.refresh.addEventListener('click', () => {
-          closeAllModals();
-          if (state.onlineStatus) fetchPrice();
-        });
-        elements.saveSettings.addEventListener('click', () => {
-          state.currentCrypto = elements.currencySelect.value;
-          localStorage.setItem('selectedCurrency', state.currentCrypto);
+            window.addEventListener('online', refreshAll);
+            window.addEventListener('offline', refreshAll);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && window.innerWidth > window.innerHeight) {
+                    checkOrientation();
+                } else if (document.visibilityState === 'hidden') {
+                    releaseWakeLock();
+                }
+            });
+            window.addEventListener('resize', checkOrientation);
+            window.addEventListener('orientationchange', checkOrientation);
+            batteryHeader.addEventListener('click', refreshAll);
+            window.addEventListener('beforeunload', () => {
+                clearInterval(dataInterval);
+                clearInterval(batteryInterval);
+                releaseWakeLock();
+            });
+        }
 
-          state.priceAlertThreshold = elements.alertThresholdInput.value ? parseFloat(elements.alertThresholdInput.value) : null;
-          if (state.priceAlertThreshold) localStorage.setItem('priceAlertThreshold', state.priceAlertThreshold);
-          else localStorage.removeItem('priceAlertThreshold');
-
-          state.userSelectedUpdateInterval = parseInt(elements.updateIntervalSelect.value);
-          localStorage.setItem('updateInterval', state.userSelectedUpdateInterval);
-
-          startPriceUpdateInterval();
-          elements.settingsForm.classList.remove('active');
-          if (state.onlineStatus) fetchPrice();
-        });
-        elements.cancelSettings.addEventListener('click', () => {
-          elements.settingsForm.classList.remove('active');
-          elements.alertThresholdInput.value = state.priceAlertThreshold || '';
-          elements.currencySelect.value = state.currentCrypto;
-          elements.updateIntervalSelect.value = state.userSelectedUpdateInterval.toString();
-        });
-      };
-
-      const init = () => {
-        checkOrientation();
-        updateDate();
-        updateTime();
-        state.timeUpdateIntervalId = setInterval(updateTime, 1000);
-        setupEventListeners();
-        checkOnlineStatus();
-        setupBatteryMonitoring();
-
-        elements.alertThresholdInput.value = state.priceAlertThreshold || '';
-        elements.currencySelect.value = state.currentCrypto;
-        elements.updateIntervalSelect.value = state.userSelectedUpdateInterval.toString();
-
-        state.bitcoinData = {
-            price: localStorage.getItem('bitcoinPrice') ? Math.round(parseFloat(localStorage.getItem('bitcoinPrice'))) : 'N/A',
-            change: localStorage.getItem('bitcoinChange') ? parseFloat(localStorage.getItem('bitcoinChange')) : '-'
-        };
-        state.ethereumData = {
-            price: localStorage.getItem('ethereumPrice') ? Math.round(parseFloat(localStorage.getItem('ethereumPrice'))) : 'N/A',
-            change: localStorage.getItem('ethereumChange') ? parseFloat(localStorage.getItem('ethereumChange')) : '-'
-        };
-
-        const mainCrypto = state.currentCrypto === 'bitcoin' ? state.bitcoinData : state.ethereumData;
-        const alternateCrypto = state.currentCrypto === 'bitcoin' ? state.ethereumData : state.bitcoinData;
-        const alternateCryptoName = state.currentCrypto === 'bitcoin' ? 'Ethereum' : 'Bitcoin';
-        updateDisplayData(mainCrypto, alternateCrypto, alternateCryptoName);
-
-        document.addEventListener('click', initAudio, { once: true });
-        document.addEventListener('keydown', initAudio, { once: true });
-      };
-
-      init();
-    });
-  </script>
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
