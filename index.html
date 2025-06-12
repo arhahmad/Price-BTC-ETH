@@ -9,7 +9,10 @@
         body { background-color: #000; color: #E0E0E0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Roboto', sans-serif; text-align: center; }
         #price-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 0; }
         #title-container { display: flex; align-items: center; position: absolute; top: 10vh; left: 50%; transform: translateX(-50%); white-space: nowrap; }
-        #title { font-size: 2em; margin-right: 0.5em; }
+        #title {
+            font-size: 2em; /* Unified size for BTC PRICE title */
+            margin-right: 0.5em;
+        }
         #price { font-size: 20em; font-weight: bold; line-height: 1; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-feature-settings: "kern" 1, "liga" 0; -webkit-font-feature-settings: "kern" 1, "liga" 0; text-rendering: optimizeLegibility; }
         @media (max-width: 1900px) { #price { font-size: 18em; } }
         @media (max-width: 1700px) { #price { font-size: 16em; } }
@@ -19,21 +22,45 @@
         @media (max-width: 700px) { #price { font-size: 8em; } }
         @media (max-width: 500px) { #price { font-size: 6em; } }
         #change-info { display: flex; align-items: center; justify-content: center; }
-        .change-icon { font-size: 1.5em; vertical-align: middle; margin-right: 0.8em; color: #E0E0E0; }
-        .change-text { font-size: 1.5em; color: #E0E0E0; }
-        #ethereum-info { display: flex; align-items: center; justify-content: center; font-size: 2.2em; color: #B0B0B0; position: absolute; bottom: 10vh; left: 50%; transform: translateX(-50%); white-space: nowrap; margin-top: 0; }
-        @media (max-width: 900px) { #ethereum-info { font-size: 2em; } }
-        @media (max-width: 600px) { #ethereum-info { font-size: 1.7em; } }
+        .change-icon {
+            font-size: 2em; /* Unified size for Bitcoin change icon */
+            vertical-align: middle;
+            margin-right: 0.8em;
+            color: #E0E0E0;
+        }
+        .change-text {
+            font-size: 2em; /* Unified size for Bitcoin change text */
+            color: #E0E0E0;
+        }
+        #ethereum-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em; /* Unified size for ETH PRICE title */
+            color: #B0B0B0;
+            position: absolute;
+            bottom: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            margin-top: 0;
+        }
+        /* No media queries needed for #ethereum-info as font-size is now relative and consistent */
         #ethereum-info span { margin-right: 0.5em; }
         #ethereum-price { font-weight: bold; margin-right: 0.8em; }
-        #ethereum-change-icon { font-size: 0.8em; }
-        #ethereum-change { font-size: 0.8em; }
+        #ethereum-change-icon {
+            font-size: 1em; /* Smaller size for Ethereum change icon */
+        }
+        #ethereum-change {
+            font-size: 1em; /* Smaller size for Ethereum change text */
+        }
+        /* Battery Header Styles - unchanged */
         #battery-header {
             width: 50px;
             height: 25px;
-            border-radius: 12px;
-            background-color: #333;
-            border: 1px solid white;
+            border-radius: 12.5px;
+            background-color: #000;
+            border: 2px solid #A0A0A0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -41,7 +68,19 @@
             color: white;
             font-weight: bold;
             cursor: pointer;
-            margin-left: 1em;
+            margin-left: 1.5em;
+            position: relative;
+        }
+        #battery-header::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 12px;
+            background-color: #A0A0A0;
+            border-radius: 0 3px 3px 0;
         }
         #battery-level.low-battery { color: #F44336; }
         #landscape-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; color: #E0E0E0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-size: 1.5em; }
@@ -59,7 +98,7 @@
 
     <div id="price-container">
         <div id="title-container">
-            <div id="title">BITCOIN PRICE</div>
+            <div id="title">BTC PRICE</div>
             <div id="change-info">
                 <i id="change-icon" class="material-icons change-icon">trending_flat</i>
                 <span id="change" class="change-text"></span>
@@ -71,7 +110,7 @@
         <div id="price"></div>
 
         <div id="ethereum-info">
-            <span>ETHEREUM</span>
+            <span>ETH PRICE</span>
             <span id="ethereum-price"></span>
             <i id="ethereum-change-icon" class="material-icons change-icon">trending_flat</i>
             <span id="ethereum-change" class="change-text"></span>
