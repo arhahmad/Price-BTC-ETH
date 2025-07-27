@@ -1,298 +1,450 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Crypto Prices</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body { background-color: #000; color: #E0E0E0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Roboto', sans-serif; text-align: center; }
-        #price-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; padding: 0; }
-        #title-container { display: flex; align-items: center; position: absolute; top: 10vh; left: 50%; transform: translateX(-50%); white-space: nowrap; }
-        #title {
-            font-size: 2em; /* Unified size for BTC PRICE title */
-            margin-right: 0.5em;
-        }
-        #price { font-size: 20em; font-weight: bold; line-height: 1; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-feature-settings: "kern" 1, "liga" 0; -webkit-font-feature-settings: "kern" 1, "liga" 0; text-rendering: optimizeLegibility; }
-        @media (max-width: 1900px) { #price { font-size: 18em; } }
-        @media (max-width: 1700px) { #price { font-size: 16em; } }
-        @media (max-width: 1400px) { #price { font-size: 14em; } }
-        @media (max-width: 1200px) { #price { font-size: 12em; } }
-        @media (max-width: 900px) { #price { font-size: 10em; } }
-        @media (max-width: 700px) { #price { font-size: 8em; } }
-        @media (max-width: 500px) { #price { font-size: 6em; } }
-        #change-info { display: flex; align-items: center; justify-content: center; }
-        .change-icon {
-            font-size: 2em; /* Unified size for Bitcoin change icon */
-            vertical-align: middle;
-            margin-right: 0.8em;
-            color: #E0E0E0;
-        }
-        .change-text {
-            font-size: 2em; /* Unified size for Bitcoin change text */
-            color: #E0E0E0;
-        }
-        #ethereum-info {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2em; /* Unified size for ETH PRICE title */
-            color: #B0B0B0;
-            position: absolute;
-            bottom: 10vh;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            margin-top: 0;
-        }
-        /* No media queries needed for #ethereum-info as font-size is now relative and consistent */
-        #ethereum-info span { margin-right: 0.5em; }
-        #ethereum-price { font-weight: bold; margin-right: 0.8em; }
-        #ethereum-change-icon {
-            font-size: 1em; /* Smaller size for Ethereum change icon */
-        }
-        #ethereum-change {
-            font-size: 1em; /* Smaller size for Ethereum change text */
-        }
-        /* Battery Header Styles - unchanged */
-        #battery-header {
-            width: 50px;
-            height: 25px;
-            border-radius: 12.5px;
-            background-color: #000;
-            border: 2px solid #A0A0A0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2em;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 1.5em;
-            position: relative;
-        }
-        #battery-header::after {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 12px;
-            background-color: #A0A0A0;
-            border-radius: 0 3px 3px 0;
-        }
-        #battery-level.low-battery { color: #F44336; }
-        #landscape-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; color: #E0E0E0; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; font-size: 1.5em; }
-        @media screen and (orientation: portrait) { #landscape-message { display: flex; } body > *:not(#landscape-message) { display: none; } }
-        @media screen and (orientation: landscape) { #landscape-message { display: none; } }
-        #landscape-message .material-icons { font-size: 3em; margin-bottom: 15px; animation: rotate-device 2s infinite ease-in-out; }
-        @keyframes rotate-device { 0% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } 100% { transform: rotate(0deg); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>Crypto Prices</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --header-color: #2d2d2d;
+      --background: #121212;
+      --surface: #1e1e1e;
+      --on-primary: #fff;
+      --menu-bg: #1a1a1a;
+      --widget-border: 2px solid #3a3a3a;
+      --widget-gap: 10px;
+      --page-padding: 15px;
+      --alert-color: #f44336;
+    }
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-text-size-adjust: none;
+      touch-action: pan-y;
+      margin: 0;
+      padding: 0;
+    }
+    html {
+      overflow-x: hidden;
+      -ms-content-zooming: none;
+    }
+    body {
+      background-color: var(--background);
+      color: var(--on-primary);
+      font-family: Tahoma,sans-serif;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      overscroll-behavior-y: contain;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: filter 0.3s ease;
+    }
+    body.grayscale { filter: grayscale(100%); }
+    .header {
+      background-color: var(--header-color);
+      padding: 0 var(--page-padding);
+      height: 45px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 8px;
+      left: var(--page-padding);
+      right: var(--page-padding);
+      z-index: 1000;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      margin: 0 auto;
+      max-width: calc(1200px - var(--page-padding)*2);
+      border: 1px solid #333;
+    }
+    .header-content, .battery-container { display: flex; align-items: center; }
+    .header-content { width: 100%; justify-content: space-between; }
+    .battery-icon {
+      position: relative;
+      width: 26px;
+      height: 12px;
+      border: 2px solid var(--on-primary);
+      border-radius: 3px;
+      margin-right: 6px;
+      transition: border-color 0.3s ease;
+    }
+    .battery-icon.low-battery { border-color: var(--alert-color); }
+    .battery-icon::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      width: 3px;
+      height: 5px;
+      background-color: var(--on-primary);
+      border-radius: 0 2px 2px 0;
+      transition: background-color 0.3s ease;
+    }
+    .battery-icon.low-battery::after { background-color: var(--alert-color); }
+    .battery-level {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      bottom: 2px;
+      background-color: var(--on-primary);
+      border-radius: 2px;
+      transition: background-color 0.3s ease;
+    }
+    .battery-level.low-battery { background-color: var(--alert-color); }
+    .battery-percent {
+      font-size: 16px;
+      margin-left: 4px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+    .battery-percent.low-battery { color: var(--alert-color); }
+    .header-title {
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: .5px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--on-primary);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: background-color .2s;
+      margin-left: auto;
+    }
+    .menu-btn:hover { background-color: rgba(255,255,255,.1); }
+    .menu-btn .material-icons { font-size: 24px; }
+    .menu {
+      position: absolute;
+      top: 50px;
+      right: 8px;
+      background-color: var(--menu-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
+      display: none;
+      min-width: 180px;
+      overflow: hidden;
+      z-index: 1001;
+      border: 1px solid #333;
+    }
+    .menu.show { display: block; }
+    .menu-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .menu-item:hover { background-color: rgba(255,255,255,.05); }
+    .menu-item .material-icons { margin-right: 12px; font-size: 22px; }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 55px var(--page-padding) 30px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .widgets-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--widget-gap);
+      margin: 5px 0;
+    }
+    .widget {
+      background-color: var(--surface);
+      border-radius: 6px;
+      width: calc(50% - var(--widget-gap)/2);
+      max-width: 350px;
+      min-width: 240px;
+      overflow: hidden;
+      border: var(--widget-border);
+      pointer-events: none;
+      transform: translateZ(0);
+    }
+    .tradingview-widget-container { height: 120px; }
+    .alert-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.7);
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .alert-box {
+      background-color: #2d2d2d;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 80%;
+      text-align: center;
+      border: 2px solid var(--alert-color);
+      animation: pulse 1.5s infinite;
+    }
+    .alert-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .alert-message { font-size: 16px; margin-bottom: 15px; }
+    .alert-close {
+      background-color: var(--alert-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .footer {
+      text-align: center;
+      padding: 10px 0 20px;
+      color: #666;
+      font-size: 12px;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 900px) { .widget { width: 100%; max-width: 400px; } }
+    @media (max-width: 768px) {
+      :root { --page-padding: 12px; --widget-gap: 8px; }
+      .header { top: 8px; height: 42px; }
+      .container { padding: 52px var(--page-padding) 25px; }
+    }
+    @media (max-width: 480px) {
+      :root { --page-padding: 10px; --widget-gap: 6px; }
+      .widget { min-width: 200px; }
+      .tradingview-widget-container { height: 110px; }
+      .header-title { font-size: 15px; }
+      .battery-icon { width: 24px; height: 11px; }
+      .battery-percent { font-size: 15px; }
+      .menu-item { padding: 10px 14px; font-size: 14px; }
+      .menu-item .material-icons { font-size: 20px; }
+      .alert-box { padding: 15px; max-width: 90%; }
+      .alert-title { font-size: 16px; }
+      .alert-message { font-size: 14px; }
+      .footer { font-size: 11px; }
+    }
+  </style>
 </head>
 <body>
-    <div id="landscape-message">
-        <i class="material-icons">screen_rotation</i>
-        <p>Please rotate your device</p>
-    </div>
-
-    <div id="price-container">
-        <div id="title-container">
-            <div id="title">BTC PRICE</div>
-            <div id="change-info">
-                <i id="change-icon" class="material-icons change-icon">trending_flat</i>
-                <span id="change" class="change-text"></span>
-                <div id="battery-header">
-                    <span id="battery-level"></span>
-                </div>
-            </div>
+  <div class="header">
+    <div class="header-content">
+      <div class="battery-container">
+        <div class="battery-icon" id="batteryIcon">
+          <div class="battery-level" id="batteryLevel"></div>
         </div>
-        <div id="price"></div>
-
-        <div id="ethereum-info">
-            <span>ETH PRICE</span>
-            <span id="ethereum-price"></span>
-            <i id="ethereum-change-icon" class="material-icons change-icon">trending_flat</i>
-            <span id="ethereum-change" class="change-text"></span>
+        <span class="battery-percent" id="batteryPercent"></span>
+      </div>
+      <div class="header-title">CRYPTO PRICES</div>
+      <button class="menu-btn" id="menuBtn">
+        <span class="material-icons">menu</span>
+      </button>
+      <div class="menu" id="menu">
+        <div class="menu-item" id="nightModeBtn">
+          <span class="material-icons">dark_mode</span>
+          <span>Night Mode</span>
         </div>
+        <div class="menu-item" id="aboutBtn">
+          <span class="material-icons">info</span>
+          <span>About</span>
+        </div>
+        <div class="menu-item" id="logoutBtn">
+          <span class="material-icons">logout</span>
+          <span>Exit</span>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        const API_BASE = 'https://min-api.cryptocompare.com/data/';
-        const priceEl = document.getElementById('price');
-        const changeEl = document.getElementById('change');
-        const changeIcon = document.getElementById('change-icon');
-        const ethereumPriceEl = document.getElementById('ethereum-price');
-        const ethereumChangeEl = document.getElementById('ethereum-change');
-        const ethereumChangeIcon = document.getElementById('ethereum-change-icon');
-        const landscapeMsg = document.getElementById('landscape-message');
-        const priceContainer = document.getElementById('price-container');
-        const batteryHeader = document.getElementById('battery-header');
-        const batteryLevelEl = document.getElementById('battery-level');
+  <div class="container">
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="btc_widget"></div>
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {"symbol":"BINANCE:BTCUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+          </script>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="eth_widget"></div>
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+          {"symbol":"BINANCE:ETHUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+          </script>
+        </div>
+      </div>
+    </div>
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="btc-dominance-chart"></div>
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+          </script>
+        </div>
+      </div>
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="eth-dominance-chart"></div>
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:ETH.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+          </script>
+        </div>
+      </div>
+    </div>
+    <div class="widgets-container">
+      <div class="widget">
+        <div class="tradingview-widget-container">
+          <div id="usdt-dominance-chart"></div>
+          <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+          {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+          </script>
+        </div>
+      </div>
+    </div>
+    <div class="footer">Powered by TradingView</div>
+  </div>
 
-        let dataInterval, batteryInterval, wakeLock = null;
+  <div class="alert-overlay" id="alertOverlay">
+    <div class="alert-box">
+      <div class="alert-title">PRICE ALERT!</div>
+      <div class="alert-message" id="alertMessage"></div>
+      <button class="alert-close" id="alertClose">DISMISS</button>
+    </div>
+  </div>
 
-        const fmtNum = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-        async function requestWakeLock() {
-            if ('wakeLock' in navigator) {
-                try {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    wakeLock.addEventListener('release', () => console.log('Screen Wake Lock released!'));
-                } catch (err) {
-                    console.error(`${err.name}, ${err.message}`);
-                }
-            } else {
-                console.warn('Wake Lock API not supported by this browser.');
-            }
+  <script>
+    document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefault() }, { passive: false });
+    
+    let wakeLock = null;
+    async function requestWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeLock.addEventListener('release', () => {});
         }
-
-        function releaseWakeLock() {
-            if (wakeLock) {
-                wakeLock.release();
-                wakeLock = null;
-            }
+      } catch (err) {}
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && wakeLock === null) requestWakeLock();
+    });
+    requestWakeLock();
+    
+    const menu = document.getElementById('menu'),
+          menuBtn = document.getElementById('menuBtn'),
+          batteryIcon = document.getElementById('batteryIcon'),
+          batteryLevel = document.getElementById('batteryLevel'),
+          batteryPercent = document.getElementById('batteryPercent'),
+          nightModeBtn = document.getElementById('nightModeBtn');
+    
+    menuBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      menu.classList.toggle('show');
+    });
+    document.addEventListener('click', () => menu.classList.remove('show'));
+    menu.addEventListener('click', e => e.stopPropagation());
+    
+    document.getElementById('logoutBtn').addEventListener('click', () => window.close());
+    document.getElementById('aboutBtn').addEventListener('click', () => alert('About information would appear here'));
+    document.querySelectorAll('.widget').forEach(w => w.style.pointerEvents = 'none');
+    
+    nightModeBtn.addEventListener('click', () => {
+      document.body.classList.toggle('grayscale');
+      const icon = nightModeBtn.querySelector('.material-icons');
+      if (document.body.classList.contains('grayscale')) {
+        icon.textContent = 'light_mode';
+        nightModeBtn.querySelector('span:last-child').textContent = 'Day Mode';
+      } else {
+        icon.textContent = 'dark_mode';
+        nightModeBtn.querySelector('span:last-child').textContent = 'Night Mode';
+      }
+      menu.classList.remove('show');
+    });
+    
+    let batterySound = null, batterySoundTimeout = null, lastBatteryAlertTime = 0;
+    
+    function updateBatteryStatus() {
+      if ('getBattery' in navigator) {
+        navigator.getBattery().then(battery => {
+          updateBatteryInfo(battery);
+          battery.addEventListener('levelchange', () => updateBatteryInfo(battery));
+          battery.addEventListener('chargingchange', () => updateBatteryInfo(battery));
+        });
+      } else {
+        batteryLevel.style.width = '100%';
+        batteryPercent.textContent = '100';
+      }
+    }
+    
+    function updateBatteryInfo(battery) {
+      const level = Math.round(battery.level * 100);
+      const isLow = level <= 30 && !battery.charging;
+      
+      batteryLevel.style.width = `${level}%`;
+      batteryPercent.textContent = level;
+      
+      if (isLow) {
+        batteryLevel.classList.add('low-battery');
+        batteryPercent.classList.add('low-battery');
+        batteryIcon.classList.add('low-battery');
+        const now = Date.now();
+        if (now - lastBatteryAlertTime > 60000) {
+          playLowBatterySound();
+          lastBatteryAlertTime = now;
         }
-
-        function updateUI(currentPrice, changePct, priceElement, changeElement, changeIconElement) {
-            priceElement.textContent = fmtNum(Math.round(currentPrice));
-            changeElement.textContent = `${changePct.toFixed(2)}%`;
-            changeIconElement.textContent = changePct > 0 ? 'trending_up' : (changePct < 0 ? 'trending_down' : 'trending_flat');
-            changeElement.style.color = changePct > 0 ? '#4CAF50' : (changePct < 0 ? '#F44336' : '#E0E0E0');
-        }
-
-        function loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey) {
-            const storedData = localStorage.getItem(localStorageKey);
-            if (storedData) {
-                try {
-                    const { price, change } = JSON.parse(storedData);
-                    updateUI(price, change, priceEl, changeEl, changeIcon);
-                } catch (e) {
-                    console.error(`Error parsing stored data for ${fsym}:`, e);
-                    priceEl.textContent = 'N/A';
-                    changeEl.textContent = 'N/A';
-                    changeIcon.textContent = 'error';
-                }
-            } else {
-                priceEl.textContent = 'N/A';
-                changeEl.textContent = 'N/A';
-                changeIcon.textContent = 'trending_flat';
-            }
-        }
-
-        async function getCrypto(fsym, priceEl, changeEl, changeIcon, localStorageKey) {
-            if (!navigator.onLine) {
-                loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey);
-                changeIcon.textContent = 'cloud_off';
-                return;
-            }
-
-            try {
-                const [currentRes, historicalRes] = await Promise.all([
-                    fetch(`${API_BASE}price?fsym=${fsym}&tsyms=USD`),
-                    fetch(`${API_BASE}v2/histoday?fsym=${fsym}&tsym=USD&limit=1`)
-                ]);
-
-                if (!currentRes.ok || !historicalRes.ok) throw new Error(`HTTP error! status: ${currentRes.status} / ${historicalRes.status}`);
-
-                const currentData = await currentRes.json();
-                const historicalData = await historicalRes.json();
-
-                const currentPrice = currentData.USD;
-                const yesterdayClose = historicalData.Data.Data[0]?.close || currentPrice;
-                const changePct = yesterdayClose > 0 ? ((currentPrice - yesterdayClose) / yesterdayClose) * 100 : 0;
-
-                updateUI(currentPrice, changePct, priceEl, changeEl, changeIcon);
-                localStorage.setItem(localStorageKey, JSON.stringify({ price: currentPrice, change: changePct }));
-
-            } catch (error) {
-                console.error(`Error fetching ${fsym} data:`, error);
-                priceEl.textContent = 'ERROR';
-                changeEl.textContent = 'ERROR';
-                changeIcon.textContent = 'error';
-                loadCryptoFromLocalStorage(fsym, priceEl, changeEl, changeIcon, localStorageKey);
-            }
-        }
-
-        function updateBattery() {
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then(battery => {
-                    const level = Math.round(battery.level * 100);
-                    batteryLevelEl.textContent = level;
-                    batteryLevelEl.classList.toggle('low-battery', level < 30);
-                }).catch(error => {
-                    console.error('Error fetching battery status:', error);
-                    batteryLevelEl.textContent = 'N/A';
-                    batteryLevelEl.classList.remove('low-battery');
-                });
-            } else {
-                batteryLevelEl.textContent = 'N/A';
-                batteryLevelEl.classList.remove('low-battery');
-            }
-        }
-
-        function refreshAll() {
-            if (window.innerWidth > window.innerHeight) {
-                getCrypto('BTC', priceEl, changeEl, changeIcon, 'bitcoinData');
-                getCrypto('ETH', ethereumPriceEl, ethereumChangeEl, ethereumChangeIcon, 'ethereumData');
-            }
-        }
-
-        function setupRefreshIntervals() {
-            clearInterval(dataInterval);
-            dataInterval = setInterval(refreshAll, 30000);
-            clearInterval(batteryInterval);
-            batteryInterval = setInterval(updateBattery, 5000);
-        }
-
-        function checkOrientation() {
-            const isPortrait = window.innerHeight > window.innerWidth;
-            landscapeMsg.style.display = isPortrait ? 'flex' : 'none';
-            priceContainer.style.display = isPortrait ? 'none' : 'flex';
-            
-            if (isPortrait) {
-                clearInterval(dataInterval);
-                clearInterval(batteryInterval);
-                releaseWakeLock();
-            } else {
-                loadCryptoFromLocalStorage('BTC', priceEl, changeEl, changeIcon, 'bitcoinData');
-                loadCryptoFromLocalStorage('ETH', ethereumPriceEl, ethereumChangeEl, ethereumChangeIcon, 'ethereumData');
-                refreshAll();
-                updateBattery();
-                setupRefreshIntervals();
-                requestWakeLock();
-            }
-        }
-
-        function init() {
-            priceEl.textContent = '';
-            changeEl.textContent = '';
-            ethereumPriceEl.textContent = '';
-            ethereumChangeEl.textContent = '';
-
-            checkOrientation();
-            requestWakeLock();
-
-            window.addEventListener('online', refreshAll);
-            window.addEventListener('offline', refreshAll);
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible' && window.innerWidth > window.innerHeight) {
-                    checkOrientation();
-                } else if (document.visibilityState === 'hidden') {
-                    releaseWakeLock();
-                }
-            });
-            window.addEventListener('resize', checkOrientation);
-            window.addEventListener('orientationchange', checkOrientation);
-            batteryHeader.addEventListener('click', refreshAll);
-            window.addEventListener('beforeunload', () => {
-                clearInterval(dataInterval);
-                clearInterval(batteryInterval);
-                releaseWakeLock();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
+      } else {
+        batteryLevel.classList.remove('low-battery');
+        batteryPercent.classList.remove('low-battery');
+        batteryIcon.classList.remove('low-battery');
+        batteryLevel.style.backgroundColor = battery.charging ? '#4CAF50' : '#fff';
+      }
+    }
+    
+    function playLowBatterySound() {
+      stopBatterySound();
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        batterySound = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        batterySound.type = 'sine';
+        batterySound.frequency.value = 440;
+        gainNode.gain.value = 0.5;
+        
+        batterySound.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        batterySound.start();
+        batterySoundTimeout = setTimeout(stopBatterySound, 3000);
+      } catch (e) {}
+    }
+    
+    function stopBatterySound() {
+      if (batterySound) {
+        batterySound.stop();
+        batterySound = null;
+      }
+      if (batterySoundTimeout) {
+        clearTimeout(batterySoundTimeout);
+        batterySoundTimeout = null;
+      }
+    }
+    
+    updateBatteryStatus();
+  </script>
 </body>
 </html>
