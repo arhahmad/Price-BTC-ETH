@@ -64,70 +64,19 @@ body.grayscale { filter: grayscale(100%); }
   border: 1px solid #333;
 }
 
-.header-content, .battery-container { 
-  display: flex; 
-  align-items: center; 
-}
-
 .header-content { 
   width: 100%; 
-  justify-content: space-between; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-.battery-icon {
-  position: relative;
-  width: 28px;
-  height: 14px;
-  border: 2px solid var(--on-primary);
-  border-radius: 4px;
-  margin-right: 8px;
-  transition: border-color 0.3s ease;
-}
-
-.battery-icon.low-battery { border-color: var(--alert-color); }
-.battery-icon::after {
-  content: '';
-  position: absolute;
-  right: -5px;
-  top: 4px;
-  width: 4px;
-  height: 6px;
-  background-color: var(--on-primary);
-  border-radius: 0 3px 3px 0;
-  transition: background-color 0.3s ease;
-}
-
-.battery-icon.low-battery::after { background-color: var(--alert-color); }
-
-.battery-level {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  bottom: 2px;
-  background-color: var(--on-primary);
-  border-radius: 3px;
-  transition: background-color 0.3s ease;
-}
-
-.battery-level.low-battery { background-color: var(--alert-color); }
-
-.battery-percent {
-  font-size: 17px;
-  margin-left: 6px;
-  font-weight: 600;
-  transition: color 0.3s ease;
-}
-
-.battery-percent.low-battery { color: var(--alert-color); }
 
 .header-title {
   font-weight: 800;
   font-size: 20px;
   letter-spacing: 1px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  margin-left: 0;
 }
 
 .menu-btn {
@@ -138,7 +87,6 @@ body.grayscale { filter: grayscale(100%); }
   padding: 10px;
   border-radius: 50%;
   transition: background-color .3s;
-  margin-left: auto;
 }
 
 .menu-btn:hover { background-color: rgba(255,255,255,.15); }
@@ -310,12 +258,6 @@ body.grayscale { filter: grayscale(100%); }
 <body>
 <div class="header">
   <div class="header-content">
-    <div class="battery-container">
-      <div class="battery-icon" id="batteryIcon">
-        <div class="battery-level" id="batteryLevel"></div>
-      </div>
-      <span class="battery-percent" id="batteryPercent"></span>
-    </div>
     <div class="header-title">CRYPTO PRICES</div>
     <button class="menu-btn" id="menuBtn">
       <span class="material-icons">menu</span>
@@ -442,9 +384,6 @@ requestWakeLock();
 
 const menu=document.getElementById('menu'),
       menuBtn=document.getElementById('menuBtn'),
-      batteryIcon=document.getElementById('batteryIcon'),
-      batteryLevel=document.getElementById('batteryLevel'),
-      batteryPercent=document.getElementById('batteryPercent'),
       nightModeBtn=document.getElementById('nightModeBtn');
 
 menuBtn.addEventListener('click',e=>{
@@ -461,7 +400,7 @@ document.getElementById('logoutBtn').addEventListener('click',()=>{
 });
 
 document.getElementById('aboutBtn').addEventListener('click',()=>{
-  alert('Crypto Prices App v2.0\n\nReal-time cryptocurrency price tracker with TradingView widgets\n• Live BTC/USDT prices\n• Live ETH/USDT prices  \n• BTC Dominance chart\n• USDT Dominance chart\n• Battery optimization\n• Dark theme optimized');
+  alert('Crypto Prices App v2.0\n\nReal-time cryptocurrency price tracker with TradingView widgets\n• Live BTC/USDT prices\n• Live ETH/USDT prices  \n• BTC Dominance chart\n• USDT Dominance chart\n• Dark theme optimized');
 });
 
 nightModeBtn.addEventListener('click',()=>{
@@ -476,77 +415,6 @@ nightModeBtn.addEventListener('click',()=>{
   }
   menu.classList.remove('show');
 });
-
-let batterySound=null,batterySoundTimeout=null,lastBatteryAlertTime=0;
-
-function updateBatteryStatus(){
-  if('getBattery'in navigator){
-    navigator.getBattery().then(battery=>{
-      updateBatteryInfo(battery);
-      battery.addEventListener('levelchange',()=>updateBatteryInfo(battery));
-      battery.addEventListener('chargingchange',()=>updateBatteryInfo(battery));
-    });
-  }else{
-    batteryLevel.style.width='100%';
-    batteryPercent.textContent='100';
-  }
-}
-
-function updateBatteryInfo(battery){
-  const level=Math.round(battery.level*100);
-  const isLow=level<=30&&!battery.charging;
-  
-  batteryLevel.style.width=`${level}%`;
-  batteryPercent.textContent=level;
-  
-  if(isLow){
-    batteryLevel.classList.add('low-battery');
-    batteryPercent.classList.add('low-battery');
-    batteryIcon.classList.add('low-battery');
-    const now=Date.now();
-    if(now-lastBatteryAlertTime>60000){
-      playLowBatterySound();
-      lastBatteryAlertTime=now;
-    }
-  }else{
-    batteryLevel.classList.remove('low-battery');
-    batteryPercent.classList.remove('low-battery');
-    batteryIcon.classList.remove('low-battery');
-    batteryLevel.style.backgroundColor=battery.charging?'#4CAF50':'#fff';
-  }
-}
-
-function playLowBatterySound(){
-  stopBatterySound();
-  try{
-    const audioContext=new (window.AudioContext||window.webkitAudioContext)();
-    batterySound=audioContext.createOscillator();
-    const gainNode=audioContext.createGain();
-    
-    batterySound.type='sine';
-    batterySound.frequency.value=440;
-    gainNode.gain.value=0.5;
-    
-    batterySound.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    batterySound.start();
-    batterySoundTimeout=setTimeout(stopBatterySound,3000);
-  }catch(e){}
-}
-
-function stopBatterySound(){
-  if(batterySound){
-    batterySound.stop();
-    batterySound=null;
-  }
-  if(batterySoundTimeout){
-    clearTimeout(batterySoundTimeout);
-    batterySoundTimeout=null;
-  }
-}
-
-updateBatteryStatus();
 
 // Reinitialize TradingView widgets when coming back from grayscale mode
 document.getElementById('nightModeBtn').addEventListener('click', function() {
