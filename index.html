@@ -13,7 +13,7 @@
   --on-primary: #fff;
   --menu-bg: #1a1a1a;
   --widget-border: 2px solid #3a3a3a;
-  --widget-gap: 10px;
+  --widget-gap: 12px;
   --page-padding: 15px;
   --alert-color: #f44336;
 }
@@ -27,21 +27,19 @@
   box-sizing: border-box;
 }
 
-html {
-  overflow-x: hidden;
-  -ms-content-zooming: none;
+html, body {
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   background-color: var(--background);
   color: var(--on-primary);
-  font-family: Tahoma,sans-serif;
+  font-family: Tahoma, sans-serif;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
   overscroll-behavior-y: contain;
-  min-height: 100vh;
-  overflow-x: hidden;
   transition: filter 0.3s ease;
 }
 
@@ -50,17 +48,17 @@ body.grayscale { filter: grayscale(100%); }
 .header {
   background-color: var(--header-color);
   padding: 0 var(--page-padding);
-  height: 45px;
+  height: 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: fixed;
-  top: 7px;
+  top: 12px;
   left: var(--page-padding);
   right: var(--page-padding);
   z-index: 1000;
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
   margin: 0 auto;
   max-width: calc(1200px - var(--page-padding)*2);
   border: 1px solid #333;
@@ -78,11 +76,11 @@ body.grayscale { filter: grayscale(100%); }
 
 .battery-icon {
   position: relative;
-  width: 26px;
-  height: 12px;
+  width: 28px;
+  height: 14px;
   border: 2px solid var(--on-primary);
-  border-radius: 3px;
-  margin-right: 6px;
+  border-radius: 4px;
+  margin-right: 8px;
   transition: border-color 0.3s ease;
 }
 
@@ -90,12 +88,12 @@ body.grayscale { filter: grayscale(100%); }
 .battery-icon::after {
   content: '';
   position: absolute;
-  right: -4px;
-  top: 3px;
-  width: 3px;
-  height: 5px;
+  right: -5px;
+  top: 4px;
+  width: 4px;
+  height: 6px;
   background-color: var(--on-primary);
-  border-radius: 0 2px 2px 0;
+  border-radius: 0 3px 3px 0;
   transition: background-color 0.3s ease;
 }
 
@@ -107,28 +105,29 @@ body.grayscale { filter: grayscale(100%); }
   left: 2px;
   bottom: 2px;
   background-color: var(--on-primary);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: background-color 0.3s ease;
 }
 
 .battery-level.low-battery { background-color: var(--alert-color); }
 
 .battery-percent {
-  font-size: 16px;
-  margin-left: 4px;
-  font-weight: 500;
+  font-size: 17px;
+  margin-left: 6px;
+  font-weight: 600;
   transition: color 0.3s ease;
 }
 
 .battery-percent.low-battery { color: var(--alert-color); }
 
 .header-title {
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: .5px;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 1px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .menu-btn {
@@ -136,50 +135,51 @@ body.grayscale { filter: grayscale(100%); }
   border: none;
   color: var(--on-primary);
   cursor: pointer;
-  padding: 8px;
+  padding: 10px;
   border-radius: 50%;
-  transition: background-color .2s;
+  transition: background-color .3s;
   margin-left: auto;
 }
 
-.menu-btn:hover { background-color: rgba(255,255,255,.1); }
-.menu-btn .material-icons { font-size: 24px; }
+.menu-btn:hover { background-color: rgba(255,255,255,.15); }
+.menu-btn .material-icons { font-size: 26px; }
 
 .menu {
   position: absolute;
-  top: 53px;
-  right: 8px;
+  top: 58px;
+  right: 12px;
   background-color: var(--menu-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.3);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.4);
   display: none;
-  min-width: 180px;
+  min-width: 200px;
   overflow: hidden;
   z-index: 1001;
-  border: 1px solid #333;
+  border: 1px solid #444;
 }
 
 .menu.show { display: block; }
 
 .menu-item {
-  padding: 12px 16px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
+  transition: background-color 0.2s;
 }
 
-.menu-item:hover { background-color: rgba(255,255,255,.05); }
-.menu-item .material-icons { margin-right: 12px; font-size: 22px; }
+.menu-item:hover { background-color: rgba(255,255,255,.08); }
+.menu-item .material-icons { 
+  margin-right: 14px; 
+  font-size: 24px; 
+}
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 55px var(--page-padding) 48px;
-  -webkit-overflow-scrolling: touch;
+  height: 100vh;
+  padding: 75px var(--page-padding) 50px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
 }
 
 .widgets-grid {
@@ -194,27 +194,38 @@ body.grayscale { filter: grayscale(100%); }
 
 .widget {
   background-color: var(--surface);
-  border-radius: 6px;
+  border-radius: 12px;
   overflow: hidden;
   border: var(--widget-border);
-  pointer-events: none;
-  transform: translateZ(0);
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  pointer-events: none;
 }
 
-.tradingview-widget-container { 
+.tradingview-widget-container {
   flex: 1;
   min-height: 0;
+  width: 100%;
+}
+
+.footer {
+  text-align: center;
+  padding: 15px 0 8px;
+  color: #777;
+  font-size: 13px;
+  margin-top: 15px;
+  font-weight: 600;
 }
 
 .alert-overlay {
   position: fixed;
-  top: -1px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0,0,0,0.7);
+  background-color: rgba(0,0,0,0.8);
   z-index: 2000;
   display: none;
   justify-content: center;
@@ -223,73 +234,76 @@ body.grayscale { filter: grayscale(100%); }
 
 .alert-box {
   background-color: #2d2d2d;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 80%;
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 85%;
   text-align: center;
-  border: 2px solid var(--alert-color);
+  border: 3px solid var(--alert-color);
   animation: pulse 1.5s infinite;
+  box-shadow: 0 8px 25px rgba(0,0,0,.5);
 }
 
 .alert-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.alert-message { font-size: 16px; margin-bottom: 15px; }
+.alert-message { 
+  font-size: 17px; 
+  margin-bottom: 18px; 
+  line-height: 1.4;
+}
 
 .alert-close {
   background-color: var(--alert-color);
   color: white;
   border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
+  padding: 10px 20px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 15px;
+  transition: background-color 0.2s;
 }
 
-.footer {
-  text-align: center;
-  padding: 10px 0 20px;
-  color: #666;
-  font-size: 12px;
-  margin-top: 10px;
+.alert-close:hover {
+  background-color: #d32f2f;
 }
 
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
 
 @media (max-width: 768px) {
   :root { 
     --page-padding: 12px; 
-    --widget-gap: 8px; 
+    --widget-gap: 10px; 
   }
-  .header { top: 7px; height: 42px; }
+  .header { 
+    top: 10px; 
+    height: 46px; 
+    border-radius: 18px;
+  }
   .container { 
-    padding: 52px var(--page-padding) 43px; 
-    height: calc(100vh - 90px);
+    padding: 68px var(--page-padding) 45px; 
   }
+  .widget { 
+    border-radius: 10px;
+  }
+  .header-title { font-size: 18px; }
 }
 
 @media (max-width: 480px) {
   :root { 
     --page-padding: 10px; 
-    --widget-gap: 6px; 
+    --widget-gap: 8px; 
   }
-  .tradingview-widget-container { height: 100%; }
-  .header-title { font-size: 15px; }
-  .battery-icon { width: 24px; height: 11px; }
-  .battery-percent { font-size: 15px; }
-  .menu-item { padding: 10px 14px; font-size: 14px; }
-  .menu-item .material-icons { font-size: 20px; }
-  .alert-box { padding: 15px; max-width: 90%; }
-  .alert-title { font-size: 16px; }
-  .alert-message { font-size: 14px; }
-  .footer { font-size: 11px; padding: 7px 0 17px; }
+  .header-title { font-size: 16px; }
+  .menu { min-width: 180px; }
+  .menu-item { padding: 12px 16px; font-size: 15px; }
 }
 </style>
 </head>
@@ -325,35 +339,72 @@ body.grayscale { filter: grayscale(100%); }
 
 <div class="container">
   <div class="widgets-grid">
+    <!-- BTC/USDT -->
     <div class="widget">
       <div class="tradingview-widget-container">
         <div id="btc_widget"></div>
         <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-        {"symbol":"BINANCE:BTCUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+        {
+          "symbol": "BINANCE:BTCUSDT",
+          "width": "100%",
+          "height": "100%",
+          "isTransparent": false,
+          "colorTheme": "dark",
+          "locale": "en"
+        }
         </script>
       </div>
     </div>
+
+    <!-- ETH/USDT -->
     <div class="widget">
       <div class="tradingview-widget-container">
         <div id="eth_widget"></div>
         <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-        {"symbol":"BINANCE:ETHUSDT","width":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+        {
+          "symbol": "BINANCE:ETHUSDT",
+          "width": "100%",
+          "height": "100%",
+          "isTransparent": false,
+          "colorTheme": "dark",
+          "locale": "en"
+        }
         </script>
       </div>
     </div>
+
+    <!-- BTC Dominance -->
     <div class="widget">
       <div class="tradingview-widget-container">
         <div id="btc-dominance-chart"></div>
         <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+        {
+          "symbol": "CRYPTOCAP:BTC.D",
+          "width": "100%",
+          "height": "100%",
+          "locale": "en",
+          "colorTheme": "dark",
+          "isTransparent": false,
+          "autosize": true
+        }
         </script>
       </div>
     </div>
+
+    <!-- USDT Dominance -->
     <div class="widget">
       <div class="tradingview-widget-container">
         <div id="usdt-dominance-chart"></div>
         <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+        {
+          "symbol": "CRYPTOCAP:USDT.D",
+          "width": "100%",
+          "height": "100%",
+          "locale": "en",
+          "colorTheme": "dark",
+          "isTransparent": false,
+          "autosize": true
+        }
         </script>
       </div>
     </div>
@@ -403,9 +454,15 @@ menuBtn.addEventListener('click',e=>{
 document.addEventListener('click',()=>menu.classList.remove('show'));
 menu.addEventListener('click',e=>e.stopPropagation());
 
-document.getElementById('logoutBtn').addEventListener('click',()=>window.close());
-document.getElementById('aboutBtn').addEventListener('click',()=>alert('About information would appear here'));
-document.querySelectorAll('.widget').forEach(w=>w.style.pointerEvents='none');
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  if(confirm('Are you sure you want to exit?')) {
+    window.close();
+  }
+});
+
+document.getElementById('aboutBtn').addEventListener('click',()=>{
+  alert('Crypto Prices App v2.0\n\nReal-time cryptocurrency price tracker with TradingView widgets\n• Live BTC/USDT prices\n• Live ETH/USDT prices  \n• BTC Dominance chart\n• USDT Dominance chart\n• Battery optimization\n• Dark theme optimized');
+});
 
 nightModeBtn.addEventListener('click',()=>{
   document.body.classList.toggle('grayscale');
@@ -490,6 +547,17 @@ function stopBatterySound(){
 }
 
 updateBatteryStatus();
+
+// Reinitialize TradingView widgets when coming back from grayscale mode
+document.getElementById('nightModeBtn').addEventListener('click', function() {
+  setTimeout(() => {
+    // Force refresh of TradingView widgets
+    const iframes = document.querySelectorAll('.tradingview-widget-container iframe');
+    iframes.forEach(iframe => {
+      iframe.src = iframe.src;
+    });
+  }, 100);
+});
 </script>
 </body>
 </html>
