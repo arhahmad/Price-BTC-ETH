@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Crypto Prices</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --header-color: #2d2d2d;
@@ -13,6 +14,7 @@
   --widget-border: 2px solid #3a3a3a;
   --widget-gap: 12px;
   --page-padding: 15px;
+  --accent-color: #00d4ff;
 }
 
 * {
@@ -32,7 +34,7 @@ html, body {
 body {
   background-color: var(--background);
   color: var(--on-primary);
-  font-family: Tahoma, sans-serif;
+  font-family: 'Montserrat', Tahoma, sans-serif;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
@@ -45,7 +47,7 @@ body {
   height: 40px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: fixed;
   top: 12px;
   left: var(--page-padding);
@@ -63,7 +65,16 @@ body {
   font-size: 16px;
   letter-spacing: 1px;
   text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.header-clock {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  letter-spacing: 1px;
 }
 
 .container {
@@ -115,18 +126,19 @@ body {
   .header { top: 10px; height: 38px; border-radius: 12px; }
   .container { padding: 60px var(--page-padding) 45px; }
   .widget { border-radius: 10px; }
-  .header-title { font-size: 16px; }
+  .header-title, .header-clock { font-size: 15px; }
 }
 
 @media (max-width: 480px) {
   :root { --page-padding: 10px; --widget-gap: 8px; }
-  .header-title { font-size: 16px; }
+  .header-title, .header-clock { font-size: 14px; }
 }
 </style>
 </head>
 <body>
 <div class="header">
   <div class="header-title">CRYPTO PRICES</div>
+  <div class="header-clock" id="clock">00:00:00</div>
 </div>
 
 <div class="container">
@@ -185,6 +197,19 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible'&&wakeLock===null)requestWakeLock();
 });
 requestWakeLock();
+
+// ساعت زنده
+function updateClock() {
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+}
+
+// به روز رسانی ساعت هر ثانیه
+updateClock();
+setInterval(updateClock, 1000);
 </script>
 </body>
 </html>
