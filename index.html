@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Crypto Prices</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --header-color: #2d2d2d;
@@ -67,12 +67,14 @@
         }
 
         .header-clock {
-            font-family: 'Orbitron', monospace;
-            font-weight: 700;
+            font-family: 'Chakra Petch', monospace;
+            font-weight: 600;
             font-size: 18px;
             color: white;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             letter-spacing: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 10px;
+            border-radius: 8px;
         }
 
         .container {
@@ -130,6 +132,7 @@
         @media (max-width: 480px) {
             :root { --page-padding: 10px; --widget-gap: 8px; }
             .header-title, .header-clock { font-size: 16px; }
+            .header-clock { padding: 4px 8px; }
         }
     </style>
 </head>
@@ -181,20 +184,6 @@
         document.addEventListener('dblclick', e => e.preventDefault(), {passive: false});
         document.addEventListener('gesturestart', e => e.preventDefault());
         document.addEventListener('touchmove', e => {if(e.scale !== 1) e.preventDefault()}, {passive: false});
-
-        let wakeLock = null;
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch(err) {}
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && wakeLock === null) requestWakeLock();
-        });
-        requestWakeLock();
 
         // Live clock function
         function updateClock() {
