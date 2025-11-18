@@ -69,12 +69,9 @@
         .header-clock {
             font-family: 'Chakra Petch', monospace;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 20px;
             color: white;
             letter-spacing: 1px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 5px 10px;
-            border-radius: 8px;
         }
 
         .container {
@@ -126,13 +123,14 @@
             .header { top: 10px; height: 45px; border-radius: 12px; }
             .container { padding: 70px var(--page-padding) 45px; }
             .widget { border-radius: 10px; }
-            .header-title, .header-clock { font-size: 17px; }
+            .header-title { font-size: 17px; }
+            .header-clock { font-size: 18px; }
         }
 
         @media (max-width: 480px) {
             :root { --page-padding: 10px; --widget-gap: 8px; }
-            .header-title, .header-clock { font-size: 16px; }
-            .header-clock { padding: 4px 8px; }
+            .header-title { font-size: 16px; }
+            .header-clock { font-size: 16px; }
         }
     </style>
 </head>
