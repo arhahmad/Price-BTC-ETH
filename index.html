@@ -1,215 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Crypto Prices</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-<style>
-:root {
-  --header-color: #2d2d2d;
-  --background: #121212;
-  --surface: #1e1e1e;
-  --on-primary: #fff;
-  --widget-border: 2px solid #3a3a3a;
-  --widget-gap: 12px;
-  --page-padding: 15px;
-  --accent-color: #00d4ff;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Crypto Prices</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --header-color: #2d2d2d;
+            --background: #121212;
+            --surface: #1e1e1e;
+            --on-primary: #fff;
+            --widget-border: 2px solid #3a3a3a;
+            --widget-gap: 12px;
+            --page-padding: 15px;
+        }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-text-size-adjust: none;
-  touch-action: pan-y;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: none;
+            touch-action: pan-y;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-body {
-  background-color: var(--background);
-  color: var(--on-primary);
-  font-family: 'Montserrat', Tahoma, sans-serif;
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  overscroll-behavior-y: contain;
-}
+        body {
+            background-color: var(--background);
+            color: var(--on-primary);
+            font-family: 'Poppins', Tahoma, sans-serif;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+            overscroll-behavior-y: contain;
+        }
 
-.header {
-  background-color: var(--header-color);
-  padding: 0 var(--page-padding);
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: fixed;
-  top: 12px;
-  left: var(--page-padding);
-  right: var(--page-padding);
-  z-index: 1000;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.3);
-  margin: 0 auto;
-  max-width: calc(1200px - var(--page-padding)*2);
-  border: 1px solid #333;
-}
+        .header {
+            background-color: var(--header-color);
+            padding: 0 var(--page-padding);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            top: 12px;
+            left: var(--page-padding);
+            right: var(--page-padding);
+            z-index: 1000;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.3);
+            margin: 0 auto;
+            max-width: calc(1200px - var(--page-padding)*2);
+            border: 1px solid #333;
+        }
 
-.header-title {
-  font-weight: 800;
-  font-size: 16px;
-  letter-spacing: 1px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  font-family: 'Montserrat', sans-serif;
-}
+        .header-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
 
-.header-clock {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 16px;
-  color: var(--accent-color);
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-  letter-spacing: 1px;
-}
+        .header-clock {
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 18px;
+            color: white;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
+        }
 
-.container {
-  height: 100vh;
-  padding: 65px var(--page-padding) 50px;
-  display: flex;
-  flex-direction: column;
-}
+        .container {
+            height: 100vh;
+            padding: 75px var(--page-padding) 50px;
+            display: flex;
+            flex-direction: column;
+        }
 
-.widgets-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: var(--widget-gap);
-  flex: 1;
-  width: 100%;
-  height: 100%;
-}
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: var(--widget-gap);
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
 
-.widget {
-  background-color: var(--surface);
-  border-radius: 12px;
-  overflow: hidden;
-  border: var(--widget-border);
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  box-shadow: 0 4px 12px rgba(0,0,0,.2);
-  pointer-events: none;
-}
+        .widget {
+            background-color: var(--surface);
+            border-radius: 12px;
+            overflow: hidden;
+            border: var(--widget-border);
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,.2);
+            pointer-events: none;
+        }
 
-.tradingview-widget-container {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-}
+        .tradingview-widget-container {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+        }
 
-.footer {
-  text-align: center;
-  padding: 15px 0 8px;
-  color: #777;
-  font-size: 13px;
-  margin-top: 15px;
-  font-weight: 600;
-}
+        .footer {
+            text-align: center;
+            padding: 15px 0 8px;
+            color: #777;
+            font-size: 13px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
 
-@media (max-width: 768px) {
-  :root { --page-padding: 12px; --widget-gap: 10px; }
-  .header { top: 10px; height: 38px; border-radius: 12px; }
-  .container { padding: 60px var(--page-padding) 45px; }
-  .widget { border-radius: 10px; }
-  .header-title, .header-clock { font-size: 15px; }
-}
+        @media (max-width: 768px) {
+            :root { --page-padding: 12px; --widget-gap: 10px; }
+            .header { top: 10px; height: 45px; border-radius: 12px; }
+            .container { padding: 70px var(--page-padding) 45px; }
+            .widget { border-radius: 10px; }
+            .header-title, .header-clock { font-size: 17px; }
+        }
 
-@media (max-width: 480px) {
-  :root { --page-padding: 10px; --widget-gap: 8px; }
-  .header-title, .header-clock { font-size: 14px; }
-}
-</style>
+        @media (max-width: 480px) {
+            :root { --page-padding: 10px; --widget-gap: 8px; }
+            .header-title, .header-clock { font-size: 16px; }
+        }
+    </style>
 </head>
 <body>
-<div class="header">
-  <div class="header-title">CRYPTO PRICES</div>
-  <div class="header-clock" id="clock">00:00:00</div>
-</div>
-
-<div class="container">
-  <div class="widgets-grid">
-    <div class="widget">
-      <div class="tradingview-widget-container">
-        <div id="btc_widget"></div>
-        <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-        {"symbol":"BINANCE:BTCUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
-        </script>
-      </div>
+    <div class="header">
+        <div class="header-title">CRYPTO PRICES</div>
+        <div class="header-clock" id="clock">00:00:00</div>
     </div>
-    <div class="widget">
-      <div class="tradingview-widget-container">
-        <div id="eth_widget"></div>
-        <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-        {"symbol":"BINANCE:ETHUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
-        </script>
-      </div>
+
+    <div class="container">
+        <div class="widgets-grid">
+            <div class="widget">
+                <div class="tradingview-widget-container">
+                    <div id="btc_widget"></div>
+                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+                    {"symbol":"BINANCE:BTCUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+                    </script>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="tradingview-widget-container">
+                    <div id="eth_widget"></div>
+                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
+                    {"symbol":"BINANCE:ETHUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
+                    </script>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="tradingview-widget-container">
+                    <div id="btc-dominance-chart"></div>
+                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                    {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+                    </script>
+                </div>
+            </div>
+            <div class="widget">
+                <div class="tradingview-widget-container">
+                    <div id="usdt-dominance-chart"></div>
+                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
+                    {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="footer">Powered by TradingView</div>
     </div>
-    <div class="widget">
-      <div class="tradingview-widget-container">
-        <div id="btc-dominance-chart"></div>
-        <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
-        </script>
-      </div>
-    </div>
-    <div class="widget">
-      <div class="tradingview-widget-container">
-        <div id="usdt-dominance-chart"></div>
-        <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-        {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
-        </script>
-      </div>
-    </div>
-  </div>
-  <div class="footer">Powered by TradingView</div>
-</div>
 
-<script>
-document.addEventListener('dblclick',e=>e.preventDefault(),{passive:!1});
-document.addEventListener('gesturestart',e=>e.preventDefault());
-document.addEventListener('touchmove',e=>{if(e.scale!==1)e.preventDefault()},{passive:!1});
+    <script>
+        document.addEventListener('dblclick', e => e.preventDefault(), {passive: false});
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        document.addEventListener('touchmove', e => {if(e.scale !== 1) e.preventDefault()}, {passive: false});
 
-let wakeLock=null;
-async function requestWakeLock(){
-  try{
-    if('wakeLock'in navigator){
-      wakeLock=await navigator.wakeLock.request('screen');
-    }
-  }catch(err){}
-}
+        let wakeLock = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch(err) {}
+        }
 
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible'&&wakeLock===null)requestWakeLock();
-});
-requestWakeLock();
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && wakeLock === null) requestWakeLock();
+        });
+        requestWakeLock();
 
-// ساعت زنده
-function updateClock() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
-  document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
-}
+        // Live clock function
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
 
-// به روز رسانی ساعت هر ثانیه
-updateClock();
-setInterval(updateClock, 1000);
-</script>
+        // Update clock every second
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
 </body>
 </html>
