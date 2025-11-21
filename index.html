@@ -59,11 +59,23 @@
             border: 1px solid #333;
         }
 
+        .header-date {
+            font-family: 'Chakra Petch', monospace;
+            font-weight: 600;
+            font-size: 20px;
+            color: white;
+            letter-spacing: 1px;
+            text-align: left;
+            flex: 1;
+        }
+
         .header-title {
             font-weight: 800;
             font-size: 18px;
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-align: center;
+            flex: 1;
         }
 
         .header-clock {
@@ -72,6 +84,8 @@
             font-size: 20px;
             color: white;
             letter-spacing: 1px;
+            text-align: right;
+            flex: 1;
         }
 
         .container {
@@ -125,17 +139,20 @@
             .widget { border-radius: 10px; }
             .header-title { font-size: 17px; }
             .header-clock { font-size: 18px; }
+            .header-date { font-size: 18px; }
         }
 
         @media (max-width: 480px) {
             :root { --page-padding: 10px; --widget-gap: 8px; }
             .header-title { font-size: 16px; }
             .header-clock { font-size: 16px; }
+            .header-date { font-size: 16px; }
         }
     </style>
 </head>
 <body>
     <div class="header">
+        <div class="header-date" id="date">2024 Jan 1</div>
         <div class="header-title">CRYPTO PRICES</div>
         <div class="header-clock" id="clock">00:00:00</div>
     </div>
@@ -192,9 +209,23 @@
             document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
         }
 
-        // Update clock every second
+        // Date function
+        function updateDate() {
+            const now = new Date();
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            const monthName = months[now.getMonth()];
+            const day = now.getDate();
+            const year = now.getFullYear();
+            
+            document.getElementById('date').textContent = `${year} ${monthName} ${day}`;
+        }
+
+        // Update clock every second and date every minute
         updateClock();
+        updateDate();
         setInterval(updateClock, 1000);
+        setInterval(updateDate, 60000);
     </script>
 </body>
 </html>
