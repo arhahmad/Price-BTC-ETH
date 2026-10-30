@@ -1,231 +1,2816 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Crypto Prices</title>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --header-color: #2d2d2d;
-            --background: #121212;
-            --surface: #1e1e1e;
-            --on-primary: #fff;
-            --widget-border: 2px solid #3a3a3a;
-            --widget-gap: 12px;
-            --page-padding: 15px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<title>Wallet Monitor</title>
+<style>
+:root{
+  --bg: #000000;
+  --card: #161616;
+  --card-hover: #1d1d1d;
+  --pill: #111111;
+  --line: #262626;
+  --line2: #363636;
+  --text: #ffffff;
+  --muted: #9c9c9c;
+  --dim: #5f5f5f;
+  --green: #089981;
+  --red: #f23645;
+  --accent: #d4d4d4;
+  --ring: #444444;
+  --ring-hover: #808080;
+  --hdr-h: 80px;
+  --row-h: 36px;
+  --row-gap: 3px;
+  --bar-h: 35px;
+}
+html{background:var(--bg);touch-action:pan-x pan-y;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior-y:none}
+*{box-sizing:border-box}
 
-        * {
-            -webkit-tap-highlight-color: transparent;
-            -webkit-text-size-adjust: none;
-            touch-action: pan-y;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+/* Disable text selection, long-press callout and image/link dragging everywhere */
+*{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-user-drag:none;
+}
+/* Inputs must stay selectable/editable so typing and pasting still work */
+input,textarea{
+  -webkit-user-select:text;
+  user-select:text;
+  -webkit-touch-callout:default;
+}
 
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+body{
+  margin:0;min-height:100vh;background:var(--bg);color:var(--text);
+  font:13.5px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:8px 12px 96px;touch-action:pan-x pan-y;
+  overscroll-behavior-y:none;
+}
+.wrap{max-width:800px;margin:0 auto}
 
-        body {
-            background-color: var(--background);
-            color: var(--on-primary);
-            font-family: 'Poppins', Tahoma, sans-serif;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-            overscroll-behavior-y: contain;
-        }
+.top{
+  position:sticky;top:0;z-index:12;
+  background:var(--bg);
+  margin:0 -12px;padding:6px 12px 5px;
+}
+header{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:var(--card);border:1px solid var(--line2);
+  padding:8px 10px 8px 16px;border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,0.6);
+}
+.title-wrap{display:flex;flex-direction:column;gap:1px;min-width:0}
+h1{margin:0;font-size:18px;line-height:1.25;font-weight:600;letter-spacing:-.01em;color:#fff}
+.upd{font-size:11.5px;line-height:1.3;color:var(--muted);letter-spacing:.01em}
+.upd.offline{color:rgba(242,54,69,.7)}
 
-        .header {
-            background-color: var(--header-color);
-            padding: 0 var(--page-padding);
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: fixed;
-            top: 12px;
-            left: var(--page-padding);
-            right: var(--page-padding);
-            z-index: 1000;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,.3);
-            margin: 0 auto;
-            max-width: calc(1200px - var(--page-padding)*2);
-            border: 1px solid #333;
-        }
+.tools{display:flex;align-items:center;gap:2px}
+button{font:inherit;cursor:pointer;border:0;color:var(--text);background:none}
 
-        .header-date {
-            font-family: 'Chakra Petch', monospace;
-            font-weight: 600;
-            font-size: 20px;
-            color: white;
-            letter-spacing: 1px;
-            text-align: left;
-            flex: 1;
-        }
+.iconbtn{
+  width:38px;height:38px;padding:0;border-radius:12px;
+  background:none;border:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+}
+.iconbtn svg{
+  width:22px;height:22px;
+  stroke:#fff;
+  transition:transform .2s,opacity .2s;
+}
+.iconbtn:hover svg{transform:scale(1.08)}
+.iconbtn:active svg{transform:scale(.92);opacity:.7}
+.iconbtn.spin svg{animation:spin 1s linear infinite}
+#refreshAll:hover svg{transform:none}
+#settingsBtn.active svg{transform:rotate(60deg)}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-        .header-title {
-            font-weight: 800;
-            font-size: 18px;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            text-align: center;
-            flex: 1;
-        }
+.menu{
+  position:absolute;top:calc(100% - 4px);right:12px;
+  width:max-content;padding:5px;
+  background:var(--card);border:1px solid var(--line2);border-radius:15px;
+  box-shadow:0 10px 30px rgba(0,0,0,.9);
+  z-index:20;
+  opacity:0;pointer-events:none;
+  transform:translateY(-6px) scale(.98);transform-origin:top right;
+  transition:opacity .18s ease,transform .18s ease;
+}
+.menu.show{opacity:1;pointer-events:auto;transform:none}
+.menu-item{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:11px 12px;border-radius:11px;
+  font-size:15px;font-weight:500;color:var(--text);text-align:left;
+  transition:background .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.menu-item svg{
+  width:21px;height:21px;flex-shrink:0;
+  stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+.menu-item:hover{background:rgba(255,255,255,.05)}
+.menu-item:active{background:rgba(255,255,255,.09)}
+.menu-sep{height:1px;background:var(--line2);margin:5px 7px}
+.menu-item.exit{color:var(--red)}
+.menu-item.exit svg{stroke:var(--red)}
+.menu-item.exit:hover{background:rgba(242,54,69,.1)}
 
-        .header-clock {
-            font-family: 'Chakra Petch', monospace;
-            font-weight: 600;
-            font-size: 20px;
-            color: white;
-            letter-spacing: 1px;
-            text-align: right;
-            flex: 1;
-        }
+.name{
+  display:inline-flex;align-items:center;gap:7px;max-width:100%;min-width:0;
+  padding:5px 14px 5px 10px;border-radius:999px;
+  background:var(--pill);
+  border:1px solid var(--line2);
+  transition:border-color .25s ease;
+}
+.name:hover{border-color:var(--ring-hover)}
+.name svg{width:12px;height:12px;flex-shrink:0;stroke:#ececec;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.name-txt{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;font-weight:600;
+  letter-spacing:.02em;color:#ececec;
+}
 
-        .container {
-            height: 100vh;
-            padding: 75px var(--page-padding) 50px;
-            display: flex;
-            flex-direction: column;
-        }
+.summary{
+  position:fixed;
+  left:0;right:0;bottom:10px;
+  width:calc(100% - 24px);max-width:776px;margin:0 auto;
+  z-index:15;
+  display:flex;flex-direction:column;
+  height:var(--bar-h);
+  background:#161616;
+  border:1px solid var(--line2);border-radius:13px;
+  box-shadow:0 4px 14px rgba(0,0,0,.55);
+  overflow:hidden;
+  font-variant-numeric:tabular-nums;
+}
+.summary-mask{
+  position:fixed;left:0;right:0;bottom:0;
+  height:50px;
+  z-index:14;
+  pointer-events:none;
+  background:linear-gradient(
+    to top,
+    var(--bg) 0,
+    var(--bg) 92%,
+    rgba(0,0,0,0) 100%
+  );
+}
+.sum-row{
+  display:grid;grid-template-columns:repeat(3,1fr);align-items:center;
+  height:33px;
+  padding:0 6px;
+}
+.sum-row.two{grid-template-columns:repeat(2,1fr)}
+.sum-item{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:12.5px;font-weight:700;line-height:1.2;
+}
+.sum-item + .sum-item{border-left:1px solid var(--line2)}
+.sum-item .lbl{color:#bdbdbd;font-weight:700;font-size:12.5px;text-transform:uppercase;letter-spacing:.09em}
+.sum-item .num{color:#fff;font-weight:700;font-size:12.5px}
+.sum-item .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sum-item .dot.gray{background:#6b6b6b;opacity:.8}
+.sum-item.long .dot{background:var(--green);opacity:.6}
+.sum-item.long .num{color:var(--green)}
+.sum-item.short .dot{background:var(--red);opacity:.6}
+.sum-item.short .num{color:var(--red)}
 
-        .widgets-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: var(--widget-gap);
-            flex: 1;
-            width: 100%;
-            height: 100%;
-        }
+.board{display:flex;flex-direction:column}
+.board-head{
+  position:sticky;top:var(--hdr-h);z-index:5;
+  background:var(--bg);
+  padding:0 0 5px;
+}
+.bh-in,.prow{
+  display:grid;
+  grid-template-columns:1.15fr .95fr .65fr 1.25fr 1.1fr;
+  align-items:center;text-align:center;
+}
+.bh-in{
+  position:relative;overflow:hidden;
+  height:var(--bar-h);min-height:var(--bar-h);
+  padding:0 6px 0 11px;
+  background:#161616;
+  border:1px solid var(--line2);border-radius:13px;
+  box-shadow:0 4px 14px rgba(0,0,0,.55);
+  color:#bdbdbd;font-weight:700;font-size:12px;line-height:1.2;
+  text-transform:uppercase;letter-spacing:.09em;
+}
+.bh-in::before{
+  content:"";position:absolute;left:12%;right:12%;top:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--ring-hover),transparent);
+  opacity:.7;
+}
+.bh-in > span{
+  display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;
+}
+.bh-in svg{
+  width:12px;height:12px;flex-shrink:0;
+  stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+}
+.prow{
+  position:relative;overflow:hidden;
+  background:var(--card);
+  border:1px solid var(--line);border-radius:13px;
+  height:var(--row-h);
+  padding:0 6px 0 11px;margin-bottom:var(--row-gap);
+  font-variant-numeric:tabular-nums;
+  cursor:pointer;user-select:none;-webkit-user-select:none;
+  box-shadow:0 3px 12px rgba(0,0,0,.45);
+  transition:border-color .2s,transform .12s,background .2s;
+}
+.prow::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--green);opacity:.55;
+}
+.prow.short::before{background:var(--red)}
+.prow:hover{border-color:var(--line2);background:var(--card-hover)}
+.prow:active{transform:scale(.99)}
+.prow.grp{margin-top:10px}
+.prow.flash{border-color:#fff;animation:flashRow 1.2s ease 2}
+@keyframes flashRow{0%,100%{box-shadow:0 3px 12px rgba(0,0,0,.45)}50%{box-shadow:0 0 0 2px #fff,0 3px 12px rgba(0,0,0,.45)}}
+.prow .px{color:var(--text);font-weight:500}
+.pnl{
+  display:inline-block;min-width:54px;padding:1px 8px;border-radius:5px;
+  font-weight:600;font-size:13.5px;
+}
+.pnl.pos{color:var(--green);background:rgba(8,153,129,0.1)}
+.pnl.neg{color:var(--red);background:rgba(242,54,69,0.1)}
+.pnl.na{color:var(--dim)}
+.sg{margin-right:2px}
 
-        .widget {
-            background-color: var(--surface);
-            border-radius: 12px;
-            overflow: hidden;
-            border: var(--widget-border);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,.2);
-            pointer-events: none;
-        }
+.coin-cell{
+  justify-self:center;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.ndot{
+  position:absolute;left:13px;top:50%;
+  margin-top:-3.5px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--green);
+  animation:blink 1s steps(2,start) infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-        .tradingview-widget-container {
-            flex: 1;
-            min-height: 0;
-            width: 100%;
-        }
+.coin{font-weight:600;display:inline-block;padding:1px 6px;border-radius:5px;border:1px solid var(--line);background:#0a0a0a}
 
-        .footer {
-            text-align: center;
-            padding: 15px 0 8px;
-            color: #777;
-            font-size: 13px;
-            margin-top: 15px;
-            font-weight: 600;
-        }
+.side{display:inline-block;font-size:13px;font-weight:600;letter-spacing:.03em;padding:1px 6px;border-radius:5px}
+.side.long{color:var(--green);background:rgba(8,153,129,0.1)}
+.side.short{color:var(--red);background:rgba(242,54,69,0.1)}
 
-        @media (max-width: 768px) {
-            :root { --page-padding: 12px; --widget-gap: 10px; }
-            .header { top: 10px; height: 45px; border-radius: 12px; }
-            .container { padding: 70px var(--page-padding) 45px; }
-            .widget { border-radius: 10px; }
-            .header-title { font-size: 17px; }
-            .header-clock { font-size: 18px; }
-            .header-date { font-size: 18px; }
-        }
+.lev{color:var(--muted)}
+.empty{color:var(--dim);font-size:13px;padding:8px 0 2px;text-align:center}
+.empty.big{color:#fff;font-size:16px;font-weight:600;padding:12px 0 2px}
 
-        @media (max-width: 480px) {
-            :root { --page-padding: 10px; --widget-gap: 8px; }
-            .header-title { font-size: 16px; }
-            .header-clock { font-size: 16px; }
-            .header-date { font-size: 16px; }
-        }
-    </style>
+.empty-add{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
+  width:48px;height:48px;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--pill);border:1px solid var(--line2);
+  box-shadow:0 6px 20px rgba(0,0,0,.6);
+  z-index:15;
+  transition:transform .12s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.empty-add:hover{border-color:var(--ring-hover)}
+.empty-add:active{transform:translateX(-50%) scale(.94)}
+.empty-add svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.listbox{display:flex;flex-direction:column;gap:var(--row-gap)}
+.listitem{display:flex;flex-direction:column;gap:0}
+.listrow{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;
+  background:var(--card);
+  border:1px solid var(--line2);border-radius:13px;
+  height:var(--row-h);
+  padding:0 12px 0 15px;
+  cursor:pointer;user-select:none;-webkit-user-select:none;
+  transition:border-color .2s;box-shadow:0 3px 12px rgba(0,0,0,.45);
+}
+.listrow::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--red);opacity:.55;
+}
+.listrow.on::before{background:var(--green)}
+.listrow.off::before{background:#6b6b6b}
+.listrow:hover{border-color:var(--ring)}
+.listrow .info{min-width:0;grid-column:1}
+.listrow .wallet-ic{display:inline-flex}
+.listrow .wallet-ic svg{stroke:var(--red);transition:stroke .2s ease;width:18px;height:18px}
+.listrow .wallet-ic.on svg{stroke:var(--green)}
+.listrow .wallet-ic.off svg{stroke:#6b6b6b}
+.listrow .meta{
+  grid-column:2;min-width:0;
+  display:flex;align-items:center;justify-content:flex-end;gap:6px;
+}
+.vsep{
+  display:block;flex-shrink:0;
+  width:1px;height:16px;
+  background:var(--line2);
+}
+.pos-grp{display:inline-flex;align-items:center;gap:6px}
+
+.listrow .name{
+  padding:0;background:none;border:0;border-radius:0;
+}
+.listrow .name-txt{font-size:16px}
+
+.slot{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:21px;height:21px;flex-shrink:0;
+}
+.slot svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.cnt-sq{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:22px;height:22px;padding:0 4px;margin-left:1px;
+  background:#fff;color:#000;border-radius:5px;
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:13px;font-weight:700;line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+
+.listitem.open .listrow{border-radius:13px 13px 0 0;border-bottom-color:var(--line2);box-shadow:none}
+.detail{
+  background:#090909;border:1px solid var(--line2);border-top:0;
+  border-radius:0 0 13px 13px;padding:0;overflow:hidden;
+  box-shadow:0 4px 18px rgba(0,0,0,.5);
+}
+
+.detail .board-head{position:static;background:none;padding:0}
+.detail .bh-in{
+  height:auto;min-height:30px;padding:4px 6px 4px 11px;
+  border:0;border-bottom:1px solid var(--line2);border-radius:0;
+  box-shadow:none;
+}
+.detail .bh-in::before,
+.detail .bh-in svg{display:none}
+
+.detail .prow{
+  background:none;border:0;border-bottom:1px solid var(--line);border-radius:0;
+  box-shadow:none;margin-bottom:0;
+  height:auto;
+  padding:5px 6px 5px 11px;min-height:36px;
+}
+.detail .prow::before{display:none}
+.detail .prow:last-child{border-bottom:0}
+.detail .prow:hover{background:rgba(255,255,255,.025)}
+.detail .prow:active{transform:none}
+
+.detail .prow .lev{
+  display:inline-block;justify-self:center;
+  padding:1px 7px;border-radius:5px;
+  border:1px solid var(--line2);background:var(--card);
+  color:#d0d0d0;font-weight:600;font-size:11.5px;
+}
+.detail .prow .coin,
+.detail .prow .side,
+.detail .prow .lev,
+.detail .prow .px,
+.detail .prow .pnl{font-size:13.5px;font-weight:600;letter-spacing:0}
+
+.actions-mask{
+  position:fixed;left:0;right:0;bottom:0;
+  height:76px;
+  z-index:14;
+  pointer-events:none;
+  background:linear-gradient(
+    to top,
+    var(--bg) 0,
+    var(--bg) 92%,
+    rgba(0,0,0,0) 100%
+  );
+}
+.actions-mask.more-mask{height:52px}
+.actions{
+  --box:34px;
+  position:fixed;
+  left:0;right:0;bottom:10px;
+  width:calc(100% - 24px);max-width:776px;margin:0 auto;
+  z-index:15;
+  direction:ltr;
+  display:grid;grid-template-columns:repeat(8,var(--box));
+  justify-content:space-between;justify-items:center;
+  padding:8px;
+  background:var(--card);
+  border:1px solid var(--line2);border-radius:13px;
+  box-shadow:0 4px 14px rgba(0,0,0,.55);
+}
+.list-pill{
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+  width:var(--box);height:var(--box);padding:0;color:#fff;
+  background:none;border:0;
+  transition:color .2s,transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.list-pill svg{width:22px;height:22px;stroke:currentColor;fill:none}
+.list-pill:active{transform:scale(.94)}
+.list-pill.del:hover{color:var(--red)}
+.list-pill.link:hover{color:var(--accent)}
+.list-pill.armed svg{fill:currentColor}
+.list-pill.spin svg{animation:spin 1s linear infinite}
+
+.fav-on svg{fill:#fff}
+
+.overlay{
+  position:fixed;inset:0;z-index:30;
+  display:none;align-items:center;justify-content:center;padding:16px;
+  background:rgba(0,0,0,.78);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+}
+.overlay.show{display:flex}
+.modal{
+  width:100%;max-width:340px;
+  max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px);
+  overflow-y:auto;
+  background:var(--card);
+  border:1px solid var(--line2);border-radius:18px;
+  padding:18px 16px 14px;
+  box-shadow:0 18px 48px rgba(0,0,0,.85);
+  animation:pop .16s ease;
+}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+.modal h2{
+  margin:0 0 14px;
+  font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);text-align:center;
+}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field label{
+  font-size:10.5px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:600;
+  padding-left:2px;
+}
+input{
+  background:var(--pill);border:1px solid var(--line2);color:var(--text);
+  padding:0 12px;border-radius:11px;font:inherit;outline:none;min-width:0;width:100%;
+  transition:border-color .2s;
+  height:38px;
+}
+input::placeholder{color:var(--dim)}
+input.mono{font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+input:focus{border-color:var(--ring-hover)}
+
+.add-modal{max-width:360px;padding:22px 18px 16px}
+.add-head{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px}
+.add-head h2{margin:0;font-size:12.5px}
+.add-ic{
+  width:54px;height:54px;border-radius:17px;
+  background:var(--pill);border:1px solid var(--line2);
+  display:flex;align-items:center;justify-content:center;
+}
+.add-ic svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.add-modal .field{margin-bottom:14px;gap:7px}
+.add-modal .field label{font-size:11.5px;color:#fff}
+.inp-row{display:flex;align-items:center;gap:8px}
+.inp{position:relative;display:flex;align-items:center;flex:1;min-width:0}
+.inp .lead{
+  position:absolute;left:14px;top:50%;margin-top:-9px;
+  width:18px;height:18px;pointer-events:none;
+  stroke:var(--muted);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+.inp input{height:48px;padding:0 12px 0 42px;font-size:15.5px;border-radius:13px}
+.inp input.mono{font-size:13.5px}
+.sq-btn{
+  flex-shrink:0;width:48px;height:48px;border-radius:13px;
+  background:var(--pill);border:1px solid var(--line2);
+  display:inline-flex;align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
+  transition:background .15s,border-color .15s;
+}
+.sq-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sq-btn:hover{border-color:var(--ring-hover)}
+.sq-btn:active{background:rgba(255,255,255,.1)}
+.add-msg{display:none;font-size:13px;line-height:1.5;padding:0 2px;color:var(--muted)}
+.add-msg.show{display:block}
+.add-msg.ok,.add-msg.dup{color:#fff}
+.add-msg.err{color:var(--red)}
+.addr-box{
+  background:var(--pill);border:1px solid var(--line2);color:var(--muted);
+  padding:9px 12px;border-radius:11px;
+  font-family:ui-monospace,Menlo,monospace;font-size:11.5px;line-height:1.5;
+  word-break:break-all;user-select:none;-webkit-user-select:none;cursor:default;
+}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.btn{
+  flex:1;height:38px;padding:0 12px;border-radius:11px;
+  font-weight:600;font-size:13px;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  transition:background .2s,border-color .2s,color .2s,opacity .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.add-modal .btn{height:46px;font-size:15px;border-radius:13px}
+.btn:active{opacity:.75}
+.btn:disabled{opacity:.35;pointer-events:none}
+.btn.primary{background:var(--text);color:#000;border:1px solid var(--text)}
+.btn.ghost{background:var(--pill);border:1px solid var(--line2);color:var(--muted)}
+.btn.ghost:hover{border-color:var(--ring-hover);color:#fff}
+.confirm-text{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 2px;text-align:center}
+
+.bk-single{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 4px 2px}
+.bk-hint{color:var(--dim);font-size:12px;line-height:1.5;text-align:center}
+
+.infobar{
+  position:absolute;top:6px;left:12px;right:12px;bottom:5px;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+  padding:0 16px;
+  background:var(--card);border:1px solid var(--line2);border-radius:14px;
+  box-shadow:0 6px 24px rgba(0,0,0,0.6);z-index:3;
+  opacity:0;pointer-events:none;transform:translateY(-6px);
+  transition:transform .22s ease,opacity .22s ease;
+  cursor:pointer;
+}
+.infobar.show{opacity:1;pointer-events:auto;transform:none}
+.infobar.alert-long{border-color:rgba(8,153,129,.5);box-shadow:0 0 0 1px rgba(8,153,129,.15),0 6px 24px rgba(0,0,0,.6)}
+.infobar.alert-short{border-color:rgba(242,54,69,.5);box-shadow:0 0 0 1px rgba(242,54,69,.15),0 6px 24px rgba(0,0,0,.6)}
+.info-row1{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.info-row1 .name{flex:0 1 auto;min-width:0;padding:2px 15px 2px 11px;gap:9px}
+.infobar .name{cursor:pointer}
+.infobar .name svg{width:19px;height:19px}
+.infobar .name .wallet-ic svg{width:11px;height:11px}
+.infobar .name-txt{font-size:15.5px}
+
+.dt-line{
+  display:flex;align-items:center;justify-content:center;gap:8px;flex:1;min-width:0;
+  font-size:14px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.dt-date{color:#fff}
+.dt-time{color:var(--muted)}
+.dt-sep{display:block;width:3px;height:3px;border-radius:50%;background:var(--dim);flex-shrink:0}
+.dt-none{flex:1;text-align:center;color:#fff;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+.alert-msg{display:flex;align-items:center;gap:6px;min-width:0;font-size:13px;font-weight:600;color:var(--muted)}
+.alert-msg svg{width:15px;height:15px;flex-shrink:0;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transform-origin:50% 10%;animation:ring .6s ease 3}
+.alert-txt{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.alert-txt b{color:#fff}
+@keyframes ring{0%,100%{transform:rotate(0)}25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
+
+.set-box{display:flex;flex-direction:column;gap:5px;padding-bottom:8px}
+.set-card{
+  background:var(--card);border:1px solid var(--line2);border-radius:13px;
+  padding:11px 12px 11px 15px;box-shadow:0 3px 12px rgba(0,0,0,.45);
+}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:42px}
+.set-txt{min-width:0}
+.set-lbl{font-weight:600;font-size:16px;color:#fff}
+.set-sub{color:#8a8a8a;font-size:13px;line-height:1.35;margin-top:2px}
+.sw{
+  position:relative;flex-shrink:0;width:40px;height:22px;padding:0;border-radius:999px;
+  background:#2a2a2a;border:1px solid #4a4a4a;
+  transition:background .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.sw::after{
+  content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+  background:#8a8a8a;transition:transform .2s,background .2s;
+}
+.sw.on{background:#ffffff;border-color:#ffffff}
+.sw.on::after{transform:translateX(18px);background:#000000}
+.chips{display:flex;gap:6px;margin-top:9px}
+.chip{
+  flex:1;min-width:0;height:36px;padding:0 4px;border-radius:9px;
+  background:var(--pill);border:1px solid var(--line2);color:var(--muted);
+  font-weight:600;font-size:14px;
+  transition:background .2s,color .2s,border-color .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.chip:active{opacity:.75}
+.chip.on{background:var(--text);color:#000;border-color:var(--text)}
+
+.tg-card{padding:8px 12px 8px 15px}
+.tg-card .set-row{min-height:34px}
+.tg-field{display:flex;flex-direction:row;align-items:center;gap:10px;margin-top:6px}
+.tg-field label{
+  flex-shrink:0;white-space:nowrap;
+  font-size:10.5px;color:var(--dim);
+  text-transform:uppercase;letter-spacing:.08em;font-weight:600;padding-left:2px;
+}
+.tg-field input{flex:1;width:auto;height:38px}
+.tg-status{margin-top:4px;font-size:12px;line-height:1.4;padding-left:2px}
+.tg-status.ok{color:var(--green)}
+.tg-status.err{color:var(--red)}
+.tg-status.busy{color:var(--muted)}
+
+.bk-row{
+  position:fixed;
+  left:0;right:0;bottom:10px;
+  width:calc(100% - 24px);max-width:776px;margin:0 auto;
+  z-index:15;
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+}
+.bk-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  height:42px;padding:0 10px;border-radius:11px;
+  background:var(--card);border:1px solid var(--line2);
+  color:var(--text);font-weight:600;font-size:15px;
+  box-shadow:0 3px 10px rgba(0,0,0,.45);
+  transition:background .2s,transform .12s;
+  -webkit-tap-highlight-color:transparent;
+}
+.bk-btn:hover{background:var(--card-hover)}
+.bk-btn:active{transform:scale(.98)}
+.bk-btn svg{
+  width:17px;height:17px;flex-shrink:0;
+  stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+}
+
+.toast{
+  position:fixed;left:0;right:0;bottom:58px;
+  width:calc(100% - 24px);max-width:776px;margin:0 auto;
+  z-index:60;padding:10px 14px;
+  background:var(--card);border:1px solid var(--line2);border-radius:13px;
+  box-shadow:0 6px 24px rgba(0,0,0,.7);
+  color:#fff;font-size:13px;font-weight:600;text-align:center;
+  opacity:0;pointer-events:none;transform:translateY(6px);
+  transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:none}
+.toast.err{border-color:rgba(242,54,69,.6)}
+.toast.ok{border-color:rgba(8,153,129,.6)}
+
+.about-modal{max-width:360px;padding:22px 18px 16px}
+.about-head{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:18px}
+.about-head h2{margin:0;font-size:12.5px}
+.about-name{text-align:center;font-weight:600;font-size:16px;color:#fff}
+.about-meta{display:flex;justify-content:center;gap:6px;margin:0 0 14px}
+.about-tag{
+  font-size:11.5px;color:var(--muted);padding:2px 9px;
+  border:1px solid var(--line2);border-radius:999px;background:var(--pill);
+}
+.about-desc{color:var(--muted);font-size:14px;line-height:1.6;text-align:center;margin:0 0 14px}
+.about-by{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:10px;border-radius:13px;
+  background:var(--pill);border:1px solid var(--line2);
+}
+.about-by span{font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.about-by b{font-size:14px;color:#fff;font-weight:600;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em}
+
+/* ===== In-app browser (display only, no bars) ===== */
+.browser{
+  position:fixed;inset:0;z-index:50;
+  display:none;
+  background:transparent;
+  touch-action:pan-x pan-y;
+}
+.browser.show{display:block}
+.browser.ready{background:#000}
+#brFrame{
+  position:absolute;inset:0;width:100%;height:100%;
+  border:0;background:#000;
+  touch-action:pan-x pan-y;
+  opacity:0;
+}
+#brFrame.ready{opacity:1;transition:opacity .12s}
+
+.prices{
+  position:fixed;inset:0;
+  z-index:30;display:none;background:#000;
+}
+.prices.show{display:block}
+#prFrame{width:100%;height:100%;border:0;background:#000}
+body.on-prices{overflow:hidden}
+body.on-prices .top{visibility:hidden;pointer-events:none;z-index:40}
+body.on-prices .top .menu{visibility:visible}
+.btclive{
+  position:fixed;inset:0;
+  z-index:30;display:none;background:#000;
+}
+.btclive.show{display:block}
+#btcFrame{width:100%;height:100%;border:0;background:#000}
+body.on-btc{overflow:hidden}
+body.on-btc .top{visibility:hidden;pointer-events:none;z-index:40}
+
+@media (max-width:640px){
+  body{padding:4px 8px 96px}
+  .top{margin:0 -8px;padding:6px 8px 5px}
+  .infobar{left:8px;right:8px}
+  .menu{right:8px}
+  .summary{width:calc(100% - 16px);bottom:8px}
+  .actions{width:calc(100% - 16px);bottom:8px}
+  .bk-row{width:calc(100% - 16px);bottom:8px}
+  .toast{width:calc(100% - 16px)}
+}
+@media (max-width:400px){
+  .bh-in svg{display:none}
+  .bh-in{letter-spacing:.06em}
+  header{padding:8px 6px 8px 12px}
+  .iconbtn{width:34px;height:34px}
+  .iconbtn svg{width:20px;height:20px}
+  .actions{--box:32px;padding:6px}
+  .list-pill svg{width:20px;height:20px}
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-date" id="date">2024 Jan 1</div>
-        <div class="header-title">CRYPTO PRICES</div>
-        <div class="header-clock" id="clock">00:00:00</div>
+<div class="wrap">
+  <div class="top" id="topBar">
+    <header>
+      <div class="title-wrap">
+        <h1 id="title">Wallet Monitor</h1>
+        <div class="upd" id="updated"></div>
+      </div>
+      <div class="tools">
+        <button class="iconbtn" id="refreshAll" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </button>
+        <button class="iconbtn" id="sortBtn" aria-label="Sort"></button>
+        <button class="iconbtn" id="toggleList" aria-label="Back" style="display:none"></button>
+        <button class="iconbtn" id="addWalletBtn" aria-label="Add wallet" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16.5" cy="13.5" r="1"/></svg>
+        </button>
+        <button class="iconbtn" id="settingsBtn" aria-label="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+    <div class="infobar" id="infoBar"></div>
+    <div class="menu" id="settingsMenu">
+      <button class="menu-item" id="menuPrices">
+        <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg>
+        <span>Prices</span>
+      </button>
+      <button class="menu-item" id="menuBtc">
+        <svg viewBox="0 0 24 24"><path d="M7 3v3"/><rect x="5" y="6" width="4" height="9" rx="1"/><path d="M7 15v3"/><path d="M17 6v3"/><rect x="15" y="9" width="4" height="8" rx="1"/><path d="M17 17v3"/></svg>
+        <span>BTC Live</span>
+      </button>
+      <button class="menu-item" id="menuWallets">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        <span>Wallets</span>
+      </button>
+      <button class="menu-item" id="menuMore">
+        <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5" fill="#fff"/><circle cx="12" cy="12" r="1.5" fill="#fff"/><circle cx="19" cy="12" r="1.5" fill="#fff"/></svg>
+        <span>More</span>
+      </button>
+      <button class="menu-item" id="menuAbout">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>About</span>
+      </button>
+      <div class="menu-sep"></div>
+      <button class="menu-item exit" id="menuExit">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+        <span>Exit</span>
+      </button>
     </div>
+  </div>
 
-    <div class="container">
-        <div class="widgets-grid">
-            <div class="widget">
-                <div class="tradingview-widget-container">
-                    <div id="btc_widget"></div>
-                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-                    {"symbol":"BINANCE:BTCUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
-                    </script>
-                </div>
-            </div>
-            <div class="widget">
-                <div class="tradingview-widget-container">
-                    <div id="eth_widget"></div>
-                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-single-quote.js" async>
-                    {"symbol":"BINANCE:ETHUSDT","width":"100%","height":"100%","isTransparent":false,"colorTheme":"dark","locale":"en"}
-                    </script>
-                </div>
-            </div>
-            <div class="widget">
-                <div class="tradingview-widget-container">
-                    <div id="btc-dominance-chart"></div>
-                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    {"symbol":"CRYPTOCAP:BTC.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
-                    </script>
-                </div>
-            </div>
-            <div class="widget">
-                <div class="tradingview-widget-container">
-                    <div id="usdt-dominance-chart"></div>
-                    <script src="https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js" async>
-                    {"symbol":"CRYPTOCAP:USDT.D","width":"100%","height":"100%","locale":"en","colorTheme":"dark","isTransparent":false,"autosize":true}
-                    </script>
-                </div>
-            </div>
+  <div id="list"></div>
+</div>
+
+<div class="prices" id="prices">
+</div>
+
+<div class="btclive" id="btclive">
+</div>
+
+<!-- In-app browser -->
+<div class="browser" id="browser">
+  <iframe id="brFrame" title="Browser"
+    sandbox="allow-scripts allow-same-origin allow-forms"
+    referrerpolicy="no-referrer"
+    allow="clipboard-read 'none'; clipboard-write 'none'; fullscreen 'none'"></iframe>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="overlay" id="overlay">
+  <div class="modal add-modal">
+    <div class="add-head">
+      <div class="add-ic">
+        <svg viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16.5" cy="13.5" r="1"/></svg>
+      </div>
+      <h2>Add wallet</h2>
+    </div>
+    <div class="field">
+      <label for="label">Name</label>
+      <div class="inp-row">
+        <div class="inp">
+          <svg class="lead" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/></svg>
+          <input id="label" spellcheck="false" autocomplete="off">
         </div>
-        <div class="footer">Powered by TradingView</div>
+        <button type="button" class="sq-btn" data-clear="label" aria-label="Clear name">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="labelMsg" class="add-msg" dir="ltr"></div>
     </div>
+    <div class="field">
+      <label for="addr">Address</label>
+      <div class="inp-row">
+        <div class="inp">
+          <svg class="lead" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          <input id="addr" class="mono" placeholder="0x..." spellcheck="false" autocomplete="off" autocapitalize="off">
+        </div>
+        <button type="button" class="sq-btn" data-clear="addr" aria-label="Clear address">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+        <button type="button" class="sq-btn" id="checkLink" aria-label="Check address">
+          <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>
+        </button>
+      </div>
+      <div id="addMsg" class="add-msg" dir="ltr"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelAdd">Cancel</button>
+      <button class="btn primary" id="confirmAdd">Add</button>
+    </div>
+  </div>
+</div>
 
-    <script>
-        document.addEventListener('dblclick', e => e.preventDefault(), {passive: false});
-        document.addEventListener('gesturestart', e => e.preventDefault());
-        document.addEventListener('touchmove', e => {if(e.scale !== 1) e.preventDefault()}, {passive: false});
+<div class="overlay" id="renameOverlay">
+  <div class="modal add-modal">
+    <div class="add-head">
+      <div class="add-ic">
+        <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/></svg>
+      </div>
+      <h2>Rename wallet</h2>
+    </div>
+    <div class="field">
+      <label for="renameInput">Name</label>
+      <div class="inp-row">
+        <div class="inp">
+          <svg class="lead" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/></svg>
+          <input id="renameInput" spellcheck="false" autocomplete="off">
+        </div>
+        <button type="button" class="sq-btn" data-clear="renameInput" aria-label="Clear name">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div id="renameMsg" class="add-msg" dir="ltr"></div>
+    </div>
+    <div class="field">
+      <label>Address</label>
+      <div id="renameAddr" class="addr-box"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelRename">Cancel</button>
+      <button class="btn primary" id="confirmRename">Save</button>
+    </div>
+  </div>
+</div>
 
-        // Live clock function
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+<div class="overlay" id="restoreOverlay">
+  <div class="modal">
+    <h2>Restore from backup</h2>
+    <div class="bk-single">
+      <div class="bk-hint">Select a backup file (.json) to restore your wallets.</div>
+    </div>
+    <input type="file" id="restoreFile" accept=".json,application/json" style="display:none">
+    <div class="modal-actions">
+      <button class="btn ghost" id="closeRestore">Close</button>
+      <button class="btn primary" id="pickFile">Choose file</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="confirmOverlay">
+  <div class="modal">
+    <h2>Restore backup</h2>
+    <p class="confirm-text" id="confirmText"></p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="cancelConfirm">Cancel</button>
+      <button class="btn primary" id="okConfirm">Restore</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deleteOverlay">
+  <div class="modal">
+    <h2>Delete address</h2>
+    <p class="confirm-text">Do you want to delete this address?</p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="noDelete">No</button>
+      <button class="btn primary" id="yesDelete">Yes</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="aboutOverlay">
+  <div class="modal add-modal about-modal">
+    <div class="add-head about-head">
+      <div class="add-ic">
+        <svg viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16.5" cy="13.5" r="1"/></svg>
+      </div>
+      <h2>About</h2>
+    </div>
+    <div class="about-name">Wallet Monitor</div>
+    <div class="about-meta">
+      <span class="about-tag">Version 3.1</span>
+      <span class="about-tag">2026</span>
+    </div>
+    <p class="about-desc">Real-time monitor for Hyperliquid wallets. Tracks open positions, alerts you on new trades, and sends notifications to Telegram.</p>
+    <div class="about-by">
+      <span>Designed by</span>
+      <b>ahmadrezaheydari</b>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="closeAbout">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://api.hyperliquid.xyz/info";
+const EXPLORER = "https://hyperdash.com/address/";
+const LEGACY = ["hl_wallets", "hl_hidden", "hl_alerts", "hl_known", "hl_tg", "hl_cache", "hl_saved_at", "hl_favs", "hl_cfg"];
+const REFRESH_OPTS = [10, 15];
+const ALERT_OPTS = [15, 30, 60, 120, 300];
+const ALERT_SHOW_MS = 5000;
+const MENU_AUTO_CLOSE_MS = 5000;
+const TOAST_MS = 3500;
+const NEW_WINDOW = 60 * 60 * 1000;
+const OLD_LIMIT_MS = 30 * 24 * 60 * 60 * 1000;
+const TG_WINDOW_MS = 15 * 60 * 1000;
+const MIN_SPIN_MS = 900;
+const REQUEST_TIMEOUT_MS = 15000;
+const TG_SAVE_DELAY_MS = 600;
+const PULL_REFRESH_PX = 70;
+const DB_NAME = "hl_store";
+const DRAFT_KEY = "hl_add_draft";
+const APP_TITLE = "Wallet Monitor";
+const TG_TOKEN = "8890907218:AAGxt77TSFnQMQIohQEtsBjNpiByoRThEaY";
+const WS_URL = "wss://api.hyperliquid.xyz/ws";
+const WS_PING_MS = 30000;
+const WS_RETRY_MAX_MS = 30000;
+const FILL_DEBOUNCE_MS = 1500;
+const FILL_KEEP = 2000;
+const BACKFILL_COOLDOWN_MS = 60 * 1000;
+
+const ICON_BACK = `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>`;
+const ICON_CLOCK = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
+const ICON_SORT_COIN = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h7M4 18h4"/><path d="M18 4v16"/><path d="M15 17l3 3 3-3"/></svg>`;
+const ICON_EYE = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>`;
+const ICON_EYE_OFF = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-7-11-7a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 7 11 7a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg>`;
+const ICON_TRASH = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg>`;
+const ICON_HEART = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+const ICON_COPY = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>`;
+const ICON_LINK = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+const ICON_EDIT = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><circle cx="7" cy="7" r="1"/></svg>`;
+const ICON_WALLET = `<svg viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4"/><path d="M3 5v14a2 2 0 0 0 2 2h15V7"/><circle cx="16.5" cy="13.5" r="1"/></svg>`;
+const ICON_BELL = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+const ICON_REFRESH = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>`;
+const ICON_ADD = `<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>`;
+
+const HI_COIN = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5h5"/></svg>`;
+const HI_SIDE = `<svg viewBox="0 0 24 24"><path d="M8 20V5M4 9l4-4 4 4"/><path d="M16 4v15M12 15l4 4 4-4"/></svg>`;
+const HI_LEV = `<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>`;
+const HI_ENTRY = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>`;
+const HI_PNL = `<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>`;
+const ICON_POS_COUNT = `<svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 18l9 5 9-5"/></svg>`;
+const ICON_BACKUP = `<svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>`;
+const ICON_RESTORE = `<svg viewBox="0 0 24 24"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 21h14"/></svg>`;
+
+const SORT_MODES = ["time", "coin"];
+const SORT_ICONS = {time: ICON_CLOCK, coin: ICON_SORT_COIN};
+const COIN_PRIORITY = {BTC: 0, ETH: 1};
+
+const $ = id => document.getElementById(id);
+const arr = v => Array.isArray(v) ? v : [];
+const obj = v => v && typeof v === "object" && !Array.isArray(v) ? v : {};
+const ESC_MAP = {"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ESC_MAP[c]);
+const num = (v, d = 2) => { const x = Number(v); return isNaN(x) ? "-" : x.toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d}); };
+const priceFmt = (coin, v) => ["BTC","ETH"].includes(coin) ? (isNaN(Number(v)) ? "-" : Math.round(Number(v)).toLocaleString("en-US")) : num(v);
+const coinName = c => String(c).replace(/coin/gi, "") || String(c);
+const coinRank = c => COIN_PRIORITY[c] ?? 2;
+const sideOf = p => Number(p.szi) > 0 ? "long" : "short";
+const delay = ms => new Promise(r => setTimeout(r, ms));
+const fmtSec = s => s >= 60 ? (s / 60) + "m" : s + "s";
+const extractAddr = s => {
+  const m = String(s ?? "").match(/0x[a-fA-F0-9]{40}/);
+  return m ? m[0].toLowerCase() : "";
+};
+const show = (id, on) => $(id).classList.toggle("show", on);
+
+/* Block text selection, the long-press context menu and dragging everywhere
+   except inside text inputs, so typing and pasting still work normally. */
+const isEditable = t => !!(t && t.closest && t.closest("input, textarea"));
+document.addEventListener("contextmenu", e => { if(!isEditable(e.target)) e.preventDefault(); });
+document.addEventListener("selectstart", e => { if(!isEditable(e.target)) e.preventDefault(); });
+document.addEventListener("dragstart", e => { if(!isEditable(e.target)) e.preventDefault(); });
+
+const normCfg = c => {
+  c = obj(c);
+  return {
+    tg: c.tg !== false,
+    alert: c.alert !== false,
+    real: c.real !== false,
+    screenOn: c.screenOn !== false,
+    hideOld: c.hideOld === true,
+    refreshMin: REFRESH_OPTS.includes(c.refreshMin) ? c.refreshMin : 10,
+    alertSec: ALERT_OPTS.includes(c.alertSec) ? c.alertSec : 60
+  };
+};
+const normTg = t => ({chat: String(obj(t).chat || ""), id: String(obj(t).id || "")});
+const cleanCache = c => {
+  const out = {}, raw = obj(c);
+  for(const a in raw) if(raw[a] && Array.isArray(raw[a].positions)) out[a] = raw[a];
+  return out;
+};
+
+const Calc = {
+  startTimes(fills){
+    const st = {};
+    [...fills].sort((x, y) => x.time - y.time).forEach(f => {
+      const s = st[f.coin] || (st[f.coin] = {net: 0, start: 0});
+      const before = s.net;
+      s.net += (f.side === "B" ? 1 : -1) * Number(f.sz);
+      if(Math.abs(s.net) < 1e-9){ s.net = 0; s.start = 0; return; }
+      if(Math.abs(before) < 1e-9 || before * s.net < 0) s.start = f.time;
+    });
+    const out = {};
+    for(const c in st) if(st[c].start) out[c] = st[c].start;
+    return out;
+  },
+  trimPositions(state){
+    return arr(state && state.assetPositions)
+      .map(x => x && x.position)
+      .filter(p => p && Number(p.szi) !== 0)
+      .map(p => ({
+        coin: p.coin,
+        szi: p.szi,
+        entryPx: p.entryPx,
+        positionValue: p.positionValue,
+        leverage: p.leverage ? {value: p.leverage.value} : null
+      }));
+  },
+  pctMove(p){
+    const sz = Math.abs(Number(p.szi)), e = Number(p.entryPx), v = Number(p.positionValue);
+    if(!sz || !e || isNaN(v)) return null;
+    const m = v / sz;
+    return (sideOf(p) === "long" ? (m - e) / e : (e - m) / e) * 100;
+  },
+  newPositions(prev, pos){
+    return pos.filter(p => {
+      const was = prev[p.coin];
+      if(was === undefined) return true;
+      // Older saved versions stored only a numeric start timestamp.
+      // Treat those entries as already-open positions during migration.
+      if(typeof was !== "object" || was === null) return false;
+      const oldSide = was.side || (Number(was.szi) > 0 ? "long" : Number(was.szi) < 0 ? "short" : "");
+      if(oldSide && oldSide !== sideOf(p)) return true;
+      // A changed, fill-derived start time means the position was closed
+      // and entered again, not merely increased in size.
+      return !!(was.start && p.start && p.start > was.start);
+    });
+  },
+  snapshot(pos){
+    const s = {};
+    pos.forEach(p => {
+      s[p.coin] = {start: Number(p.start) || 0, szi: Number(p.szi) || 0, side: sideOf(p)};
+    });
+    return s;
+  }
+};
+
+const S = {
+  wallets: [], hidden: [], alerts: [], favs: [], known: {}, notified: {},
+  tg: normTg({}), cfg: normCfg({}), cache: {},
+  screen: "main", selected: null, sortMode: "time", shown: null, html: "",
+  storeFail: false, refreshing: false, refreshAllPending: false, spinCount: 0, wakeLock: null,
+  alertQueue: [], alertActive: false,
+  pendingRestore: null, pendingDelete: null, renameAddr: null,
+  spinning: new Set(),
+  timers: {},
+  fromLongPress: false, revealPos: null,
+  browserOpen: false
+};
+const isHidden = a => S.hidden.includes(a);
+const isFav = a => S.favs.includes(a);
+
+const Store = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    const r = indexedDB.open(DB_NAME, 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("kv");
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => { dbp = null; rej(r.error); };
+  }));
+  const run = async (mode, fn) => {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const t = db.transaction("kv", mode);
+      const q = fn(t.objectStore("kv"));
+      t.oncomplete = () => res(q && q.result);
+      t.onerror = t.onabort = () => rej(t.error);
+    });
+  };
+  const get = k => run("readonly", s => s.get(k));
+  const set = (k, v) => run("readwrite", s => s.put(v, k));
+  const del = k => run("readwrite", s => s.delete(k));
+  const bc = "BroadcastChannel" in window ? new BroadcastChannel("hl_sync") : null;
+
+  const setFail = v => {
+    if(S.storeFail === v) return;
+    S.storeFail = v;
+    renderUpdated();
+  };
+  const saver = (key, snap, type) => {
+    let chain = Promise.resolve(true), queued = false;
+    return () => {
+      if(queued) return chain;
+      queued = true;
+      chain = chain.then(async () => {
+        queued = false;
+        try{
+          await set(key, snap());
+          setFail(false);
+          if(bc) bc.postMessage(type);
+          return true;
+        }catch(e){
+          setFail(true);
+          return false;
         }
+      });
+      return chain;
+    };
+  };
+  const persist = saver("state", () => ({v: 3, wallets: S.wallets, hidden: S.hidden, alerts: S.alerts, favs: S.favs, cfg: S.cfg, tg: S.tg, known: S.known, notified: S.notified}), "state");
+  const persistCache = saver("cache", () => S.cache, "cache");
 
-        // Date function
-        function updateDate() {
-            const now = new Date();
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            const monthName = months[now.getMonth()];
-            const day = now.getDate();
-            const year = now.getFullYear();
-            
-            document.getElementById('date').textContent = `${year} ${monthName} ${day}`;
-        }
+  const apply = s => {
+    S.wallets = arr(s.wallets);
+    S.hidden = arr(s.hidden);
+    S.alerts = arr(s.alerts);
+    S.favs = arr(s.favs);
+    S.known = obj(s.known);
+    S.notified = obj(s.notified);
+    S.cfg = normCfg(s.cfg);
+    S.tg = normTg(s.tg);
+  };
 
-        // Update clock every second and date every minute
-        updateClock();
-        updateDate();
-        setInterval(updateClock, 1000);
-        setInterval(updateDate, 60000);
-    </script>
+  const ls = (k, fb) => {
+    try{
+      const v = JSON.parse(localStorage.getItem(k) || "null");
+      return v === null ? fb : v;
+    }catch(e){ return fb; }
+  };
+  const migrate = async () => {
+    const local = {
+      wallets: arr(ls("hl_wallets", [])), hidden: arr(ls("hl_hidden", [])), alerts: arr(ls("hl_alerts", [])),
+      favs: arr(ls("hl_favs", [])), known: obj(ls("hl_known", {})), cfg: obj(ls("hl_cfg", {})), tg: obj(ls("hl_tg", {}))
+    };
+    let m = null;
+    try{ m = await get("mirror"); }catch(e){}
+    const mirrorWins = m && Array.isArray(m.wallets) && m.wallets.length &&
+      (!local.wallets.length || (m.savedAt || 0) > ls("hl_saved_at", 0));
+    if(mirrorWins) return {...local, wallets: m.wallets, hidden: m.hidden, alerts: m.alerts, known: m.known || local.known};
+    return local.wallets.length ? local : null;
+  };
+
+  const load = async () => {
+    let s = null;
+    try{ s = await get("state"); }catch(e){ S.storeFail = true; }
+    const migrated = !s && !!(s = await migrate());
+    if(s) apply(s);
+    try{ S.cache = cleanCache(await get("cache")); }catch(e){ S.cache = {}; }
+    if(migrated){
+      if(!Object.keys(S.cache).length) S.cache = cleanCache(obj(ls("hl_cache", {})));
+      if((await persist()) && (await persistCache())){
+        LEGACY.forEach(k => { try{ localStorage.removeItem(k); }catch(e){} });
+        del("mirror").catch(() => {});
+      }
+    }
+  };
+  const listen = fn => { if(bc) bc.onmessage = e => fn(e.data); };
+
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {}); }catch(e){}
+  return {persist, persistCache, apply, load, listen, get, set};
+})();
+
+const Api = (() => {
+  const post = async body => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT_MS);
+    try{
+      const r = await fetch(API, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body), signal: ctrl.signal});
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return await r.json();
+    }finally{
+      clearTimeout(timer);
+    }
+  };
+  const fetchWallet = async a => {
+    const state = await post({type: "clearinghouseState", user: a});
+    return {positions: Calc.trimPositions(state), time: Date.now()};
+  };
+  const normalizeChat = s => {
+    let v = String(s ?? "").trim().replace(/^https?:\/\/(t\.me|telegram\.me)\//i, "");
+    if(/^-?\d+$/.test(v)) return v;
+    v = v.replace(/^@/, "").replace(/[\/?#].*$/, "");
+    return /^[A-Za-z][A-Za-z0-9_]{3,}$/.test(v) ? "@" + v : "";
+  };
+  const resolveChatId = async chat => {
+    if(/^-?\d+$/.test(chat)) return chat;
+    const name = chat.slice(1).toLowerCase();
+    try{
+      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/getUpdates?limit=100&allowed_updates=${encodeURIComponent('["message"]')}`);
+      const j = await r.json();
+      const list = j && j.ok ? arr(j.result) : [];
+      for(let i = list.length - 1; i >= 0; i--){
+        const m = list[i].message;
+        if(m && m.chat && m.chat.type === "private" && m.from && String(m.from.username || "").toLowerCase() === name) return String(m.chat.id);
+      }
+    }catch(e){}
+    return "";
+  };
+  const tgSend = async text => {
+    if(!S.tg.chat) return null;
+    if(!S.tg.id){
+      const id = await resolveChatId(S.tg.chat);
+      if(id){ S.tg.id = id; Store.persist(); }
+    }
+    try{
+      const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({chat_id: S.tg.id || S.tg.chat, text, parse_mode: "HTML"})
+      });
+      const j = await r.json();
+      return !!(j && j.ok);
+    }catch(e){
+      return false;
+    }
+  };
+  const fetchFills = async a => arr(await post({type: "userFills", user: a}));
+  return {fetchWallet, fetchFills, normalizeChat, resolveChatId, tgSend};
+})();
+
+const fillKey = f => f.tid ?? `${f.hash}|${f.oid}|${f.time}|${f.coin}|${f.sz}`;
+
+const Live = (() => {
+  let ws = null, up = false, hadOpen = false, reconnected = false, retry = 0, retryT = null, pingT = null, reconcileT = null;
+  const subs = new Set(), confirmed = new Set(), seen = new Set(), fillsBy = {}, pending = {};
+  const send = m => { if(ws && ws.readyState === 1) ws.send(JSON.stringify(m)); };
+  const sub = (a, on) => send({method: on ? "subscribe" : "unsubscribe", subscription: {type: "userFills", user: a}});
+
+  const sync = () => {
+    if(!up) return;
+    const want = new Set(S.wallets.map(w => w.addr).filter(a => !isHidden(a)));
+    subs.forEach(a => {
+      if(want.has(a)) return;
+      subs.delete(a); confirmed.delete(a); seen.delete(a); delete fillsBy[a];
+      sub(a, false);
+    });
+    want.forEach(a => {
+      if(subs.has(a)) return;
+      subs.add(a); sub(a, true);
+    });
+  };
+
+  const scheduleState = a => {
+    clearTimeout(pending[a]);
+    pending[a] = setTimeout(async () => {
+      delete pending[a];
+      if(!S.wallets.some(w => w.addr === a) || isHidden(a)) return;
+      await fetchOne(a);
+      checkAlerts([a]);
+      render();
+    }, FILL_DEBOUNCE_MS);
+  };
+
+  const applyFills = (a, list, snapshot) => {
+    const w = S.wallets.find(x => x.addr.toLowerCase() === a);
+    if(!w || isHidden(w.addr)) return;
+    const addr = w.addr;
+    const base = snapshot ? [] : (fillsBy[addr] || []);
+    const seenKeys = new Set(base.map(fillKey));
+    const merged = base.slice();
+    list.forEach(f => {
+      const k = fillKey(f);
+      if(!seenKeys.has(k)){ seenKeys.add(k); merged.push(f); }
+    });
+    merged.sort((x, y) => x.time - y.time);
+    const truncated = merged.length >= FILL_KEEP;
+    fillsBy[addr] = truncated ? merged.slice(-FILL_KEEP) : merged;
+
+    const c = S.cache[addr] || {};
+    const starts = Calc.startTimes(fillsBy[addr]);
+    const firstFillTime = fillsBy[addr].length ? fillsBy[addr][0].time : 0;
+    arr(c.positions).forEach(p => {
+      const cached = c.starts && c.starts[p.coin];
+      if(!cached) return;
+      if(!starts[p.coin]) starts[p.coin] = cached;
+      else if(truncated && starts[p.coin] === firstFillTime) starts[p.coin] = cached;
+    });
+    S.cache[addr] = {...c, starts, snapSeen: !!(c.snapSeen || snapshot)};
+    Store.persistCache();
+
+    if(snapshot){ confirmed.add(addr); seen.add(addr); }
+    if(snapshot && !reconnected) render();
+    else scheduleState(addr);
+  };
+
+  const lastBackfill = {};
+  const backfill = async a => {
+    const k = String(a).toLowerCase();
+    const now = Date.now();
+    if(lastBackfill[k] && now - lastBackfill[k] < BACKFILL_COOLDOWN_MS) return;
+    lastBackfill[k] = now;
+    try{ applyFills(k, await Api.fetchFills(a), false); }catch(e){}
+  };
+
+  const onMessage = e => {
+    let m;
+    try{ m = JSON.parse(e.data); }catch(err){ return; }
+    if(!m || m.channel !== "userFills" || !m.data) return;
+    const a = String(m.data.user || "").toLowerCase();
+    if(a) applyFills(a, arr(m.data.fills), !!m.data.isSnapshot);
+  };
+
+  function later(){
+    clearTimeout(retryT);
+    const d = Math.min(1000 * Math.pow(2, retry), WS_RETRY_MAX_MS);
+    retry++;
+    retryT = setTimeout(connect, d);
+  }
+
+  function connect(){
+    if(ws && ws.readyState <= 1) return;
+    clearTimeout(retryT);
+    try{ ws = new WebSocket(WS_URL); }catch(e){ later(); return; }
+    const sock = ws;
+    sock.onopen = () => {
+      up = true; retry = 0;
+      reconnected = hadOpen; hadOpen = true;
+      clearInterval(pingT);
+      clearTimeout(reconcileT);
+      pingT = setInterval(() => send({method: "ping"}), WS_PING_MS);
+      sync();
+      renderUpdated();
+      if(reconnected){
+        // Let userFills snapshots arrive first, then reconcile authoritative
+        // open-position state through the API. This catches real entries made
+        // during an outage without treating every reconnect as a new trade.
+        reconcileT = setTimeout(async () => {
+          if(!up || sock !== ws) return;
+          const addrs = S.wallets.map(w => w.addr).filter(a => !isHidden(a));
+          await Promise.all(addrs.map(fetchOne));
+          checkAlerts(addrs);
+          render();
+        }, FILL_DEBOUNCE_MS + 700);
+      }
+    };
+    sock.onmessage = onMessage;
+    sock.onclose = () => {
+      if(sock !== ws) return;
+      up = false; confirmed.clear(); subs.clear();
+      clearInterval(pingT);
+      clearTimeout(reconcileT);
+      renderUpdated();
+      later();
+    };
+    sock.onerror = () => { try{ sock.close(); }catch(e){} };
+  }
+
+  return {
+    kick: () => { retry = 0; connect(); },
+    sync,
+    backfill,
+    confirmed: a => confirmed.has(a),
+    seen: a => seen.has(a)
+  };
+})();
+
+const Beep = (() => {
+  let ctx = null;
+  const get = () => {
+    try{
+      if(!ctx){
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if(AC) ctx = new AC();
+      }
+      if(ctx && ctx.state === "suspended") ctx.resume();
+    }catch(e){}
+    return ctx;
+  };
+  const play = () => {
+    const c = get();
+    if(c){
+      const t0 = c.currentTime + 0.05;
+      for(let i = 0; i < 3; i++){
+        const t = t0 + i * 0.4, osc = c.createOscillator(), gain = c.createGain();
+        osc.type = "square";
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.25);
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.start(t);
+        osc.stop(t + 0.3);
+      }
+    }
+    try{ if(navigator.vibrate) navigator.vibrate([250, 150, 250, 150, 250]); }catch(e){}
+  };
+  return {get, play};
+})();
+["pointerdown", "touchstart", "keydown"].forEach(ev => document.addEventListener(ev, () => Beep.get(), {passive: true}));
+
+function toast(msg, kind = "err"){
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = "toast show " + kind;
+  clearTimeout(S.timers.toast);
+  S.timers.toast = setTimeout(() => el.classList.remove("show"), TOAST_MS);
+}
+
+const refreshMs = () => S.cfg.refreshMin * 60 * 1000;
+
+function scheduleTimers(){
+  clearInterval(S.timers.refresh);
+  clearInterval(S.timers.alert);
+  S.timers.refresh = setInterval(refreshAll, refreshMs());
+  S.timers.alert = setInterval(pollAlerts, S.cfg.alertSec * 1000);
+}
+
+function syncMore(){
+  document.querySelectorAll("#list [data-tog]").forEach(b => b.classList.toggle("on", !!S.cfg[b.dataset.tog]));
+  document.querySelectorAll("#list [data-int]").forEach(b => b.classList.toggle("on", S.cfg[b.dataset.int] === Number(b.dataset.val)));
+}
+
+function setCfg(k, v){
+  S.cfg[k] = v;
+  Store.persist();
+  if(k === "refreshMin" || k === "alertSec") scheduleTimers();
+  if(k === "screenOn"){ if(v) keepAwake(); else releaseWake(); }
+  syncMore();
+}
+
+async function keepAwake(){
+  if(!S.cfg.screenOn || !("wakeLock" in navigator) || S.wakeLock || document.hidden) return;
+  try{
+    S.wakeLock = await navigator.wakeLock.request("screen");
+    S.wakeLock.addEventListener("release", () => { S.wakeLock = null; });
+  }catch(e){ S.wakeLock = null; }
+}
+function releaseWake(){
+  if(!S.wakeLock) return;
+  const lock = S.wakeLock;
+  S.wakeLock = null;
+  lock.release().catch(() => {});
+}
+document.addEventListener("pointerdown", keepAwake, {passive: true});
+
+function spinStart(){
+  S.spinCount++;
+  $("refreshAll").classList.add("spin");
+}
+function spinStop(){
+  S.spinCount = Math.max(0, S.spinCount - 1);
+  if(S.spinCount === 0) $("refreshAll").classList.remove("spin");
+}
+
+async function copyText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    toast("Address copied", "ok");
+  }catch(e){
+    try{
+      const t = document.createElement("textarea");
+      t.value = text; t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove();
+      toast("Address copied", "ok");
+    }catch(e2){
+      toast("Copy failed");
+    }
+  }
+}
+
+const PRICE_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no\">\n  <title>Crypto Prices<\/title>\n  <style>\n    :root {\n      --header-color: #161616;\n      --background: #000000;\n      --surface: #161616;\n      --widget-border: 1px solid #363636;\n      --widget-gap: 4px;\n      --page-padding: 8px;\n    }\n\n    * {\n      -webkit-tap-highlight-color: transparent;\n      -webkit-text-size-adjust: none;\n      touch-action: pan-y;\n      margin: 0;\n      padding: 0;\n    }\n\n    html {\n      overflow-x: hidden;\n    }\n\n    body {\n      background-color: var(--background);\n      color: #fff;\n      font-family: system-ui, -apple-system, \"Segoe UI\", Roboto, sans-serif;\n      -webkit-touch-callout: none;\n      -webkit-user-select: none;\n      user-select: none;\n      overscroll-behavior-y: contain;\n      min-height: 100vh;\n      overflow-x: hidden;\n    }\n\n    .header {\n      background-color: var(--header-color);\n      padding: 0 6px;\n      height: 48px;\n      display: flex;\n      justify-content: space-between;\n      align-items: center;\n      gap: 10px;\n      position: fixed;\n      top: 10px;\n      left: var(--page-padding);\n      right: var(--page-padding);\n      z-index: 1000;\n      border-radius: 14px;\n      box-shadow: 0 6px 24px rgba(0,0,0,.6);\n      border: 1px solid #363636;\n    }\n\n    .header-title {\n      flex: 1;\n      text-align: center;\n      font-weight: 600;\n      font-size: 18px;\n      line-height: 1.25;\n      letter-spacing: -.01em;\n    }\n\n    .iconbtn {\n      background: none;\n      border: none;\n      color: #fff;\n      cursor: pointer;\n      width: 38px;\n      height: 38px;\n      padding: 0;\n      border-radius: 12px;\n      flex-shrink: 0;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n    }\n    .iconbtn svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }\n\n    .container {\n      max-width: 1200px;\n      margin: 0 auto;\n      padding: 64px var(--page-padding) 16px;\n    }\n\n    .widgets-container {\n      display: flex;\n      flex-wrap: wrap;\n      justify-content: center;\n      gap: var(--widget-gap);\n      margin-bottom: var(--widget-gap);\n    }\n\n    .widget {\n      background-color: var(--surface);\n      border-radius: 6px;\n      width: calc(50% - var(--widget-gap)/2);\n      max-width: 350px;\n      min-width: 240px;\n      overflow: hidden;\n      border: var(--widget-border);\n      transform: translateZ(0);\n      pointer-events: none;\n    }\n\n    .tradingview-widget-container.quote { height: 65px; }\n    .tradingview-widget-container.mini { height: 140px; }\n    .tradingview-widget-container iframe { display: block; width: 100%; height: 100%; border: 0; background: transparent; }\n\n    @media (max-width: 900px) {\n      .widget {\n        width: 100%;\n        max-width: 400px;\n      }\n    }\n\n    @media (max-width: 480px) {\n      .widget { min-width: 200px; }\n    }\n\n    @media (max-width: 400px) {\n      .iconbtn { width: 34px; height: 34px; }\n      .iconbtn svg { width: 20px; height: 20px; }\n    }\n  <\/style>\n<\/head>\n<body>\n  <div class=\"header\">\n    <button class=\"iconbtn\" id=\"backBtn\" aria-label=\"Back\"><svg viewBox=\"0 0 24 24\"><path d=\"M19 12H5\"/><path d=\"M12 19l-7-7 7-7\"/><\/svg><\/button>\n    <div class=\"header-title\">Crypto Prices<\/div>\n    <button class=\"iconbtn\" id=\"settingsBtn\" aria-label=\"Settings\"><svg viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"/><\/svg><\/button>\n  <\/div>\n\n  <div class=\"container\">\n    <div class=\"widgets-container\">\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container quote\"><iframe src=\"https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22BINANCE%3ABTCUSDT%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22colorTheme%22%3A%22dark%22%2C%22locale%22%3A%22en%22%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container quote\"><iframe src=\"https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22BINANCE%3AETHUSDT%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22colorTheme%22%3A%22dark%22%2C%22locale%22%3A%22en%22%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n    <\/div>\n    <div class=\"widgets-container\">\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container quote\"><iframe src=\"https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22BYBIT%3AXAUTUSDT%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22colorTheme%22%3A%22dark%22%2C%22locale%22%3A%22en%22%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container quote\"><iframe src=\"https://s.tradingview.com/embed-widget/single-quote/?locale=en#%7B%22symbol%22%3A%22TVC%3AUKOIL%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22colorTheme%22%3A%22dark%22%2C%22locale%22%3A%22en%22%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n    <\/div>\n    <div class=\"widgets-container\">\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container mini\"><iframe src=\"https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=en#%7B%22symbol%22%3A%22CRYPTOCAP%3ABTC.D%22%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22locale%22%3A%22en%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22autosize%22%3Atrue%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container mini\"><iframe src=\"https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=en#%7B%22symbol%22%3A%22CRYPTOCAP%3AETH.D%22%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22locale%22%3A%22en%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22autosize%22%3Atrue%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n    <\/div>\n    <div class=\"widgets-container\">\n      <div class=\"widget\">\n        <div class=\"tradingview-widget-container mini\"><iframe src=\"https://s.tradingview.com/embed-widget/mini-symbol-overview/?locale=en#%7B%22symbol%22%3A%22CRYPTOCAP%3AUSDT.D%22%2C%22width%22%3A%22100%25%22%2C%22height%22%3A%22100%25%22%2C%22locale%22%3A%22en%22%2C%22colorTheme%22%3A%22dark%22%2C%22isTransparent%22%3Atrue%2C%22autosize%22%3Atrue%7D\" loading=\"eager\" scrolling=\"no\" allowtransparency=\"true\" frameborder=\"0\"><\/iframe><\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n\n  <script>\n    (function() {\n      document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });\n      document.addEventListener('gesturestart', e => e.preventDefault());\n      document.addEventListener('touchmove', e => { if (e.scale !== 1) e.preventDefault() }, { passive: false });\n\n      document.getElementById('backBtn').addEventListener('click', () => {\n        parent.postMessage('crypto-prices-back', '*');\n      });\n      document.getElementById('settingsBtn').addEventListener('click', () => {\n        parent.postMessage('crypto-prices-settings', '*');\n      });\n      document.addEventListener('pointerdown', e => {\n        if (!e.target.closest('.header')) parent.postMessage('crypto-prices-tap', '*');\n      });\n    })();\n  <\/script>\n<\/body>\n<\/html>";
+
+const BTC_HTML = "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Bitcoin · minimal alert<\/title>\n<style>\n:root {\n  --bg: #000;\n  --text: #E0E0E0;\n  --muted: #B0B0B0;\n  --icon-muted: #A0A0A0;\n  --down: #F44336;\n  --stale: #666;\n  --alarm: #1E88E5;\n  --modal-bg: rgba(0, 0, 0, .75);\n  --panel: #111;\n  --panel-border: #2a2a2a;\n  --display-bg: #1c1c1c;\n  --display-border: #3a3a3a;\n  --key-bg: #1a1a1a;\n  --key-border: #333;\n  --key-text: #ddd;\n  --key-del-bg: #222;\n  --key-del-text: #aaa;\n  --key-active: #2a2a2a;\n  --enter-bg: #fff;\n  --enter-text: #000;\n}\n\n* {\n  box-sizing: border-box;\n  margin: 0;\n  padding: 0;\n  -webkit-tap-highlight-color: transparent;\n}\n\nbody {\n  background: var(--bg);\n  color: var(--text);\n  height: 100vh;\n  overflow: hidden;\n  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;\n  text-align: center;\n}\n\nbutton {\n  font: inherit;\n  color: inherit;\n  background: none;\n  border: 0;\n  cursor: pointer;\n}\n\n.ic { display: inline-flex; width: 1em; height: 1em; flex-shrink: 0; }\n.ic svg { width: 100%; height: 100%; fill: currentColor; }\n\n/* Layout visibility is controlled by one mechanism: body.portrait */\nbody.portrait #price-container,\nbody.portrait #alert-modal { display: none; }\n\n#landscape-message {\n  position: fixed;\n  inset: 0;\n  background: var(--bg);\n  display: none;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  z-index: 9999;\n  font-size: 1.5em;\n}\nbody.portrait #landscape-message { display: flex; }\n#landscape-message .ic {\n  font-size: 3em;\n  margin-bottom: 15px;\n  animation: rotate-device 2s infinite ease-in-out;\n}\n@keyframes rotate-device {\n  0%, 100% { transform: rotate(0deg); }\n  50% { transform: rotate(90deg); }\n}\n\n#price-container {\n  position: relative;\n  height: 100%;\n  width: 100%;\n  user-select: none;\n  -webkit-user-select: none;\n}\n\n#title-container {\n  display: flex;\n  align-items: center;\n  position: absolute;\n  top: 10vh;\n  left: 50%;\n  transform: translateX(-50%);\n  white-space: nowrap;\n}\n#title { font-size: 2em; margin-right: .5em; letter-spacing: .5px; }\n\n#alert-icon {\n  font-size: 1.8em;\n  margin-right: .5em;\n  color: var(--muted);\n  transition: color .2s;\n}\n#alert-icon.active { color: #fff; }\n#alert-icon.fired { color: var(--alarm); }\n\n#battery-header {\n  width: 50px;\n  height: 25px;\n  border-radius: 12.5px;\n  background-color: var(--bg);\n  border: 2px solid var(--icon-muted);\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  font-size: 1.2em;\n  color: #fff;\n  font-weight: bold;\n  margin-left: 1.5em;\n  position: relative;\n}\n#battery-header::after {\n  content: '';\n  position: absolute;\n  right: -6px;\n  top: 50%;\n  transform: translateY(-50%);\n  width: 6px;\n  height: 12px;\n  background-color: var(--icon-muted);\n  border-radius: 0 3px 3px 0;\n}\n#battery-level.low-battery { color: var(--down); }\n\n#price {\n  font-size: 20em;\n  font-weight: bold;\n  line-height: 1;\n  position: absolute;\n  top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);\n  font-feature-settings: \"kern\" 1, \"liga\" 0;\n  transition: color .6s;\n}\n#price.stale {\n  color: var(--stale);\n  animation: blink 1.6s ease-in-out infinite;\n}\n@keyframes blink {\n  0%, 100% { opacity: 1; }\n  50% { opacity: .3; }\n}\n#price.alarm {\n  color: var(--alarm);\n  animation: alarm-pulse .5s ease-in-out infinite;\n}\n@keyframes alarm-pulse {\n  0%, 100% { transform: translate(-50%, -50%) scale(1); }\n  50% { transform: translate(-50%, -50%) scale(1.06); }\n}\n\n#change-info {\n  display: flex;\n  align-items: center;\n  position: absolute;\n  bottom: 10vh;\n  left: 50%;\n  transform: translateX(-50%);\n  white-space: nowrap;\n}\n.change-label { font-size: 2em; color: var(--muted); margin-right: .5em; }\n.change-text { font-size: 2em; }\n.change-icon { font-size: 2em; margin-left: .8em; }\n\n/* Alert modal */\n#alert-modal {\n  position: fixed;\n  inset: 0;\n  background: var(--modal-bg);\n  backdrop-filter: blur(2px);\n  display: none;\n  justify-content: center;\n  align-items: center;\n  z-index: 10000;\n}\n#alert-modal.open { display: flex; }\n\n#alert-form {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n  background: var(--panel);\n  padding: 16px;\n  border-radius: 20px;\n  box-shadow: 0 20px 40px rgba(0, 0, 0, .8);\n  border: 1px solid var(--panel-border);\n  user-select: none;\n  -webkit-user-select: none;\n}\n#alert-top { display: flex; align-items: center; gap: 8px; }\n#alert-top .ic { font-size: 1.5rem; color: var(--muted); }\n\n#alert-display {\n  flex: 1;\n  height: 44px;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  background: var(--display-bg);\n  border: 1px solid var(--display-border);\n  border-radius: 40px;\n  color: #fff;\n  font-size: 1.3rem;\n  font-weight: 500;\n  letter-spacing: .5px;\n  white-space: nowrap;\n  overflow: hidden;\n  transition: border-color .2s;\n}\n#alert-prev { text-align: center; font-size: .85rem; color: var(--muted); }\n#alert-prev:empty { display: none; }\n#alert-display.empty { color: var(--stale); font-size: .9rem; font-weight: 400; }\n#alert-display.flash { border-color: #888; }\n\n#keypad {\n  display: grid;\n  grid-template-columns: repeat(3, 56px);\n  grid-auto-rows: 40px;\n  gap: 8px;\n}\n#keypad button {\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  background: var(--key-bg);\n  color: var(--key-text);\n  border: 1px solid var(--key-border);\n  border-radius: 12px;\n  font-weight: 500;\n  font-size: 1.2rem;\n  transition: background .12s;\n  touch-action: manipulation;\n}\n#keypad button:active { background: var(--key-active); }\n#keypad .ic { font-size: 1.3rem; }\n#keypad .key-del { background: var(--key-del-bg); color: var(--key-del-text); }\n#keypad .key-enter { background: var(--enter-bg); color: var(--enter-text); border: none; }\n#keypad .key-enter:active { background: #e0e0e0; }\n\n/* Responsive price size */\n@media (max-width: 1900px) { #price { font-size: 18em; } }\n@media (max-width: 1700px) { #price { font-size: 16em; } }\n@media (max-width: 1400px) { #price { font-size: 14em; } }\n@media (max-width: 1200px) { #price { font-size: 12em; } }\n@media (max-width: 900px)  { #price { font-size: 10em; } }\n@media (max-width: 700px)  { #price { font-size: 8em; } }\n@media (max-width: 500px)  { #price { font-size: 6em; } }\n<\/style>\n<\/head>\n<body>\n\n<div id=\"landscape-message\" role=\"status\">\n  <i class=\"ic\" data-i=\"screen_rotation\"><\/i>\n  <p>Please rotate your device<\/p>\n<\/div>\n\n<div id=\"alert-modal\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Set target price\">\n  <div id=\"alert-form\">\n    <div id=\"alert-top\">\n      <i class=\"ic\" data-i=\"notifications_active\"><\/i>\n      <div id=\"alert-display\" class=\"empty\">target price<\/div>\n    <\/div>\n    <div id=\"alert-prev\"><\/div>\n    <div id=\"keypad\"><\/div>\n  <\/div>\n<\/div>\n\n<div id=\"price-container\">\n  <div id=\"title-container\">\n    <button id=\"alert-icon\" class=\"ic\" type=\"button\" aria-label=\"Set price alert\" aria-pressed=\"false\"><\/button>\n    <div id=\"title\">BITCOIN PRICE<\/div>\n    <button id=\"battery-header\" type=\"button\" aria-label=\"Refresh price\">\n      <span id=\"battery-level\"><\/span>\n    <\/button>\n  <\/div>\n\n  <div id=\"price\"><\/div>\n\n  <div id=\"change-info\">\n    <span class=\"change-label\">24H CHANGE<\/span>\n    <span id=\"change\" class=\"change-text\"><\/span>\n    <i id=\"change-icon\" class=\"ic change-icon\"><\/i>\n  <\/div>\n<\/div>\n\n<script>\n(function () {\n  'use strict';\n\n  /* ---------- Configuration ---------- */\n  const CONFIG = {\n    API_URL: 'https://api.hyperliquid.xyz/info',\n    SYMBOL: 'BTC',\n    // Assumption: openPrice is the open of the last 24h window. Verify against LBank's API docs.\n    REQUEST_TIMEOUT_MS: 4000,\n    REFRESH_MS: 5000,\n    STALE_AFTER_MS: 15000,\n    SUCCESS_TO_RECOVER: 2,       // successful fetches needed before leaving stale state\n    ALERT_TOLERANCE: 50,         // USD band around the target that counts as \"reached\"\n    MAX_DIGITS: 7,\n    LONG_PRESS_MS: 3000,\n    ALARM_REPEATS: 3,\n    ALARM_GAP_MS: 1500,\n    ALARM_VISUAL_MS: 7000,       // how long the price pulses on alert (sound timing is separate)\n    CHIME_NOTES: [[784, 0.5, 0.1, 0], [1046, 0.7, 0.15, 0.1], [1318, 0.9, 0.2, 0.2]],\n    KEYS: { data: 'bitcoinData', alert: 'bitcoinAlertPrice' },\n    COLORS: { up: '#4CAF50', down: '#F44336', flat: '#E0E0E0' }\n  };\n\n  const ICONS = {\n    notifications_none: 'M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z',\n    notifications_active: 'M7.58 4.08L6.15 2.65C3.75 4.48 2.17 7.3 2.01 10.5h2c.15-2.65 1.51-4.97 3.57-6.42zm12.41 6.42h2c-.16-3.2-1.74-6.02-4.14-7.85l-1.43 1.43c2.05 1.45 3.41 3.77 3.57 6.42zM18 11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2v-5zm-6 11c.14 0 .27-.01.4-.04.65-.14 1.18-.58 1.44-1.18.1-.24.15-.5.15-.78h-4c.01 1.1.9 2 2.01 2z',\n    trending_up: 'M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z',\n    trending_down: 'M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6z',\n    trending_flat: 'M22 12l-4-4v3H3v2h15v3z',\n    cloud_off: 'M19.35 10.04C18.67 6.59 15.64 4 12 4c-1.48 0-2.85.43-4.01 1.17l1.46 1.46C10.21 6.23 11.08 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3 0 1.13-.64 2.11-1.56 2.62l1.45 1.45C23.16 18.16 24 16.68 24 15c0-2.64-2.05-4.78-4.65-4.96zM3 5.27l2.75 2.74C2.56 8.15 0 10.77 0 14c0 3.31 2.69 6 6 6h11.73l2 2L21 20.73 4.27 4 3 5.27zM7.73 10l8 8H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h1.73z',\n    error: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z',\n    backspace: 'M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-3 12.59L17.59 17 14 13.41 10.41 17 9 15.59 12.59 12 9 8.41 10.41 7 14 10.59 17.59 7 19 8.41 15.41 12 19 15.59z',\n    check: 'M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',\n    screen_rotation: 'M16.48 2.52c3.27 1.55 5.61 4.72 5.97 8.48h1.5C23.44 4.84 18.29 0 12 0l-.66.03 3.81 3.81 1.33-1.32zm-6.25-.77c-.59-.59-1.54-.59-2.12 0L1.75 8.11c-.59.59-.59 1.54 0 2.12l12.02 12.02c.59.59 1.54.59 2.12 0l6.36-6.36c.59-.59.59-1.54 0-2.12L10.23 1.75zm4.6 19.44L2.81 9.17l6.36-6.36 12.02 12.02-6.36 6.36zm-7.31.29C4.25 19.94 1.91 16.76 1.55 13H.05C.56 19.16 5.71 24 12 24l.66-.03-3.81-3.81-1.33 1.32z'\n  };\n\n  /* ---------- DOM refs ---------- */\n  const $ = id => document.getElementById(id);\n  const priceEl = $('price');\n  const changeEl = $('change');\n  const changeIcon = $('change-icon');\n  const alertIcon = $('alert-icon');\n  const alertModal = $('alert-modal');\n  const display = $('alert-display');\n  const prevEl = $('alert-prev');\n  const keypad = $('keypad');\n  const batteryLevelEl = $('battery-level');\n  const batteryButton = $('battery-header');\n\n  /* ---------- State (single source of truth) ---------- */\n  const state = {\n    price: 0,            // value currently shown\n    change: NaN,         // 24h change % currently shown\n    alertDir: null,      // 'up' or 'down', resolved on the first live price after setting\n    lastLive: 0,         // timestamp of last live data (live fetch or cache)\n    lastError: null,     // last fetch error message, null when healthy\n    stale: false,\n    recoverCount: 0,\n    inFlight: null,      // AbortController of the running request\n    refreshId: null,\n    active: false,       // true while live refresh is running\n    portrait: null,\n    wakeLock: null,\n    entry: '',\n    alertPrice: null,\n    alertTriggered: false,\n    alarmTimers: [],\n    visualTimer: null,\n    flashTimer: null,\n    pressTimer: null,\n    pressFired: false,\n    audioCtx: null\n  };\n\n  /* ---------- Helpers ---------- */\n  function setIcon(el, name) {\n    el.innerHTML = '<svg viewBox=\"0 0 24 24\"><path d=\"' + ICONS[name] + '\"/><\/svg>';\n  }\n\n  const store = {\n    get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } },\n    set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} },\n    del(k) { try { localStorage.removeItem(k); } catch (_) {} }\n  };\n\n  const fmt = n => Math.round(n).toLocaleString('en-US');\n\n  /* ---------- Status (one function decides stale state) ---------- */\n  // Returns true if the stale flag changed.\n  function evaluateStale() {\n    const expired = Date.now() - state.lastLive > CONFIG.STALE_AFTER_MS;\n    const offline = !navigator.onLine;\n    const recovering = state.stale && state.recoverCount < CONFIG.SUCCESS_TO_RECOVER;\n    const next = offline || expired || recovering;\n    if (next === state.stale) return false;\n    if (!next) state.recoverCount = 0;\n    state.stale = next;\n    return true;\n  }\n\n  /* ---------- Rendering (one function paints everything) ---------- */\n  function render() {\n    const offline = !navigator.onLine;\n\n    priceEl.textContent = state.price > 0 ? fmt(state.price) : '---';\n    priceEl.classList.toggle('stale', state.stale);\n\n    if (state.price > 0 && Number.isFinite(state.change)) {\n      const c = state.change;\n      changeEl.textContent = c.toFixed(2) + '%';\n      changeEl.style.color = c > 0 ? CONFIG.COLORS.up : (c < 0 ? CONFIG.COLORS.down : CONFIG.COLORS.flat);\n      setIcon(changeIcon, c > 0 ? 'trending_up' : (c < 0 ? 'trending_down' : 'trending_flat'));\n    } else {\n      changeEl.textContent = '--%';\n      changeEl.style.color = CONFIG.COLORS.flat;\n      setIcon(changeIcon, 'trending_flat');\n    }\n\n    if (offline) setIcon(changeIcon, 'cloud_off');\n    else if (state.lastError) setIcon(changeIcon, 'error');\n\n    const pending = state.alertPrice !== null && !state.alertTriggered;\n    setIcon(alertIcon, state.alertPrice !== null ? 'notifications_active' : 'notifications_none');\n    alertIcon.classList.toggle('active', pending);\n    alertIcon.classList.toggle('fired', state.alertTriggered);\n    alertIcon.setAttribute('aria-pressed', String(pending));\n  }\n\n  /* ---------- Audio ---------- */\n  function unlockAudio() {\n    try {\n      state.audioCtx = state.audioCtx || new (window.AudioContext || window.webkitAudioContext)();\n      if (state.audioCtx.state === 'suspended') state.audioCtx.resume();\n    } catch (_) {}\n  }\n\n  function playChime() {\n    const ctx = state.audioCtx;\n    if (!ctx) return;\n    const t0 = ctx.currentTime;\n    CONFIG.CHIME_NOTES.forEach(([freq, dur, vol, delay]) => {\n      const osc = ctx.createOscillator();\n      const gain = ctx.createGain();\n      osc.connect(gain);\n      gain.connect(ctx.destination);\n      osc.type = 'sine';\n      osc.frequency.value = freq;\n      const t = t0 + delay;\n      gain.gain.setValueAtTime(vol, t);\n      gain.gain.exponentialRampToValueAtTime(0.001, t + dur);\n      osc.start(t);\n      osc.stop(t + dur);\n    });\n  }\n\n  /* ---------- Alert logic ---------- */\n  function clearAlarmTimers() {\n    state.alarmTimers.forEach(clearTimeout);\n    state.alarmTimers = [];\n  }\n\n  function clearVisual() {\n    clearTimeout(state.visualTimer);\n    state.visualTimer = null;\n    priceEl.classList.remove('alarm');\n  }\n\n  function fireAlert() {\n    state.alertTriggered = true;\n    clearAlarmTimers();\n    clearVisual();\n    priceEl.classList.add('alarm');\n    state.visualTimer = setTimeout(() => {\n      priceEl.classList.remove('alarm');\n      state.visualTimer = null;\n    }, CONFIG.ALARM_VISUAL_MS);\n    for (let i = 0; i < CONFIG.ALARM_REPEATS; i++) {\n      state.alarmTimers.push(setTimeout(playChime, i * CONFIG.ALARM_GAP_MS));\n    }\n    try { parent.postMessage({ type: 'btc-alert', price: state.alertPrice }, '*'); } catch (_) {}\n    saveAlert();\n  }\n\n  // The direction is fixed on the first live price after the alert is set:\n  // target above the price means \"fire when price rises to target\", and vice versa.\n  // If the target is already reached at that point, the alert fires immediately.\n  function checkAlert(price) {\n    if (state.alertPrice === null || state.alertTriggered || !(price > 0)) return;\n    const target = state.alertPrice;\n    if (state.alertDir === null) { state.alertDir = target >= price ? 'up' : 'down'; saveAlert(); }\n    const reached = state.alertDir === 'up'\n      ? price >= target - CONFIG.ALERT_TOLERANCE\n      : price <= target + CONFIG.ALERT_TOLERANCE;\n    if (reached) fireAlert();\n  }\n\n  function saveAlert() {\n    if (state.alertPrice === null) store.del(CONFIG.KEYS.alert);\n    else store.set(CONFIG.KEYS.alert, JSON.stringify({ price: state.alertPrice, fired: state.alertTriggered, dir: state.alertDir }));\n  }\n\n  function loadAlert() {\n    let saved = null;\n    try { saved = JSON.parse(store.get(CONFIG.KEYS.alert)); } catch (_) {}\n    if (typeof saved === 'number') saved = { price: saved, fired: false };\n    if (saved && saved.price > 0) {\n      state.alertPrice = saved.price;\n      state.alertTriggered = !!saved.fired;\n      state.alertDir = saved.dir === 'up' || saved.dir === 'down' ? saved.dir : null;\n    }\n  }\n\n  function setAlert(price) {\n    clearAlarmTimers();              // a new alert supersedes a ringing one\n    clearVisual();\n    state.alertPrice = price;\n    state.alertTriggered = false;\n    state.alertDir = null;\n    saveAlert();\n    if (!state.stale) checkAlert(state.price);\n    render();\n  }\n\n  function resetAlert() {\n    clearAlarmTimers();\n    clearVisual();\n    state.alertPrice = null;\n    state.alertTriggered = false;\n    state.alertDir = null;\n    saveAlert();\n    render();\n  }\n\n  /* ---------- Keypad / modal ---------- */\n  function renderEntry() {\n    display.textContent = state.entry ? Number(state.entry).toLocaleString('en-US') : 'target price';\n    display.classList.toggle('empty', !state.entry);\n  }\n\n  function openModal() {\n    state.entry = '';\n    renderEntry();\n    prevEl.textContent = state.alertPrice !== null ? 'Previous: ' + state.alertPrice.toLocaleString('en-US') : '';\n    alertModal.classList.add('open');\n  }\n\n  function closeModal() {\n    alertModal.classList.remove('open');\n    state.entry = '';\n    renderEntry();\n  }\n\n  function flashDisplay() {\n    clearTimeout(state.flashTimer);\n    display.classList.add('flash');\n    state.flashTimer = setTimeout(() => display.classList.remove('flash'), 300);\n  }\n\n  function pressKey(k) {\n    if (k === 'enter') {\n      const price = parseInt(state.entry, 10);\n      if (price > 0) {\n        setAlert(price);\n        closeModal();\n      } else {\n        flashDisplay();\n      }\n      return;\n    }\n    if (k === 'del') {\n      state.entry = state.entry.slice(0, -1);\n    } else if (state.entry.length < CONFIG.MAX_DIGITS && !(state.entry === '' && k === '0')) {\n      state.entry += k;\n    }\n    renderEntry();\n  }\n\n  function buildKeypad() {\n    const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'enter'];\n    keypad.innerHTML = keys.map(k => {\n      let cls = '', inner = k;\n      if (k === 'del') { cls = ' class=\"key-del\"'; inner = '<i class=\"ic\" data-i=\"backspace\"><\/i>'; }\n      if (k === 'enter') { cls = ' class=\"key-enter\"'; inner = '<i class=\"ic\" data-i=\"check\"><\/i>'; }\n      const label = k === 'del' ? 'Delete' : k === 'enter' ? 'Confirm' : k;\n      return '<button type=\"button\" data-k=\"' + k + '\" aria-label=\"' + label + '\"' + cls + '>' + inner + '<\/button>';\n    }).join('');\n  }\n\n  /* ---------- Data ---------- */\n  function loadCache() {\n    let saved = null;\n    try { saved = JSON.parse(store.get(CONFIG.KEYS.data)); } catch (_) {}\n    if (saved && saved.price > 0) {\n      state.price = saved.price;\n      state.change = saved.change;\n      state.lastLive = saved.ts || 0;\n    }\n  }\n\n  function saveCache(price, change) {\n    store.set(CONFIG.KEYS.data, JSON.stringify({ price, change, ts: Date.now() }));\n  }\n\n  async function fetchBtc(signal) {\n    const res = await fetch(CONFIG.API_URL, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ type: 'metaAndAssetCtxs' }),\n      signal,\n      cache: 'no-store'\n    });\n    if (!res.ok) throw new Error('HTTP ' + res.status);\n    const json = await res.json();\n    const universe = json && json[0] && json[0].universe;\n    const ctxs = json && json[1];\n    if (!Array.isArray(universe) || !Array.isArray(ctxs)) throw new Error('bad response');\n    const idx = universe.findIndex(x => x.name === CONFIG.SYMBOL);\n    if (idx < 0 || !ctxs[idx]) throw new Error(CONFIG.SYMBOL + ' not found');\n    const item = ctxs[idx];\n    const price = parseFloat(item.midPx || item.markPx);\n    const open = parseFloat(item.prevDayPx);\n    if (!(price > 0)) throw new Error('invalid price');\n    const change = open > 0 ? ((price - open) / open) * 100 : 0;\n    return { price, change };\n  }\n\n  function onLiveData({ price, change }) {\n    if (state.stale) state.recoverCount++;\n    state.lastLive = Date.now();\n    state.lastError = null;\n    state.price = price;\n    state.change = change;\n    checkAlert(price);\n    saveCache(price, change);\n    evaluateStale();\n    render();\n  }\n\n  async function refreshNow() {\n    if (state.inFlight) return;\n\n    if (!navigator.onLine) {\n      evaluateStale();\n      render();\n      return;\n    }\n\n    const controller = new AbortController();\n    state.inFlight = controller;\n    const timer = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT_MS);\n    try {\n      const data = await fetchBtc(controller.signal);\n      if (state.inFlight !== controller) return;   // stopped while waiting\n      onLiveData(data);\n    } catch (err) {\n      if (state.inFlight !== controller) return;\n      state.lastError = err.name === 'AbortError' ? 'timeout' : err.message;\n      state.recoverCount = 0;\n      console.warn('LBank Futures:', err);\n      evaluateStale();\n      render();\n    } finally {\n      clearTimeout(timer);\n      if (state.inFlight === controller) state.inFlight = null;\n    }\n  }\n\n  /* ---------- Lifecycle: run only in landscape and while visible ---------- */\n  async function requestWakeLock() {\n    if (!('wakeLock' in navigator)) return;\n    try {\n      const lock = await navigator.wakeLock.request('screen');\n      if (!state.active || document.visibilityState !== 'visible') {\n        lock.release();\n        return;\n      }\n      releaseWakeLock();\n      state.wakeLock = lock;\n    } catch (_) {}\n  }\n\n  function releaseWakeLock() {\n    if (state.wakeLock) {\n      state.wakeLock.release();\n      state.wakeLock = null;\n    }\n  }\n\n  function start() {\n    state.active = true;\n    refreshNow();\n    clearInterval(state.refreshId);\n    state.refreshId = setInterval(refreshNow, CONFIG.REFRESH_MS);\n    requestWakeLock();\n  }\n\n  function stop() {\n    state.active = false;\n    clearInterval(state.refreshId);\n    state.refreshId = null;\n    if (state.inFlight) {\n      state.inFlight.abort();\n      state.inFlight = null;\n    }\n    releaseWakeLock();\n  }\n\n  function sync() {\n    const shouldRun = !state.portrait && document.visibilityState === 'visible';\n    if (shouldRun && !state.active) start();\n    else if (!shouldRun && state.active) stop();\n  }\n\n  function applyOrientation() {\n    const portrait = window.innerHeight > window.innerWidth;\n    if (portrait === state.portrait) return;\n    state.portrait = portrait;\n    document.body.classList.toggle('portrait', portrait);\n    if (portrait) closeModal();\n    sync();\n  }\n\n  /* ---------- Battery (event-driven, no polling) ---------- */\n  async function initBattery() {\n    if (!navigator.getBattery) {\n      batteryLevelEl.textContent = 'N/A';\n      return;\n    }\n    try {\n      const battery = await navigator.getBattery();\n      const paint = () => {\n        const level = Math.round(battery.level * 100);\n        batteryLevelEl.textContent = level;\n        batteryLevelEl.classList.toggle('low-battery', level < 30);\n      };\n      paint();\n      battery.addEventListener('levelchange', paint);\n      battery.addEventListener('chargingchange', paint);\n    } catch (_) {\n      batteryLevelEl.textContent = 'N/A';\n    }\n  }\n\n  /* ---------- Events ---------- */\n  function bindEvents() {\n    const cancelPress = () => {\n      clearTimeout(state.pressTimer);\n      state.pressTimer = null;\n    };\n    alertIcon.addEventListener('pointerdown', () => {\n      state.pressFired = false;\n      cancelPress();\n      if (state.alertPrice === null) return;\n      state.pressTimer = setTimeout(() => {\n        state.pressTimer = null;\n        state.pressFired = true;\n        openModal();\n      }, CONFIG.LONG_PRESS_MS);\n    });\n    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => alertIcon.addEventListener(ev, cancelPress));\n    alertIcon.addEventListener('contextmenu', e => e.preventDefault());\n\n    alertIcon.addEventListener('click', () => {\n      if (state.pressFired) { state.pressFired = false; return; }\n      if (state.alertPrice !== null) resetAlert();   // clear a pending or fired alert\n      else openModal();                              // no alert set: open entry\n    });\n\n    // Browsers only allow audio after a user gesture; unlock it on the first one anywhere on the page.\n    ['pointerdown', 'keydown', 'touchend'].forEach(ev =>\n      document.addEventListener(ev, unlockAudio, { passive: true }));\n\n    batteryButton.addEventListener('click', refreshNow);\n\n    keypad.addEventListener('click', e => {\n      const b = e.target.closest('button');\n      if (b) pressKey(b.dataset.k);\n    });\n\n    alertModal.addEventListener('click', e => {\n      if (e.target === alertModal) closeModal();\n    });\n\n    document.addEventListener('keydown', e => {\n      if (!alertModal.classList.contains('open')) return;\n      if (e.key === 'Escape') closeModal();\n      else if (/^\\d$/.test(e.key)) pressKey(e.key);\n      else if (e.key === 'Backspace') pressKey('del');\n      else if (e.key === 'Enter') pressKey('enter');\n    });\n\n    window.addEventListener('online', () => {\n      evaluateStale();\n      render();\n      refreshNow();\n    });\n    window.addEventListener('offline', () => {\n      evaluateStale();\n      render();\n    });\n\n    document.addEventListener('visibilitychange', sync);\n    window.addEventListener('resize', applyOrientation);\n  }\n\n  /* ---------- Init ---------- */\n  function init() {\n    buildKeypad();\n    document.querySelectorAll('[data-i]').forEach(el => setIcon(el, el.dataset.i));\n\n    loadCache();\n    loadAlert();\n\n    bindEvents();\n    applyOrientation();\n    evaluateStale();\n    render();\n    initBattery();\n\n    setInterval(() => {\n      if (evaluateStale()) render();\n    }, 1000);\n  }\n\n  init();\n})();\n<\/script>\n<\/body>\n<\/html>\n";
+
+const PRICES_ITEM = $("menuPrices").innerHTML;
+const MAIN_ITEM = `<svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg><span>Home page</span>`;
+
+function syncPrices(on){
+  const box = $("prices");
+  box.classList.toggle("show", on);
+  document.body.classList.toggle("on-prices", on);
+  if(on === !!S.pricesOn) return;
+  S.pricesOn = on;
+  $("menuPrices").innerHTML = on ? MAIN_ITEM : PRICES_ITEM;
+  const old = $("prFrame");
+  if(old) old.remove();
+  if(!on) return;
+  window.scrollTo(0, 0);
+  const f = document.createElement("iframe");
+  f.id = "prFrame";
+  f.title = "Crypto prices";
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin");
+  box.appendChild(f);
+  requestAnimationFrame(() => requestAnimationFrame(() => { if(S.pricesOn && f.isConnected) f.srcdoc = PRICE_HTML; }));
+}
+
+function syncBtc(on){
+  const box = $("btclive");
+  box.classList.toggle("show", on);
+  document.body.classList.toggle("on-btc", on);
+  if(on === !!S.btcOn) return;
+  S.btcOn = on;
+  const old = $("btcFrame");
+  if(old) old.remove();
+  if(!on){
+    try{
+      const ex = document.exitFullscreen || document.webkitExitFullscreen;
+      if(ex && (document.fullscreenElement || document.webkitFullscreenElement)){
+        const p = ex.call(document);
+        if(p && p.catch) p.catch(() => {});
+      }
+    }catch(e){}
+    setTimeout(btcTick, 0);
+    return;
+  }
+  window.scrollTo(0, 0);
+  const f = document.createElement("iframe");
+  f.id = "btcFrame";
+  f.title = "BTC Live";
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin");
+  f.setAttribute("allow", "screen-wake-lock");
+  box.appendChild(f);
+  requestAnimationFrame(() => requestAnimationFrame(() => { if(S.btcOn && f.isConnected) f.srcdoc = BTC_HTML; }));
+}
+
+/* ===== In-app browser (display only, no bars) ===== */
+function openExplorer(a){
+  openBrowser(EXPLORER + a);
+}
+
+function openBrowser(url){
+  let u;
+  try{ u = new URL(url); }catch(e){ toast("Invalid link"); return; }
+  if(u.protocol !== "https:"){ toast("Invalid link"); return; }
+  if(S.browserOpen) return;
+  S.browserOpen = true;
+  const f = $("brFrame");
+  f.classList.remove("ready");
+  $("browser").classList.remove("ready");
+  $("browser").classList.add("show");
+  history.pushState({...(history.state || {}), br: 1}, "");
+  clearTimeout(S.timers.brReady);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if(!S.browserOpen) return;
+    f.src = u.href;
+    S.timers.brReady = setTimeout(brReady, 8000);
+  }));
+}
+
+function brReady(){
+  clearTimeout(S.timers.brReady);
+  if(!S.browserOpen) return;
+  $("brFrame").classList.add("ready");
+  $("browser").classList.add("ready");
+}
+$("brFrame").addEventListener("load", () => {
+  if($("brFrame").getAttribute("src") === "about:blank") return;
+  brReady();
+});
+
+function closeBrowser(){
+  if(!S.browserOpen) return;
+  S.browserOpen = false;
+  clearTimeout(S.timers.brReady);
+  $("browser").classList.remove("show", "ready");
+  $("brFrame").classList.remove("ready");
+  $("brFrame").src = "about:blank";
+}
+
+async function getBackupDir(){
+  if(!window.showDirectoryPicker) return null;
+  try{
+    const h = await Store.get("backupDir");
+    if(h){
+      if(await h.queryPermission({mode: "readwrite"}) === "granted") return h;
+      if(await h.requestPermission({mode: "readwrite"}) === "granted") return h;
+    }
+    const dir = await window.showDirectoryPicker({mode: "readwrite"});
+    await Store.set("backupDir", dir);
+    return dir;
+  }catch(e){ return null; }
+}
+
+async function backupWallets(){
+  if(!S.wallets.length){ toast("Nothing to back up"); return; }
+  const text = JSON.stringify({
+    app: "position-monitor", version: 3, createdAt: new Date().toISOString(),
+    wallets: S.wallets, hidden: S.hidden, alerts: S.alerts, favs: S.favs, cfg: S.cfg, tg: {chat: S.tg.chat}
+  }, null, 2);
+  const d = new Date(), p = n => String(n).padStart(2, "0");
+  const fname = `hl-wallets-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}.json`;
+
+  const dir = await getBackupDir();
+  if(dir){
+    try{
+      const w = await (await dir.getFileHandle(fname, {create: true})).createWritable();
+      await w.write(text);
+      await w.close();
+      toast("Backup saved to folder", "ok");
+      return;
+    }catch(e){
+      toast("Folder write failed, downloading instead");
+    }
+  }
+  try{
+    const url = URL.createObjectURL(new Blob([text], {type: "application/json"}));
+    const a = document.createElement("a");
+    a.href = url; a.download = fname;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    toast("Backup downloaded", "ok");
+  }catch(e){
+    toast("Backup failed");
+  }
+}
+
+function parseBackup(data){
+  const list = Array.isArray(data) ? data : data && data.wallets;
+  if(!Array.isArray(list) || !list.length) throw new Error("No wallets found in this file");
+  if(!list.every(w => w && typeof w.addr === "string" && /^0x[a-fA-F0-9]{40}$/.test(w.addr))) throw new Error("File contains an invalid address");
+  const seen = new Set(), wallets = [];
+  list.forEach(w => {
+    const a = w.addr.toLowerCase();
+    if(seen.has(a)) return;
+    seen.add(a);
+    wallets.push({addr: a, name: (typeof w.name === "string" && w.name.trim()) || a.slice(0, 8)});
+  });
+  const d = Array.isArray(data) ? {} : obj(data);
+  const only = a => arr(a).filter(x => typeof x === "string").map(x => x.toLowerCase()).filter(x => seen.has(x));
+  const chat = Api.normalizeChat(obj(d.tg).chat);
+  return {
+    wallets,
+    hidden: only(d.hidden),
+    alerts: only(d.alerts),
+    favs: only(d.favs),
+    cfg: d.cfg && typeof d.cfg === "object" ? normCfg(d.cfg) : null,
+    tg: chat ? {chat, id: /^-?\d+$/.test(chat) ? chat : ""} : null
+  };
+}
+
+async function restoreFromFile(file){
+  let r;
+  try{
+    r = parseBackup(JSON.parse(await file.text()));
+  }catch(e){
+    toast(e instanceof SyntaxError ? "File is not valid JSON" : e.message);
+    return;
+  }
+  S.pendingRestore = r;
+  $("confirmText").textContent = `Restore ${r.wallets.length} addresses? The current list will be replaced.`;
+  show("confirmOverlay", true);
+}
+
+function closeConfirm(){
+  show("confirmOverlay", false);
+  S.pendingRestore = null;
+}
+
+function doRestore(){
+  const r = S.pendingRestore;
+  if(!r) return;
+  S.wallets = r.wallets;
+  S.hidden = r.hidden;
+  S.alerts = r.alerts;
+  S.favs = r.favs;
+  S.known = {};
+  if(r.cfg) S.cfg = r.cfg;
+  if(r.tg) S.tg = r.tg;
+  S.selected = null;
+  Store.persist();
+  scheduleTimers();
+  if(S.cfg.screenOn) keepAwake(); else releaseWake();
+  closeConfirm();
+  show("restoreOverlay", false);
+  render(true);
+  refreshAll();
+  toast(`Restored ${r.wallets.length} addresses`, "ok");
+}
+
+function askDelete(a){
+  S.pendingDelete = a;
+  show("deleteOverlay", true);
+}
+function closeDelete(){
+  show("deleteOverlay", false);
+  S.pendingDelete = null;
+}
+
+function renameWallet(a){
+  const w = S.wallets.find(x => x.addr === a);
+  if(!w) return;
+  S.renameAddr = a;
+  $("renameInput").value = w.name;
+  $("renameAddr").textContent = w.addr;
+  checkRenameName();
+  show("renameOverlay", true);
+  setTimeout(() => { $("renameInput").focus(); $("renameInput").select(); }, 50);
+}
+function closeRename(){
+  show("renameOverlay", false);
+  S.renameAddr = null;
+  showMsg("renameMsg", "");
+}
+function confirmRename(){
+  const w = S.wallets.find(x => x.addr === S.renameAddr);
+  const name = $("renameInput").value.trim();
+  if(!w){ closeRename(); return; }
+  if(!name){ closeRename(); return; }
+  if(isNameTaken(name, w.addr)){
+    showMsg("renameMsg", `"${name}" is already used by another wallet.`, "dup");
+    $("confirmRename").disabled = true;
+    return;
+  }
+  w.name = name;
+  Store.persist();
+  closeRename();
+  render();
+}
+
+const infoBar = $("infoBar");
+const topBar = $("topBar");
+
+function syncHeaderHeight(){
+  document.documentElement.style.setProperty("--hdr-h", topBar.offsetHeight + "px");
+}
+
+function hideInfo(){
+  clearTimeout(S.timers.info);
+  infoBar.classList.remove("show");
+  if(S.alertActive){
+    S.alertActive = false;
+    setTimeout(nextAlert, 300);
+  }
+}
+
+function dateParts(ts){
+  if(!ts) return null;
+  const d = new Date(ts);
+  return {
+    date: d.toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric"}),
+    time: d.toLocaleTimeString("en-GB", {hour: "2-digit", minute: "2-digit"})
+  };
+}
+
+function openInfo(a, coin){
+  if(S.alertActive) return;
+  const w = S.wallets.find(x => x.addr === a);
+  const p = w && openPositions(a).find(x => x.coin === coin);
+  if(!p) return;
+  const dt = dateParts(p.start);
+  const dtHtml = dt
+    ? `<div class="dt-line">
+         <span class="dt-date">${esc(dt.date)}</span><i class="dt-sep"></i>
+         <span class="dt-time">${esc(dt.time)}</span>
+       </div>`
+    : `<span class="dt-none">Old position</span>`;
+  infoBar.className = "infobar";
+  infoBar.innerHTML = `<div class="info-row1">
+      <div class="name" data-link="${a}"><span class="wallet-ic">${ICON_WALLET}</span><span class="name-txt">${esc(w.name)}</span></div>
+      ${dtHtml}
+    </div>`;
+  infoBar.classList.add("show");
+  clearTimeout(S.timers.info);
+  S.timers.info = setTimeout(hideInfo, 5000);
+}
+
+function nextAlert(){
+  if(S.alertActive || !S.alertQueue.length) return;
+  const it = S.alertQueue.shift();
+  const w = S.wallets.find(x => x.addr === it.addr);
+  S.alertActive = true;
+  if(S.screen === "prices" || S.screen === "btclive"){ closeMenu(); history.back(); }
+  clearTimeout(S.timers.info);
+  if(it.btc){
+    infoBar.className = "infobar";
+    infoBar.innerHTML = `<div class="alert-msg">${ICON_BELL}<span class="alert-txt"><b>Bitcoin</b> reached ${esc(it.btc)}</span></div>`;
+  }else{
+    infoBar.className = "infobar alert-" + sideOf(it.p);
+    infoBar.innerHTML = `<div class="alert-msg">${ICON_BELL}<span class="alert-txt"><b>${esc(w ? w.name : "Wallet")}</b> opened a new position</span></div>`;
+  }
+  infoBar.classList.add("show");
+  S.timers.info = setTimeout(hideInfo, ALERT_SHOW_MS);
+}
+
+infoBar.addEventListener("click", e => {
+  const l = e.target.closest("[data-link]");
+  if(l){ openExplorer(l.dataset.link); hideInfo(); return; }
+  hideInfo();
+});
+window.addEventListener("resize", syncHeaderHeight);
+["gesturestart", "gesturechange", "gestureend"].forEach(ev => document.addEventListener(ev, e => e.preventDefault()));
+
+function nextWalletName(){
+  for(let i = 1; i <= 100; i++){
+    const n = "W" + String(i).padStart(3, "0");
+    if(!isNameTaken(n)) return n;
+  }
+  return "W" + String(S.wallets.length + 1).padStart(3, "0");
+}
+
+function isNameTaken(name, exceptAddr){
+  const key = name.trim().toLowerCase();
+  if(!key) return false;
+  return S.wallets.some(w => w.addr !== exceptAddr && w.name.trim().toLowerCase() === key);
+}
+
+function showMsg(id, text, kind){
+  const el = $(id);
+  el.textContent = text;
+  el.className = "add-msg" + (text ? " show" : "") + (kind ? " " + kind : "");
+}
+
+function checkLabel(){
+  const name = $("label").value.trim();
+  if(name && isNameTaken(name)){
+    showMsg("labelMsg", `"${name}" is already used by another wallet.`, "dup");
+    $("confirmAdd").disabled = true;
+    return;
+  }
+  showMsg("labelMsg", "");
+  $("confirmAdd").disabled = false;
+}
+
+function checkRenameName(){
+  const name = $("renameInput").value.trim();
+  if(name && isNameTaken(name, S.renameAddr)){
+    showMsg("renameMsg", `"${name}" is already used by another wallet.`, "dup");
+    $("confirmRename").disabled = true;
+    return;
+  }
+  showMsg("renameMsg", "");
+  $("confirmRename").disabled = false;
+}
+
+function checkAddr(){
+  const raw = $("addr").value.trim();
+  $("confirmAdd").disabled = false;
+  if(!raw){ showMsg("addMsg", ""); checkLabel(); return; }
+  const a = extractAddr(raw);
+  if(!a){
+    showMsg("addMsg", raw.length >= 42 ? "Invalid address." : "", raw.length >= 42 ? "err" : "");
+    checkLabel();
+    return;
+  }
+  const dup = S.wallets.find(w => w.addr === a);
+  if(dup){
+    showMsg("addMsg", `Already in the list as "${dup.name}".`, "dup");
+    $("confirmAdd").disabled = true;
+    return;
+  }
+  showMsg("addMsg", "This address is a new wallet.", "ok");
+  checkLabel();
+}
+
+/* Draft of the Add wallet form is kept in sessionStorage so that it survives
+   leaving the app for the explorer link and coming back (even after a reload). */
+function saveDraft(){
+  try{
+    if($("overlay").classList.contains("show")){
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({label: $("label").value, addr: $("addr").value}));
+    }
+  }catch(e){}
+}
+function clearDraft(){
+  try{ sessionStorage.removeItem(DRAFT_KEY); }catch(e){}
+}
+function readDraft(){
+  try{
+    const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
+    return d && typeof d === "object" ? d : null;
+  }catch(e){ return null; }
+}
+
+function openAdd(draft){
+  $("label").value = draft ? String(draft.label || "") : "";
+  $("addr").value = draft ? String(draft.addr || "") : "";
+  $("label").placeholder = nextWalletName();
+  checkAddr();
+  show("overlay", true);
+  saveDraft();
+  setTimeout(() => $("addr").focus(), 50);
+}
+function closeAdd(){
+  show("overlay", false);
+  clearDraft();
+  showMsg("labelMsg", "");
+  showMsg("addMsg", "");
+}
+
+function confirmAdd(){
+  const a = extractAddr($("addr").value);
+  const name = $("label").value.trim() || nextWalletName();
+  if(!/^0x[a-f0-9]{40}$/.test(a)){ showMsg("addMsg", "Invalid address.", "err"); return; }
+  const dup = S.wallets.find(w => w.addr === a);
+  if(dup){ showMsg("addMsg", `Already in the list as "${dup.name}".`, "dup"); return; }
+  if(isNameTaken(name)){ checkLabel(); return; }
+  S.wallets.push({addr: a, name});
+  Store.persist();
+  closeAdd();
+  render();
+  fetchOne(a).then(() => render());
+}
+
+const closers = {
+  overlay: closeAdd, renameOverlay: closeRename, restoreOverlay: () => show("restoreOverlay", false),
+  confirmOverlay: closeConfirm, deleteOverlay: closeDelete, aboutOverlay: () => show("aboutOverlay", false)
+};
+Object.entries(closers).forEach(([id, fn]) => $(id).addEventListener("click", e => { if(e.target.id === id) fn(); }));
+$("cancelAdd").onclick = closeAdd;
+$("confirmAdd").onclick = confirmAdd;
+$("addr").addEventListener("input", () => { checkAddr(); saveDraft(); });
+$("label").addEventListener("input", () => { checkLabel(); saveDraft(); });
+$("addr").addEventListener("keydown", e => { if(e.key === "Enter") confirmAdd(); });
+$("label").addEventListener("keydown", e => { if(e.key === "Enter") $("addr").focus(); });
+$("renameInput").addEventListener("input", checkRenameName);
+document.querySelectorAll("[data-clear]").forEach(b => {
+  b.addEventListener("mousedown", e => e.preventDefault());
+  b.onclick = () => {
+    const i = $(b.dataset.clear);
+    i.value = "";
+    i.dispatchEvent(new Event("input"));
+    i.focus();
+  };
+});
+$("checkLink").onclick = () => {
+  const a = extractAddr($("addr").value);
+  if(!a){ toast("Enter a valid address first"); return; }
+  saveDraft();
+  openExplorer(a);
+};
+$("cancelRename").onclick = closeRename;
+$("confirmRename").onclick = confirmRename;
+$("renameInput").addEventListener("keydown", e => { if(e.key === "Enter") confirmRename(); });
+$("closeRestore").onclick = closers.restoreOverlay;
+$("pickFile").onclick = () => $("restoreFile").click();
+$("restoreFile").onchange = e => {
+  const f = e.target.files[0];
+  if(f) restoreFromFile(f);
+  e.target.value = "";
+};
+$("cancelConfirm").onclick = closeConfirm;
+$("okConfirm").onclick = doRestore;
+$("noDelete").onclick = closeDelete;
+$("yesDelete").onclick = () => {
+  const a = S.pendingDelete;
+  closeDelete();
+  if(a) removeWallet(a);
+};
+$("closeAbout").onclick = closers.aboutOverlay;
+
+const settingsBtn = $("settingsBtn");
+const settingsMenu = $("settingsMenu");
+
+function armMenuTimer(){
+  clearTimeout(S.timers.menu);
+  S.timers.menu = setTimeout(closeMenu, MENU_AUTO_CLOSE_MS);
+}
+function openMenu(){
+  settingsMenu.classList.add("show");
+  settingsBtn.classList.add("active");
+  armMenuTimer();
+}
+function closeMenu(){
+  clearTimeout(S.timers.menu);
+  settingsMenu.classList.remove("show");
+  settingsBtn.classList.remove("active");
+}
+settingsBtn.onclick = e => { e.stopPropagation(); settingsMenu.classList.contains("show") ? closeMenu() : openMenu(); };
+settingsMenu.addEventListener("click", e => e.stopPropagation());
+["pointerdown", "touchstart", "scroll"].forEach(ev =>
+  settingsMenu.addEventListener(ev, () => { if(settingsMenu.classList.contains("show")) armMenuTimer(); }, {passive: true})
+);
+document.addEventListener("click", closeMenu);
+document.addEventListener("keydown", e => {
+  if(e.key !== "Escape") return;
+  if(S.browserOpen){ history.back(); return; }
+  closeMenu();
+});
+
+function nav(screen, replace){
+  if(screen === S.screen) return;
+  S.fromLongPress = false;
+  S.revealPos = null;
+  const from = replace ? (history.state || {}).from : S.screen;
+  history[replace ? "replaceState" : "pushState"]({screen, from}, "");
+  S.screen = screen;
+  S.selected = null;
+  if(!S.alertActive) hideInfo();
+  render();
+  if(screen === "list") refreshAll(true);
+  nextAlert();
+}
+
+function back(){
+  if(S.screen === "list" && S.selected && !S.fromLongPress){ S.selected = null; render(); return; }
+  if(S.screen !== "main") history.back();
+}
+
+/* Highlight the long-pressed position row on the main screen and open its info */
+function revealPosition({addr, coin}){
+  let target = null;
+  document.querySelectorAll("#list .prow[data-info]").forEach(r => {
+    if(r.dataset.info === addr && r.dataset.coin === coin) target = r;
+  });
+  if(!target) return;
+  target.scrollIntoView({block: "center", behavior: "smooth"});
+  target.classList.remove("flash");
+  void target.offsetWidth;
+  target.classList.add("flash");
+  setTimeout(() => target.classList.remove("flash"), 2500);
+  openInfo(addr, coin);
+}
+
+window.addEventListener("popstate", e => {
+  // Closing the in-app browser consumes this history step
+  if(S.browserOpen){ closeBrowser(); return; }
+  let next = (e.state && e.state.screen) || "main";
+  if((S.screen === "prices" || S.screen === "btclive") && next !== "main"){
+    next = "main";
+    history.replaceState({screen: "main", from: "main"}, "");
+  }
+  if(S.screen === "list" && S.selected && next === "main" && !S.fromLongPress){
+    S.selected = null;
+    history.pushState({screen: "list", from: "main"}, "");
+    render();
+    return;
+  }
+  const reveal = S.fromLongPress && next === "main" ? S.revealPos : null;
+  S.fromLongPress = false;
+  S.revealPos = null;
+  S.screen = next;
+  S.selected = null;
+  if(!S.alertActive) hideInfo();
+  render();
+  if(next === "list") refreshAll(true);
+  if(reveal) revealPosition(reveal);
+  nextAlert();
+});
+
+$("addWalletBtn").onclick = () => openAdd();
+$("menuMore").onclick = () => { closeMenu(); nav("more"); };
+window.addEventListener("message", e => {
+  const pf = $("prFrame");
+  if(!pf || e.source !== pf.contentWindow || S.screen !== "prices") return;
+  if(e.data === "crypto-prices-back"){ closeMenu(); history.back(); }
+  else if(e.data === "crypto-prices-settings") settingsMenu.classList.contains("show") ? closeMenu() : openMenu();
+  else if(e.data === "crypto-prices-tap" && settingsMenu.classList.contains("show")) closeMenu();
+});
+$("menuPrices").onclick = () => { closeMenu(); S.screen === "prices" ? history.back() : nav("prices"); };
+$("menuBtc").onclick = () => {
+  closeMenu();
+  nav("btclive");
+  try{
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if(req && !(document.fullscreenElement || document.webkitFullscreenElement)){
+      const p = req.call(el);
+      if(p && p.catch) p.catch(() => {});
+    }
+  }catch(e){}
+};
+document.addEventListener("fullscreenchange", () => {
+  if(!document.fullscreenElement && S.screen === "btclive") history.back();
+});
+
+let orientMode = null;
+function syncOrientation(){
+  const mode = S.screen === "btclive" ? "landscape" : "portrait";
+  if(mode === orientMode) return;
+  orientMode = mode;
+  try{
+    screen.orientation.lock(mode).catch(() => { orientMode = null; });
+  }catch(e){}
+}
+["pointerdown", "fullscreenchange"].forEach(ev => document.addEventListener(ev, syncOrientation, {passive: true}));
+
+const BTC_KEY = "bitcoinAlertPrice";
+const BTC_TOLERANCE = 50;
+let btcBusy = false;
+
+function btcRead(){
+  try{
+    let v = JSON.parse(localStorage.getItem(BTC_KEY));
+    if(typeof v === "number") v = {price: v, fired: false};
+    return v && v.price > 0 ? v : null;
+  }catch(e){ return null; }
+}
+function btcWrite(v){
+  try{ localStorage.setItem(BTC_KEY, JSON.stringify(v)); }catch(e){}
+}
+
+function btcAlertFired(target, bar){
+  const txt = Number(target).toLocaleString("en-US");
+  if(bar){
+    Beep.play();
+    S.alertQueue.push({btc: txt});
+    nextAlert();
+  }
+  if(S.cfg.tg){
+    Api.tgSend(`\u{1F514} Bitcoin has reached the price set by the user: ${txt}`).then(ok => {
+      if(ok === null) toast("Telegram chat is not set");
+      else if(!ok) toast("Telegram message failed");
+    });
+  }
+}
+
+async function btcTick(){
+  if(btcBusy || S.screen === "btclive") return;
+  const a = btcRead();
+  if(!a || a.fired || !navigator.onLine) return;
+  btcBusy = true;
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), 4000);
+  try{
+    const r = await fetch(API, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({type: "allMids"}),
+      signal: ctl.signal,
+      cache: "no-store"
+    });
+    if(!r.ok) return;
+    const j = await r.json();
+    const price = parseFloat(j && j.BTC);
+    if(!(price > 0)) return;
+    const cur = btcRead();
+    if(!cur || cur.fired || cur.price !== a.price || S.screen === "btclive") return;
+    if(cur.dir !== "up" && cur.dir !== "down"){
+      cur.dir = cur.price >= price ? "up" : "down";
+      btcWrite(cur);
+    }
+    const hit = cur.dir === "up" ? price >= cur.price - BTC_TOLERANCE : price <= cur.price + BTC_TOLERANCE;
+    if(hit){
+      cur.fired = true;
+      btcWrite(cur);
+      btcAlertFired(cur.price, true);
+    }
+  }catch(e){
+  }finally{
+    clearTimeout(t);
+    btcBusy = false;
+  }
+}
+setInterval(btcTick, 5000);
+
+window.addEventListener("message", e => {
+  const bf = $("btcFrame");
+  if(!bf || e.source !== bf.contentWindow || S.screen !== "btclive") return;
+  const d = e.data;
+  if(d && d.type === "btc-alert" && d.price > 0) btcAlertFired(d.price, false);
+});
+$("menuWallets").onclick = () => {
+  closeMenu();
+  if(S.screen === "more" && history.state && history.state.from === "list") history.back();
+  else nav("list", S.screen === "more");
+};
+$("menuAbout").onclick = () => { closeMenu(); show("aboutOverlay", true); };
+$("menuExit").onclick = () => {
+  closeMenu();
+  window.close();
+  setTimeout(() => { if(!window.closed) location.replace("about:blank"); }, 300);
+};
+
+function setTgStatus(text, kind){
+  const el = $("tgStatus");
+  if(!el) return;
+  clearTimeout(S.timers.tgStatus);
+  el.textContent = text || "";
+  el.className = "tg-status" + (kind ? " " + kind : "");
+  el.style.display = text ? "" : "none";
+  if(kind === "ok" || kind === "err") S.timers.tgStatus = setTimeout(() => setTgStatus(""), 3000);
+}
+
+async function saveTelegram(){
+  const input = $("tgChat");
+  if(!input) return;
+  const raw = input.value.trim();
+  if(!raw){
+    S.tg = {chat: "", id: ""};
+    Store.persist();
+    setTgStatus("Telegram chat cleared.", "ok");
+    return;
+  }
+  const chat = Api.normalizeChat(raw);
+  if(!chat){ setTgStatus("Enter a valid Chat ID or @username.", "err"); return; }
+  S.tg = {chat, id: /^-?\d+$/.test(chat) ? chat : ""};
+  Store.persist();
+  setTgStatus("Saving...", "busy");
+  if(!S.tg.id){
+    const id = await Api.resolveChatId(chat);
+    if(S.tg.chat === chat){ S.tg.id = id; Store.persist(); }
+  }
+  setTgStatus(S.tg.id ? "Saved." : "Saved. Press Start in the bot first.", S.tg.id ? "ok" : "err");
+}
+
+function tgNotify(a, p){
+  if(!S.cfg.tg) return;
+  const w = S.wallets.find(x => x.addr === a);
+  const lev = p.leverage ? p.leverage.value + "x" : "-";
+  const s = sideOf(p);
+  const dot = s === "long" ? "\u{1F7E2}" : "\u{1F534}";
+  Api.tgSend(`${dot} ${esc(w ? w.name : "Wallet")} opened a new position\n${esc(coinName(p.coin))} / ${s.toUpperCase()} / ${lev} / ${priceFmt(p.coin, p.entryPx)}`).then(ok => {
+    if(ok === null) toast("Telegram chat is not set");
+    else if(!ok) toast("Telegram message failed");
+  });
+}
+
+async function fetchOne(a){
+  try{
+    const fresh = await Api.fetchWallet(a);
+    const cur = S.cache[a] || {};
+    S.cache[a] = {...fresh, starts: cur.starts || {}, snapSeen: !!cur.snapSeen};
+    Store.persistCache();
+    if(fresh.positions.some(p => !S.cache[a].starts[p.coin])) Live.backfill(a);
+    return true;
+  }catch(e){
+    const prev = S.cache[a];
+    if(!(prev && Array.isArray(prev.positions))) S.cache[a] = {time: Date.now()};
+    Store.persistCache();
+    return false;
+  }
+}
+
+function openPositions(a){
+  const c = S.cache[a];
+  if(!c || !Array.isArray(c.positions)) return [];
+  const starts = c.starts || {};
+  return c.positions.map(p => ({...p, start: starts[p.coin] || 0}));
+}
+const hasPositions = a => openPositions(a).length > 0;
+const isNew = p => !!p.start && Date.now() - p.start < NEW_WINDOW;
+const isOld = p => !p.start || Date.now() - p.start > OLD_LIMIT_MS;
+const latestPositionTime = a => openPositions(a).reduce((m, p) => Math.max(m, p.start), 0);
+
+function checkAlerts(addrs){
+  let fired = false;
+  const now = Date.now();
+  for(const k in S.notified) if(now - S.notified[k] > TG_WINDOW_MS) delete S.notified[k];
+  addrs.forEach(a => {
+    if(!S.alerts.includes(a)) return;
+    const c = S.cache[a];
+    if(!c || !Array.isArray(c.positions)) return;
+    const pos = openPositions(a);
+    const prev = S.known[a];
+    if(prev && (S.cfg.alert || S.cfg.tg)) Calc.newPositions(prev, pos).forEach(p => {
+      const key = `${a}|${p.coin}|${sideOf(p)}`;
+      if(!p.start || now - p.start > TG_WINDOW_MS || S.notified[key]) return;
+      S.notified[key] = now;
+      if(S.cfg.alert){
+        S.alertQueue.push({addr: a, p});
+        fired = true;
+      }
+      if(S.cfg.tg) tgNotify(a, p);
+    });
+    const nextKnown = Calc.snapshot(pos);
+    // If a wallet newly has a position but its fill-derived entry time has
+    // not arrived yet, keep it pending instead of consuming the new-position
+    // transition during a reconnect/API race. First-time baselines stay quiet.
+    if(prev) pos.forEach(p => {
+      if(!p.start && prev[p.coin] === undefined) delete nextKnown[p.coin];
+    });
+    S.known[a] = nextKnown;
+  });
+  Store.persist();
+  if(fired){
+    Beep.play();
+    nextAlert();
+  }
+}
+
+function toggleAlert(a){
+  Beep.get();
+  const on = S.alerts.includes(a);
+  S.alerts = on ? S.alerts.filter(x => x !== a) : [...S.alerts, a];
+  delete S.known[a];
+  Store.persist();
+  render();
+  if(!on) fetchOne(a).then(() => { checkAlerts([a]); render(); });
+}
+
+function toggleFav(a){
+  S.favs = isFav(a) ? S.favs.filter(x => x !== a) : [...S.favs, a];
+  Store.persist();
+  render();
+}
+
+async function pollAlerts(){
+  if(S.refreshing || !S.cfg.alert) return;
+  const list = S.alerts.filter(a => S.wallets.some(w => w.addr === a) && !isHidden(a) && !Live.confirmed(a));
+  if(!list.length) return;
+  await Promise.all(list.map(fetchOne));
+  checkAlerts(list);
+  render();
+}
+
+async function refreshAll(all, silent){
+  if(S.refreshing){
+    if(all && !silent) S.refreshAllPending = true;
+    return;
+  }
+  S.refreshing = true;
+  if(!silent) spinStart();
+  const startedAt = Date.now();
+  try{
+    S.lastRefresh = Date.now();
+    const list = S.wallets.map(w => w.addr).filter(a => all || !isHidden(a));
+    await Promise.all(list.map(fetchOne));
+    checkAlerts(list);
+    render();
+  }finally{
+    const left = silent ? 0 : MIN_SPIN_MS - (Date.now() - startedAt);
+    if(left > 0) await delay(left);
+    S.refreshing = false;
+    if(!silent) spinStop();
+    renderUpdated();
+    if(S.refreshAllPending){
+      S.refreshAllPending = false;
+      refreshAll(true);
+    }
+  }
+}
+
+async function refreshOne(a){
+  if(!S.wallets.some(w => w.addr === a) || S.spinning.has(a)) return;
+  S.spinning.add(a);
+  spinStart();
+  render();
+  const startedAt = Date.now();
+  try{
+    await fetchOne(a);
+    checkAlerts([a]);
+  }finally{
+    const left = MIN_SPIN_MS - (Date.now() - startedAt);
+    if(left > 0) await delay(left);
+    S.spinning.delete(a);
+    spinStop();
+    render();
+  }
+}
+
+function removeWallet(a){
+  S.wallets = S.wallets.filter(w => w.addr !== a);
+  S.hidden = S.hidden.filter(x => x !== a);
+  S.alerts = S.alerts.filter(x => x !== a);
+  S.favs = S.favs.filter(x => x !== a);
+  S.alertQueue = S.alertQueue.filter(x => x.addr !== a);
+  delete S.cache[a];
+  delete S.known[a];
+  S.spinning.delete(a);
+  if(S.selected === a) S.selected = null;
+  Store.persist();
+  Store.persistCache();
+  render();
+}
+
+function hideWallet(a){
+  if(!isHidden(a)) S.hidden.push(a);
+  Store.persist();
+  render();
+}
+
+function unhideWallet(a){
+  S.hidden = S.hidden.filter(x => x !== a);
+  delete S.known[a];
+  Store.persist();
+  render();
+  fetchOne(a).then(() => { checkAlerts([a]); render(); });
+}
+
+function dataTime(){
+  const times = S.wallets
+    .filter(w => !isHidden(w.addr))
+    .map(w => S.cache[w.addr])
+    .filter(c => c && Array.isArray(c.positions))
+    .map(c => c.time || 0);
+  return times.length ? Math.min(...times) : 0;
+}
+
+function renderUpdated(){
+  const el = $("updated");
+  if(S.storeFail){
+    el.textContent = "Storage error";
+    el.classList.add("offline");
+  }else{
+    el.classList.remove("offline");
+    const t = dataTime();
+    el.textContent = t ? "Updated " + new Date(t).toLocaleTimeString("en-GB") : "";
+  }
+  syncHeaderHeight();
+}
+
+function boardHead(){
+  return `<div class="board-head"><div class="bh-in">
+    <span>${HI_COIN}Coin</span>
+    <span>${HI_SIDE}Side</span>
+    <span>${HI_LEV}Lev</span>
+    <span>${HI_ENTRY}Entry</span>
+    <span>${HI_PNL}ROE</span>
+  </div></div>`;
+}
+
+function pctCell(p){
+  let v = Calc.pctMove(p);
+  if(v === null) return `<span class="pnl na">-</span>`;
+  if(S.cfg.real && p.leverage) v *= Number(p.leverage.value) || 1;
+  if(v < 0) return `<span class="pnl neg"><span class="sg">-</span>${num(-v)}</span>`;
+  return `<span class="pnl pos">${num(v)}</span>`;
+}
+
+function posCard(addr, p, cls = ""){
+  const s = sideOf(p);
+  return `<div class="prow ${s} ${cls}" data-info="${addr}" data-coin="${esc(p.coin)}">
+      ${isNew(p) ? `<i class="ndot"></i>` : ""}
+      <span class="coin-cell"><span class="coin">${esc(coinName(p.coin))}</span></span>
+      <span><span class="side ${s}">${s.toUpperCase()}</span></span>
+      <span class="lev">${p.leverage ? esc(p.leverage.value) + "x" : "-"}</span>
+      <span class="px">${priceFmt(p.coin, p.entryPx)}</span>
+      <span>${pctCell(p)}</span>
+    </div>`;
+}
+
+function summaryBox(items){
+  const longs = items.filter(x => sideOf(x.p) === "long").length;
+  return `<div class="summary-mask"></div>
+  <div class="summary"><div class="sum-row">
+      <span class="sum-item"><i class="dot gray"></i><span class="lbl">Total</span><span class="num">${items.length}</span></span>
+      <span class="sum-item long"><span class="dot"></span><span class="lbl">Long</span><span class="num">${longs}</span></span>
+      <span class="sum-item short"><span class="dot"></span><span class="lbl">Short</span><span class="num">${items.length - longs}</span></span>
+  </div></div>`;
+}
+
+function walletsSummaryBox(){
+  const active = S.wallets.filter(w => hasPositions(w.addr)).length;
+  return `<div class="summary-mask"></div>
+  <div class="summary"><div class="sum-row two">
+      <span class="sum-item"><i class="dot gray"></i><span class="lbl">Wallets</span><span class="num">${S.wallets.length}</span></span>
+      <span class="sum-item long"><span class="dot"></span><span class="lbl">Active</span><span class="num">${active}</span></span>
+  </div></div>`;
+}
+
+function switchRow(key, label, sub){
+  return `<div class="set-card"><div class="set-row">
+      <div class="set-txt"><div class="set-lbl">${label}</div><div class="set-sub">${sub}</div></div>
+      <button class="sw${S.cfg[key] ? " on" : ""}" data-tog="${key}" aria-label="${label}"></button>
+    </div></div>`;
+}
+
+function chipRow(key, label, sub, opts, fmt){
+  const chips = opts.map(o => `<button class="chip${S.cfg[key] === o ? " on" : ""}" data-int="${key}" data-val="${o}">${fmt(o)}</button>`).join("");
+  return `<div class="set-card">
+      <div class="set-txt"><div class="set-lbl">${label}</div><div class="set-sub">${sub}</div></div>
+      <div class="chips">${chips}</div>
+    </div>`;
+}
+
+function telegramCard(){
+  return `<div class="set-card tg-card">
+    <div class="set-row">
+      <div class="set-txt"><div class="set-lbl">Telegram</div><div class="set-sub">Send new position alerts to Telegram</div></div>
+      <button class="sw${S.cfg.tg ? " on" : ""}" data-tog="tg" aria-label="Telegram"></button>
+    </div>
+    <div class="tg-field">
+      <label for="tgChat">Chat ID or Username</label>
+      <input id="tgChat" class="mono" placeholder="123456789 or @username" spellcheck="false" autocomplete="off" autocapitalize="off" value="${esc(S.tg.chat)}">
+    </div>
+    <div id="tgStatus" class="tg-status" style="display:none" dir="ltr"></div>
+  </div>`;
+}
+
+function moreView(){
+  return `<div class="set-box">
+    ${telegramCard()}
+    ${switchRow("alert", "Alerts", "Sound, vibration and in-app alert for new positions")}
+    ${switchRow("screenOn", "Keep screen on", "Prevent the screen from turning off while the app is open")}
+    ${switchRow("real", "Real move", "Move shown multiplied by leverage")}
+    ${switchRow("hideOld", "Hide positions older than 30 days", "Main screen only, unknown start included")}
+    ${chipRow("refreshMin", "Auto refresh", "Interval for refreshing all wallets", REFRESH_OPTS, o => o + "m")}
+    ${chipRow("alertSec", "Alert backup check", "Fallback check when the live feed is down", ALERT_OPTS, fmtSec)}
+  </div>
+  <div class="actions-mask more-mask"></div>
+  <div class="bk-row">
+    <button class="bk-btn" data-backup="1">${ICON_BACKUP}<span>Backup</span></button>
+    <button class="bk-btn" data-restore="1">${ICON_RESTORE}<span>Restore</span></button>
+  </div>`;
+}
+
+function addNewBtn(){
+  return `<button class="empty-add" data-addnew="1" aria-label="Add wallet">${ICON_ADD}</button>`;
+}
+
+function mainView(){
+  if(!S.wallets.length) return `<div class="empty">No wallets yet. Use the add button to add one.</div>${addNewBtn()}`;
+  const items = [];
+  S.wallets.forEach(w => {
+    if(isHidden(w.addr)) return;
+    const c = S.cache[w.addr];
+    /* Start times are not reliable until the live snapshot has arrived, either
+       in this session or in a previous one (saved as snapSeen in the cache). */
+    const snapshotReady = Live.seen(w.addr) || !!(c && c.snapSeen);
+    openPositions(w.addr).forEach(p => {
+      /* A known start time can be judged right away from the cache.
+         Only positions with an unknown start wait for the snapshot. */
+      if(S.cfg.hideOld && isOld(p) && (p.start || snapshotReady)) return;
+      items.push({addr: w.addr, p});
+    });
+  });
+  if(!items.length){
+    return S.wallets.some(w => S.cache[w.addr])
+      ? `<div class="empty big">No wallets with open positions.</div>${addNewBtn()}`
+      : "";
+  }
+  const byCoin = (x, y) =>
+    (coinRank(x.p.coin) - coinRank(y.p.coin)) ||
+    x.p.coin.localeCompare(y.p.coin) ||
+    (y.p.start - x.p.start) ||
+    sideOf(x.p).localeCompare(sideOf(y.p)) ||
+    x.addr.localeCompare(y.addr);
+  const newest = (x, y) => (y.p.start - x.p.start) || byCoin(x, y);
+  items.sort(S.sortMode === "coin" ? byCoin : newest);
+  let prevCoin = null;
+  const rows = items.map(({addr, p}) => {
+    const cls = S.sortMode === "coin" && prevCoin !== null && p.coin !== prevCoin ? "grp" : "";
+    prevCoin = p.coin;
+    return posCard(addr, p, cls);
+  }).join("");
+  return `<div class="board">${boardHead()}${rows}</div>` + summaryBox(items);
+}
+
+function addressPositionsView(a){
+  const pos = openPositions(a);
+  return pos.length ? `<div class="board">${boardHead()}${pos.map(p => posCard(a, p)).join("")}</div>` : "";
+}
+
+function listRank(w){
+  if(isHidden(w.addr)) return 1;
+  return hasPositions(w.addr) ? 0 : 2;
+}
+
+function listView(){
+  if(!S.wallets.length) return `<div class="empty">No wallets yet. Use the add button to add one.</div>`;
+  const ordered = [...S.wallets].sort((x, y) =>
+    (listRank(x) - listRank(y)) ||
+    (openPositions(y.addr).length - openPositions(x.addr).length) ||
+    (latestPositionTime(y.addr) - latestPositionTime(x.addr))
+  );
+  const visible = S.selected ? ordered.filter(w => w.addr === S.selected) : ordered;
+  const rows = visible.map(w => {
+    const a = w.addr;
+    const active = hasPositions(a);
+    const hiddenNow = isHidden(a);
+    const open = S.selected === a;
+    const detailHtml = open ? addressPositionsView(a) : "";
+    const armed = S.alerts.includes(a);
+    const fav = isFav(a);
+    const pill = (attr, icon, cls = "") => `<button class="list-pill${cls}" data-${attr}="${a}">${icon}</button>`;
+
+    const actionsHtml = open ? `<div class="actions-mask"></div><div class="actions">
+        ${pill("del", ICON_TRASH, " del")}
+        ${pill("copy", ICON_COPY)}
+        ${pill("link", ICON_LINK, " link")}
+        ${pill("rename", ICON_EDIT)}
+        ${hiddenNow ? pill("unhide", ICON_EYE_OFF) : pill("hidebtn", ICON_EYE)}
+        ${pill("bell", ICON_BELL, armed ? " armed" : "")}
+        ${pill("fav", ICON_HEART, fav ? " fav-on" : "")}
+        ${pill("refresh", ICON_REFRESH, S.spinning.has(a) ? " spin" : "")}
+      </div>` : "";
+
+    const parts = [];
+    if(fav) parts.push(`<span class="slot">${ICON_HEART}</span>`);
+    if(armed) parts.push(`<span class="slot">${ICON_BELL}</span>`);
+    if(hiddenNow) parts.push(`<span class="slot">${ICON_EYE_OFF}</span>`);
+    parts.push(`<span class="pos-grp"><span class="slot">${ICON_POS_COUNT}</span><span class="cnt-sq">${openPositions(a).length}</span></span>`);
+    const metaHtml = open ? "" : `<div class="meta">${parts.join(`<i class="vsep"></i>`)}</div>`;
+
+    return `
+    <div class="listitem${detailHtml ? " open" : ""}">
+      <div class="listrow${active ? " on" : ""}${hiddenNow ? " off" : ""}" data-row="${a}">
+        <div class="info">
+          <div class="name">
+            <span class="wallet-ic${active ? " on" : ""}${hiddenNow && active ? " off" : ""}">${ICON_WALLET}</span>
+            <span class="name-txt">${esc(w.name)}</span>
+          </div>
+        </div>
+        ${metaHtml}
+      </div>
+      ${detailHtml ? `<div class="detail">${detailHtml}</div>` : ""}
+      ${actionsHtml}
+    </div>`;
+  }).join("");
+  return `<div class="listbox">${rows}</div>${S.selected ? "" : walletsSummaryBox()}`;
+}
+
+function render(force){
+  Live.sync();
+  const {screen} = S;
+  const more = screen === "more";
+  const prices = screen === "prices";
+  const btc = screen === "btclive";
+  $("toggleList").innerHTML = ICON_BACK;
+  $("toggleList").style.display = screen === "main" ? "none" : "";
+  $("title").textContent = prices ? "Crypto Prices" : more ? "More" : screen === "list" ? "Wallets" : APP_TITLE;
+  $("refreshAll").style.display = screen === "main" ? "" : "none";
+  $("addWalletBtn").style.display = screen === "list" ? "" : "none";
+  $("sortBtn").style.display = screen === "main" ? "" : "none";
+  $("sortBtn").innerHTML = SORT_ICONS[S.sortMode];
+  renderUpdated();
+
+  const hs = history.state || {};
+  if(hs.screen !== screen || (hs.sel || null) !== (S.selected || null)){
+    history.replaceState({...hs, screen, sel: S.selected || null}, "");
+  }
+
+  if(!(more && S.shown === "more" && !force)){
+    const html = (prices || btc) ? "" : more ? moreView() : screen === "list" ? listView() : mainView();
+    if(html !== S.html || S.shown !== screen){
+      $("list").innerHTML = html;
+      S.html = html;
+    }
+    S.shown = screen;
+  }
+  syncPrices(prices);
+  syncBtc(btc);
+  syncOrientation();
+  syncHeaderHeight();
+}
+
+/* Long-press (3 s) on a position row on the main screen → open the Wallets
+   list, select that wallet and show its positions. Back returns to the main
+   screen and highlights the same position row. */
+const LONG_PRESS_MS = 3000;
+const LONG_PRESS_MOVE_PX = 10;
+let lpTimer = null, lpStart = null, lpSuppressClick = false;
+
+function cancelLongPress(){
+  clearTimeout(lpTimer);
+  lpTimer = null;
+  lpStart = null;
+}
+
+function jumpToWallet(addr, coin){
+  if(!S.wallets.some(w => w.addr === addr)) return;
+  hideInfo();
+  S.fromLongPress = true;
+  S.revealPos = {addr, coin};
+  history.pushState({screen: "list", from: S.screen, sel: addr}, "");
+  S.screen = "list";
+  S.selected = addr;
+  render();
+  refreshAll(true);
+  refreshOne(addr);
+  nextAlert();
+}
+
+$("list").addEventListener("pointerdown", e => {
+  if(S.screen !== "main") return;
+  if(e.pointerType === "mouse" && e.button !== 0) return;
+  const row = e.target.closest("[data-info]");
+  if(!row) return;
+  cancelLongPress();
+  lpStart = {x: e.clientX, y: e.clientY};
+  const addr = row.dataset.info;
+  const coin = row.dataset.coin;
+  lpTimer = setTimeout(() => {
+    lpTimer = null;
+    lpStart = null;
+    lpSuppressClick = true;
+    try{ if(navigator.vibrate) navigator.vibrate(30); }catch(err){}
+    jumpToWallet(addr, coin);
+  }, LONG_PRESS_MS);
+});
+
+$("list").addEventListener("pointermove", e => {
+  if(!lpStart) return;
+  if(Math.abs(e.clientX - lpStart.x) > LONG_PRESS_MOVE_PX || Math.abs(e.clientY - lpStart.y) > LONG_PRESS_MOVE_PX){
+    cancelLongPress();
+  }
+});
+
+$("list").addEventListener("pointerup", () => {
+  cancelLongPress();
+  if(lpSuppressClick){
+    setTimeout(() => { lpSuppressClick = false; }, 300);
+  }
+});
+["pointercancel", "pointerleave"].forEach(ev =>
+  $("list").addEventListener(ev, () => {
+    cancelLongPress();
+    lpSuppressClick = false;
+  })
+);
+
+document.addEventListener("touchmove", cancelLongPress, {passive: true});
+document.addEventListener("touchstart", e => { if(e.touches.length > 1) cancelLongPress(); }, {passive: true});
+document.addEventListener("scroll", cancelLongPress, {passive: true});
+
+$("list").addEventListener("click", e => {
+  if(!lpSuppressClick) return;
+  lpSuppressClick = false;
+  e.stopPropagation();
+  e.preventDefault();
+}, true);
+
+$("list").addEventListener("input", e => {
+  if(e.target.id !== "tgChat") return;
+  clearTimeout(S.timers.tgSave);
+  S.timers.tgSave = setTimeout(saveTelegram, TG_SAVE_DELAY_MS);
+});
+
+const actions = {
+  backup: backupWallets, restore: () => show("restoreOverlay", true),
+  addnew: () => openAdd(),
+  info: (a, el) => openInfo(a, el.dataset.coin),
+  refresh: refreshOne, bell: toggleAlert, fav: toggleFav, hidebtn: hideWallet, unhide: unhideWallet,
+  del: askDelete, copy: copyText, link: openExplorer, rename: renameWallet
+};
+
+$("list").addEventListener("click", e => {
+  if(e.target.closest("#tgChat")) return;
+  const tog = e.target.closest("[data-tog]");
+  if(tog){ setCfg(tog.dataset.tog, !S.cfg[tog.dataset.tog]); return; }
+  const int = e.target.closest("[data-int]");
+  if(int){ setCfg(int.dataset.int, Number(int.dataset.val)); return; }
+  for(const k in actions){
+    const el = e.target.closest(`[data-${k}]`);
+    if(el){ actions[k](el.dataset[k], el); return; }
+  }
+  const row = e.target.closest("[data-row]");
+  if(row){
+    S.selected = S.selected === row.dataset.row ? null : row.dataset.row;
+    S.fromLongPress = false;
+    render();
+    if(S.selected) refreshOne(S.selected);
+  }
+});
+
+$("toggleList").onclick = back;
+$("refreshAll").onclick = () => refreshAll();
+$("sortBtn").onclick = () => {
+  S.sortMode = SORT_MODES[(SORT_MODES.indexOf(S.sortMode) + 1) % SORT_MODES.length];
+  render();
+};
+
+/* Pull down on an open address to refresh that address */
+let pullStartY = null;
+document.addEventListener("touchstart", e => {
+  pullStartY = (S.screen === "list" && S.selected && window.scrollY <= 0) ? e.touches[0].clientY : null;
+}, {passive: true});
+document.addEventListener("touchmove", e => {
+  if(pullStartY === null) return;
+  if(e.touches[0].clientY - pullStartY > PULL_REFRESH_PX){
+    const a = S.selected;
+    pullStartY = null;
+    if(a) refreshOne(a);
+  }
+}, {passive: true});
+["touchend", "touchcancel"].forEach(ev =>
+  document.addEventListener(ev, () => { pullStartY = null; }, {passive: true})
+);
+
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden) return;
+  keepAwake();
+  Live.kick();
+  if(Date.now() - (S.lastRefresh || 0) > refreshMs()) refreshAll();
+});
+
+async function syncFrom(type){
+  try{
+    if(type === "cache") S.cache = cleanCache(await Store.get("cache"));
+    else{
+      const s = await Store.get("state");
+      if(s) Store.apply(s);
+      scheduleTimers();
+      syncMore();
+    }
+    render();
+  }catch(e){
+    toast("Sync with another tab failed");
+  }
+}
+Store.listen(syncFrom);
+
+async function init(){
+  const st = history.state || {};
+  if(st.screen === "list" || st.screen === "more"){
+    S.screen = st.screen;
+    S.selected = st.screen === "list" && st.sel ? st.sel : null;
+  }
+  history.replaceState({...st, screen: S.screen, from: st.from || "main", sel: S.selected || null}, "");
+  await Store.load();
+  scheduleTimers();
+  Live.kick();
+  render();
+  keepAwake();
+  const entryAll = S.screen === "list";
+  refreshAll(entryAll).then(() => refreshAll(entryAll, true));
+  const draft = readDraft();
+  if(draft) openAdd(draft);
+}
+init();
+</script>
 </body>
 </html>
